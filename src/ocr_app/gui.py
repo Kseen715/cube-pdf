@@ -20,6 +20,8 @@ from PySide6.QtWidgets import (
     QAbstractItemView,
     QApplication,
     QCheckBox,
+    QDialog,
+    QDialogButtonBox,
     QFileDialog,
     QHBoxLayout,
     QLabel,
@@ -27,14 +29,15 @@ from PySide6.QtWidgets import (
     QListWidgetItem,
     QMainWindow,
     QMessageBox,
+    QPlainTextEdit,
     QProgressBar,
     QPushButton,
     QVBoxLayout,
     QWidget,
 )
 
-from ocr_app import APP_NAME, INPUT_EXTENSIONS, LANGUAGES, OUTPUT_SUFFIX, ipc
-from ocr_app.bundle import asset
+from ocr_app import APP_NAME, INPUT_EXTENSIONS, LANGUAGES, OUTPUT_SUFFIX, SOURCE_URL, ipc
+from ocr_app.bundle import asset, legal_file
 from ocr_app.winjob import KillOnCloseJob
 
 # OCRmyPDF progress step -> (what we tell the user, start %, end %) of one file
@@ -68,6 +71,20 @@ ERRORS = {
     'other': 'Что-то пошло не так.',
     'crash': 'Распознавание неожиданно прервалось.',
 }
+
+# The AGPL asks every interactive program to show these notices
+ABOUT = (
+    '<p><b>{name}</b><br>Copyright © 2026 Denis Korenev</p>'
+    '<p>Это свободная программа: её можно распространять и изменять на условиях '
+    'GNU Affero General Public License версии 3 или (по вашему выбору) любой '
+    'более поздней версии.</p>'
+    '<p>Программа распространяется <b>без каких-либо гарантий</b>, в том числе '
+    'без гарантий товарной пригодности и пригодности для определённой цели.</p>'
+    '<p>Исходный код: <a href="{url}">{url}</a></p>'
+    '<p>Внутри: OCRmyPDF, Tesseract, Ghostscript, Qt, Python и другие свободные '
+    'компоненты. Их лицензии и где взять их исходный код — по кнопке '
+    '«Сторонние компоненты».</p>'
+)
 
 GREEN = QColor('#43a047')
 RED = QColor('#e53935')
@@ -285,6 +302,16 @@ class MainWindow(QMainWindow):
         self.progress = QProgressBar()
         self.progress.setRange(0, 100)
         layout.addWidget(self.progress)
+
+        about_row = QHBoxLayout()
+        about_row.addStretch(1)
+        about_btn = QPushButton('О программе и лицензиях')
+        about_btn.setFlat(True)
+        about_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        about_btn.clicked.connect(self.show_about)
+        about_row.addWidget(about_btn)
+        layout.addLayout(about_row)
+        QShortcut(QKeySequence.StandardKey.HelpContents, self, self.show_about)
 
     @staticmethod
     def _step(text: str) -> QLabel:
@@ -592,6 +619,49 @@ class MainWindow(QMainWindow):
         if task.details.strip():
             box.setDetailedText(task.details.strip())
         box.exec()
+
+    def show_about(self) -> None:
+        dialog = QDialog(self)
+        dialog.setWindowTitle(f'О программе — {APP_NAME}')
+        dialog.setMinimumWidth(560)
+        layout = QVBoxLayout(dialog)
+        text = QLabel(ABOUT.format(name=APP_NAME, url=SOURCE_URL))
+        text.setTextFormat(Qt.TextFormat.RichText)
+        text.setWordWrap(True)
+        text.setOpenExternalLinks(True)
+        layout.addWidget(text)
+        buttons = QDialogButtonBox()
+        buttons.addButton('Закрыть', QDialogButtonBox.ButtonRole.RejectRole)
+        for label, name in (
+            ('Лицензия программы', 'LICENSE'),
+            ('Сторонние компоненты', 'THIRD-PARTY-NOTICES.txt'),
+        ):
+            button = buttons.addButton(label, QDialogButtonBox.ButtonRole.ActionRole)
+            button.clicked.connect(lambda _=False, n=name: self._show_text(dialog, n))
+        buttons.rejected.connect(dialog.reject)
+        layout.addWidget(buttons)
+        dialog.exec()
+
+    @staticmethod
+    def _show_text(parent: QWidget, name: str) -> None:
+        path = legal_file(name)
+        try:
+            text = path.read_text(encoding='utf-8')
+        except OSError:
+            text = f'Файл не найден: {path}'
+        dialog = QDialog(parent)
+        dialog.setWindowTitle(name)
+        dialog.resize(760, 640)
+        layout = QVBoxLayout(dialog)
+        view = QPlainTextEdit(text)
+        view.setReadOnly(True)
+        view.setFont(QFont('Consolas', 10))
+        layout.addWidget(view)
+        buttons = QDialogButtonBox()
+        buttons.addButton('Закрыть', QDialogButtonBox.ButtonRole.RejectRole)
+        buttons.rejected.connect(dialog.reject)
+        layout.addWidget(buttons)
+        dialog.exec()
 
     def _refresh(self) -> None:
         running = self.run is not None

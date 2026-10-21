@@ -1,0 +1,69 @@
+# Builds OCR-PDF.exe on every push and pull request. Pushing a tag like v1.2.0
+# also publishes a GitHub release with the exe, the license notices and the
+# source code of the bundled copyleft components.
+name: Build
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.14'
+
+      # Installers and language files; fetch_vendor.py checks their hashes anyway
+      - uses: actions/cache@v6
+        with:
+          path: vendor/_downloads
+          key: vendor-downloads-${{ hashFiles('tools/fetch_vendor.py') }}
+
+      - name: Build
+        shell: pwsh
+        run: ./build.ps1
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: OCR-PDF
+          path: |
+            dist/OCR-PDF.exe
+            dist/THIRD-PARTY-NOTICES.txt
+            dist/LICENSE
+          if-no-files-found: error
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: OCR-PDF
+          path: dist
+
+      # The (A)GPL and LGPL parts of the exe must ship with their source code
+      - name: Download copyleft sources
+        run: python3 tools/fetch_vendor.py --sources dist/sources
+
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >
+          gh release create "$GITHUB_REF_NAME"
+          dist/OCR-PDF.exe dist/THIRD-PARTY-NOTICES.txt dist/LICENSE dist/sources/*
+          --title "$GITHUB_REF_NAME" --generate-notes

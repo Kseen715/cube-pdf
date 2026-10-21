@@ -9,7 +9,12 @@ a = Analysis(
     # progress_plugin is loaded by name through OCRmyPDF's plugin manager;
     # worker and gui are imported inside functions
     hiddenimports=['ocr_app.progress_plugin', 'ocr_app.worker', 'ocr_app.gui'],
-    datas=[('assets/app.ico', 'assets')],
+    # LICENSE and the notices are shown by the About dialog
+    datas=[
+        ('assets/app.ico', 'assets'),
+        ('LICENSE', '.'),
+        ('build/THIRD-PARTY-NOTICES.txt', '.'),
+    ],
     excludes=['PySide6.QtNetwork', 'PySide6.QtQml', 'PySide6.QtQuick'],
     noarchive=False,
 )

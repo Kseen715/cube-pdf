@@ -18,6 +18,13 @@ def asset(name: str) -> Path:
     return resource_root() / 'assets' / name
 
 
+def legal_file(name: str) -> Path:
+    """LICENSE or THIRD-PARTY-NOTICES.txt (generated into build/ in a checkout)."""
+    if getattr(sys, 'frozen', False) or name == 'LICENSE':
+        return resource_root() / name
+    return resource_root() / 'build' / name
+
+
 def activate_vendor_programs() -> None:
     """Make OCRmyPDF use the bundled Tesseract and Ghostscript.
 
