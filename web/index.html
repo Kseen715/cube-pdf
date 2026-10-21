@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Распознавание PDF</title>
+<link rel="icon" href="icon.png">
+<link rel="stylesheet" href="app.css">
+<script type="module" src="js/app.js"></script>
+</head>
+<body>
+<main>
+  <h1>Сделать PDF, в котором можно искать текст</h1>
+  <p class="hint" id="intro"></p>
+
+  <h2>1. Выберите файлы</h2>
+  <button id="drop" class="drop" type="button">
+    Нажмите сюда, чтобы выбрать файлы<br>или перетащите их в это окно
+  </button>
+  <ul id="tasks" class="tasks"></ul>
+  <div class="row">
+    <span class="hint grow">Двойной щелчок по готовому файлу откроет его.</span>
+    <button id="clear" type="button">Очистить список</button>
+  </div>
+
+  <h2>2. На каком языке текст в документе?</h2>
+  <div class="row options" id="languages"></div>
+  <p class="hint">Можно отметить несколько. Не уверены — оставьте как есть.</p>
+
+  <details id="more">
+    <summary>Дополнительные настройки</summary>
+    <div class="options column">
+      <label><input type="checkbox" id="deskew">
+        Выпрямлять кривые (наклонённые) страницы</label>
+      <label><input type="checkbox" id="force">
+        Распознать заново, даже если в файле уже есть текст</label>
+    </div>
+  </details>
+
+  <h2>3. Нажмите кнопку</h2>
+  <button id="start" class="start" type="button"></button>
+  <p id="status" class="status"></p>
+  <progress id="progress" max="100" value="0"></progress>
+
+  <footer>
+    <button id="about" class="link" type="button">
+      О программе и лицензиях</button>
+  </footer>
+</main>
+<dialog id="dialog"></dialog>
+<input type="file" id="file-input" multiple hidden>
+</body>
+</html>

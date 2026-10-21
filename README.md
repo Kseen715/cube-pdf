@@ -1,124 +1,157 @@
 # OCR-PDF
 
-A single-file Windows app (`OCR-PDF.exe`) that wraps [OCRmyPDF](https://github.com/ocrmypdf/OCRmyPDF).
-The interface is in Russian. You pick scans, press one button, and get a searchable PDF next to
-each original, named `<name>_ocr.pdf`. Nothing needs to be installed on the target PC.
+Turns scans and photos of documents into searchable PDF/A files. You pick files, press one
+button, and get `<name>_ocr.pdf`. The interface is in Russian.
 
-## What is inside the exe
+One code base, three builds:
 
-| Component | Version | Notes |
+| Build | Where the OCR runs | Result |
 | --- | --- | --- |
-| Python | 3.14 (the build machine's; CI uses 3.14) | embedded by PyInstaller |
-| OCRmyPDF | 17.13.0 | plus pikepdf, pypdfium2, fpdf2, Pillow |
-| Qt (PySide6-Essentials) | 6.12.0 | GUI |
-| Tesseract | 5.5.3 (official Windows build) | `tessdata` 4.1.0: `rus`, `eng`, `deu`, `osd`; only the DLLs `tesseract.exe` loads |
-| Ghostscript | 10.08.0 | fallback for PDF/A; MSVC runtime DLLs copied next to it |
+| Windows app (installer or portable zip) | natively, one Tesseract per CPU core | next to the original |
+| Linux app (`.deb`, `.rpm`) | natively, one Tesseract per CPU core | next to the original |
+| Web version (GitHub Pages) | in the browser: WebAssembly in Web Workers, on the visitor's CPU | downloaded; files never leave the computer |
 
-`unpaper`, `jbig2enc` and `pngquant` are left out. They are optional in OCRmyPDF and only
-matter for `--clean` and `--optimize 2/3`, which this app does not use.
+The web version gives the same text as the apps (same engine, same models). It is slower: a
+24-page scan took 4.6 s in the Windows app and 7–12 s in Chromium on a 16-thread CPU. On the
+first visit it also downloads about 70 MB of language models, which the browser then keeps.
 
-## Building
+## What is inside
 
-You need Python 3.11+ and 7-Zip (`7z.exe` on PATH or in Program Files).
+| Component | Version | Used for |
+| --- | --- | --- |
+| [Tesseract](https://github.com/tesseract-ocr/tesseract) | 5.5.3 | OCR and page orientation |
+| [tessdata](https://github.com/tesseract-ocr/tessdata) | 4.1.0 | `rus`, `eng`, `deu`, `osd` models |
+| [Leptonica](https://github.com/DanBloomberg/leptonica) | 1.87.0 | deskewing, image handling for Tesseract |
+| [MuPDF](https://mupdf.com) | 1.28.5 | reading PDFs and images, rendering pages, writing the text layer |
+| [Ghostscript](https://ghostscript.com) | 10.08.0 | PDF/A-2b |
+| [zlib](https://zlib.net) | 1.3.2 | compression |
+| [Tauri](https://tauri.app) | 2.12 | the desktop window (WebView2 on Windows, WebKitGTK on Linux) |
 
-```powershell
-powershell -ExecutionPolicy Bypass -File build.ps1
-```
-
-The script:
-
-1. creates `.venv` and installs `requirements.txt`
-2. runs `tools/fetch_vendor.py`, which downloads the Tesseract/Ghostscript installers and language
-   files, checks them against pinned SHA-256 hashes, and unpacks them with 7-Zip into `vendor/`
-   (no admin rights, nothing installed system-wide). Tesseract's training tools are dropped,
-   together with the DLLs only they need (GLib, Pango, Cairo, ICU and so on).
-3. runs `tools/collect_licenses.py`, which writes `build/THIRD-PARTY-NOTICES.txt`
-4. runs `tools/make_assets.py`, which draws the icon and the splash image
-5. runs PyInstaller with `ocr_app.spec`, producing `dist\OCR-PDF.exe`, and copies `LICENSE` and
-   `THIRD-PARTY-NOTICES.txt` next to it
-
-After pulling changes to `tools/fetch_vendor.py`, run `.venv\Scripts\python tools\fetch_vendor.py
---force` once, so `vendor/` is unpacked again.
-
-### GitHub Actions
-
-`.github/workflows/build.yml` runs `build.ps1` on `windows-latest` for every push and pull
-request and uploads the exe as a workflow artifact. Pushing a tag that starts with `v` also
-creates a GitHub release with:
-
-- `OCR-PDF.exe`
-- `LICENSE` and `THIRD-PARTY-NOTICES.txt`
-- the exact source tarballs of the bundled copyleft code: Ghostscript (AGPL), GNU libiconv,
-  gettext's libintl, libunistring, libidn2 (LGPL) and JBIG-KIT (GPL), all downloaded by
-  `tools/fetch_vendor.py --sources`
-
-```powershell
-git tag v1.0.0
-git push origin v1.0.0
-```
-
-When you update Tesseract or Ghostscript, update `SOURCES` in `tools/fetch_vendor.py` and the
-versions in `NATIVE` in `tools/collect_licenses.py` too. The DLL versions can be read with
-`tesseract --version` and from the DLLs' exported version symbols.
-
-To work on the code without building, run `.venv\Scripts\python app.py` after the first build
-(it reuses `vendor/`).
-
-Code is formatted and linted with [Ruff](https://docs.astral.sh/ruff/) (settings in `ruff.toml`):
-
-```powershell
-.venv\Scripts\python -m pip install -r requirements-dev.txt
-.venv\Scripts\python -m ruff format .
-.venv\Scripts\python -m ruff check .
-```
+`deps/versions.mk` pins every source tarball by SHA-256. The full list, with the libraries
+MuPDF and Ghostscript bundle, is in each build's `THIRD-PARTY-NOTICES.txt`.
 
 ## How it works
 
-- `src/ocr_app/gui.py` is the window, built from `task_list.py` (the file list), `dialogs.py`
-  (message boxes, About) and `widgets.py` (style and small helpers). Each file is processed by
-  starting the same exe again as `OCR-PDF.exe --worker <json>` (`worker_process.py`), so the UI
-  never freezes and **Stop** can kill a job.
-- `src/ocr_app/worker.py` puts the bundled `tesseract` and `gswin64c` first on `PATH`, sets
-  `TESSDATA_PREFIX`, and calls `ocrmypdf.ocr()`. It reports progress, log lines and errors as
-  JSON lines on stdout (`ipc.py`, `progress_plugin.py`).
-- Worker processes get the `CREATE_NO_WINDOW` flag, so Tesseract never flashes a console window.
-  Each worker runs in a Windows job object (`winjob.py`), so Stop, or closing the app, also kills
-  its Tesseract processes. Each worker also gets its own temp folder, which is deleted afterwards.
-- A onefile child started this way reuses the parent's unpacked `_MEI*` folder. Only the first
-  launch pays the unpacking cost, about 3–4 s.
+```text
+web/            the window: HTML/CSS/JS, the same page everywhere
+  js/app.js        file list, options, progress, dialogs
+  js/engine-desktop.js   runs ocr-pdf-core through Tauri (desktop)
+  js/engine-web.js       runs the WebAssembly core in Web Workers (browser)
+core/src/       the OCR pipeline, C/C++, compiled natively and to WebAssembly
+  pdf.c            MuPDF: images to PDF, page analysis, rendering, text layers
+  ocr.cpp          Tesseract and Leptonica: orientation, deskew, OCR per page
+  pdfa.cpp         Ghostscript's PDF/A arguments
+  cli.cpp          ocr-pdf-core: pages in parallel threads, JSON progress
+  wasm.cpp         the same steps for the Web Workers
+desktop/        the Tauri shell: plugins only, no OCR logic
+deps/           pinned sources and our patches
+mk/, Makefile   the build, one fragment per step and per target
+docker/         the three toolchains (Linux, Windows cross-compile, Emscripten)
+```
 
-OCRmyPDF settings used:
+For each file:
 
-- the languages ticked in the UI (default: Russian + English)
-- `mode=skip`: pages that already contain text are copied unchanged. The **Распознать заново**
-  checkbox switches to `mode=force`.
-- `rotate_pages=True`, plus optional `deskew`
-- `output_type=auto`: PDF/A when that is possible without loss, otherwise a regular PDF
-- `invalidate_digital_signatures=True`, because the original file keeps its signature
-- `image_dpi=300` for images that have no usable DPI information
+1. **Prepare.** A PDF is used as it is; a JPEG, PNG or TIFF becomes a PDF page as large as the
+   image is at its resolution (300 dpi when the file has none). JPEGs are kept as they are.
+2. **OCR each page**, in parallel:
+   - pages that already have text are skipped, unless "Распознать заново" is ticked;
+   - the page is rendered at the resolution of its sharpest image (300–600 dpi);
+   - Tesseract's orientation detection turns it upright when it is sure (threshold 14, as in
+     OCRmyPDF);
+   - with "Выпрямлять", Leptonica straightens it;
+   - Tesseract writes an invisible text layer (its own text-only PDF renderer, as OCRmyPDF
+     uses).
+3. **Assemble.** Each text layer is placed over its page in a copy of the PDF, so the
+   original images stay untouched. Pages that were straightened, or whose old text was
+   replaced, get the new image.
+4. **PDF/A.** Ghostscript converts the result to PDF/A-2b, keeping JPEGs as they are and
+   compressing everything else losslessly. If that fails, the result is a regular PDF.
 
-## GPU
+The desktop app starts `ocr-pdf-core` once per file, so **Stop** simply ends that process (on
+Windows a job object takes Ghostscript with it). The result is written next to the original
+only when it is complete. On Windows, a manifest switches the programs to UTF-8, so paths
+with Cyrillic letters work.
 
-GPU acceleration is not included. Tesseract runs only on the CPU, and OCRmyPDF already runs one
-Tesseract per core. On a 16-thread CPU that came to about 4 pages/s on test scans. The only GPU options are
-third-party engine plugins built on PyTorch (for example `ocrmypdf-easyocr`). They would add
-3–4 GB to the exe and make every launch slower (the onefile has to unpack all of it each time),
-and their text layer is less accurate than Tesseract's for Russian and German documents.
+## Building
+
+Everything is built from source inside Docker, the same way locally and in CI. You need
+Docker and `make`; nothing else is installed on the machine.
+
+```sh
+tools/docker-make.sh linux     # dist/linux: .deb, .rpm
+tools/docker-make.sh windows   # dist/windows: installer, portable zip
+tools/docker-make.sh wasm      # dist/wasm: the static web site
+```
+
+The first build of a target takes 15–30 minutes (Docker image, libraries, Rust crates); later
+ones only rebuild what changed. The build directory is `out/`. Under WSL, a named Docker volume
+is much faster: `OCR_BUILD=ocr-build tools/docker-make.sh linux`.
+
+Other goals, passed after the target:
+
+- `core`: only `ocr-pdf-core`, `ocr-pdf-gs` and the models, in `out/<target>/bin`
+- `notices`: only `THIRD-PARTY-NOTICES.txt`
+- `sources`: the source tarballs that every release attaches
+
+`ocr-pdf-core` can be used on its own:
+
+```sh
+ocr-pdf-core run --input scan.pdf --output scan_ocr.pdf --languages rus+eng [--deskew] [--force]
+```
+
+To try the web version locally, serve `dist/wasm` with any static server, for example
+`python -m http.server -d dist/wasm`.
+
+### GitHub Actions
+
+`.github/workflows/build.yml` builds all three targets for every push and pull request.
+Pushes to `main` also publish the web version on GitHub Pages; this needs **Settings → Pages →
+Source: GitHub Actions** once. Pushing a tag that starts with `v` creates a GitHub release with:
+
+- the Windows installer and portable zip, the Linux `.deb` and `.rpm`, the web site as a zip
+- `LICENSE` and the `THIRD-PARTY-NOTICES-<target>.txt` files
+- the source tarballs of everything compiled into the programs
+
+```sh
+git tag v2.0.0
+git push origin v2.0.0
+```
+
+### Tools
+
+`tools/` holds Python scripts: `collect_licenses.py` (run by the build) and `make_assets.py`,
+which draws `assets/icon.png`. They are formatted and linted with
+[Ruff](https://docs.astral.sh/ruff/) (settings in `ruff.toml`):
+
+```sh
+python -m pip install -r requirements-dev.txt
+python -m ruff format .
+python -m ruff check .
+```
 
 ## License
 
 OCR-PDF is licensed under the GNU Affero General Public License v3.0 or later (see `LICENSE`).
-It bundles third-party software under its own licenses: OCRmyPDF (MPL-2.0), Tesseract
-(Apache-2.0), Ghostscript (AGPL-3.0), Qt/PySide6 (LGPL-3.0) and others.
-`THIRD-PARTY-NOTICES.txt` lists every component with its full license text; the app shows it under
-**О программе и лицензиях** (F1). The license files of Tesseract's DLLs are kept in `licenses/`.
+It is built from third-party software under its own licenses: MuPDF and Ghostscript
+(AGPL-3.0), Tesseract (Apache-2.0), Leptonica (BSD-2-Clause), Tauri (MIT/Apache-2.0) and
+others. `THIRD-PARTY-NOTICES.txt` lists every component of a build with its full license text;
+the app shows it under **О программе и лицензиях** (F1). Releases attach the exact source code
+of every library in the programs.
 
-OCR-PDF is not affiliated with or endorsed by the OCRmyPDF, Tesseract or Ghostscript projects.
+There is no AppImage: it would have to carry GTK, WebKitGTK and their dependencies. The `.deb`
+and `.rpm` packages use the distribution's own copies instead.
+
+OCR-PDF is not affiliated with or endorsed by the OCRmyPDF, Tesseract, MuPDF or Ghostscript
+projects.
 
 ## Как пользоваться
 
-1. Запустите `OCR-PDF.exe`. Можно сразу перетащить PDF на значок программы.
-2. Нажмите на большую рамку и выберите файлы, или перетащите их в окно. Подходят PDF, JPG, PNG и TIFF.
+1. Установите программу (Windows: `OCR-PDF_…_x64-setup.exe` или распакуйте zip; Linux: `.deb`
+   или `.rpm`), либо откройте веб-версию в браузере. Можно сразу перетащить PDF или папку на
+   значок программы.
+2. Нажмите на большую рамку и выберите файлы, или перетащите их (или папку) в окно. Подходят
+   PDF, JPG, PNG и TIFF.
 3. Отметьте языки текста.
 4. Нажмите зелёную кнопку **НАЧАТЬ РАСПОЗНАВАНИЕ**.
-5. Готовый файл `имя_ocr.pdf` появится рядом с исходным. Исходный файл не меняется.
+5. Готовый файл `имя_ocr.pdf` появится рядом с исходным (в веб-версии — скачается). Исходный
+   файл не меняется.

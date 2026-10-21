@@ -1,6 +1,8 @@
-# Builds OCR-PDF.exe on every push and pull request. Pushing a tag like v1.2.0
-# also publishes a GitHub release with the exe, the license notices and the
-# source code of the bundled copyleft components.
+# Builds everything from source in the Docker toolchains (docker/), on every
+# push and pull request: the Linux and Windows desktop apps and the web
+# version. Pushes to main also publish the web version on GitHub Pages.
+# Pushing a tag like v2.0.0 publishes a GitHub release with the apps, their
+# license notices and the source tarballs of everything compiled into them.
 name: Build
 
 on:
@@ -15,32 +17,62 @@ permissions:
 
 jobs:
   build:
-    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [linux, windows, wasm]
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
 
-      - uses: actions/setup-python@v7
-        with:
-          python-version: '3.14'
-
-      # Installers and language files; fetch_vendor.py checks their hashes
+      # Source tarballs and language models; make checks their hashes
       - uses: actions/cache@v6
         with:
-          path: vendor/_downloads
-          key: vendor-downloads-${{ hashFiles('tools/fetch_vendor.py') }}
+          path: out/downloads
+          key: downloads-${{ hashFiles('deps/versions.mk') }}
+
+      # Crates and the MSVC runtime that cargo-xwin downloads
+      - uses: actions/cache@v6
+        if: matrix.target != 'wasm'
+        with:
+          path: |
+            out/cargo-home/registry
+            out/xwin
+          key: cargo-${{ matrix.target }}-${{ hashFiles('**/Cargo.lock') }}
 
       - name: Build
-        shell: pwsh
-        run: ./build.ps1
+        run: tools/docker-make.sh ${{ matrix.target }}
 
       - uses: actions/upload-artifact@v7
         with:
-          name: OCR-PDF
-          path: |
-            dist/OCR-PDF.exe
-            dist/THIRD-PARTY-NOTICES.txt
-            dist/LICENSE
+          name: OCR-PDF-${{ matrix.target }}
+          path: dist/${{ matrix.target }}
           if-no-files-found: error
+
+  pages:
+    if: github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: OCR-PDF-wasm
+          path: site
+
+      - uses: actions/configure-pages@v6
+
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: site
+
+      - id: deploy
+        uses: actions/deploy-pages@v5
 
   release:
     if: startsWith(github.ref, 'refs/tags/v')
@@ -53,18 +85,29 @@ jobs:
 
       - uses: actions/download-artifact@v8
         with:
-          name: OCR-PDF
           path: dist
 
-      # The (A)GPL and LGPL parts of the exe must ship with their source code
-      - name: Download copyleft sources
-        run: python3 tools/fetch_vendor.py --sources dist/sources
+      # The (A)GPL parts must ship with their exact source code; the
+      # release carries the source of every library in the programs
+      - name: Collect source tarballs
+        run: make TARGET=wasm B=out SOURCES_DIR=sources sources
+
+      - name: Assemble release files
+        run: |
+          mkdir -p release
+          for target in linux windows wasm; do
+            cp "dist/OCR-PDF-$target/THIRD-PARTY-NOTICES.txt" \
+              "release/THIRD-PARTY-NOTICES-$target.txt"
+          done
+          cp dist/OCR-PDF-linux/*.deb dist/OCR-PDF-linux/*.rpm release/
+          cp dist/OCR-PDF-windows/*-setup.exe \
+            dist/OCR-PDF-windows/*-portable.zip release/
+          (cd dist/OCR-PDF-wasm && zip -qr ../../release/OCR-PDF-web.zip .)
+          cp LICENSE release/
 
       - name: Publish release
         env:
           GH_TOKEN: ${{ github.token }}
         run: >
-          gh release create "$GITHUB_REF_NAME"
-          dist/OCR-PDF.exe dist/THIRD-PARTY-NOTICES.txt dist/LICENSE
-          dist/sources/*
+          gh release create "$GITHUB_REF_NAME" release/* sources/*
           --title "$GITHUB_REF_NAME" --generate-notes

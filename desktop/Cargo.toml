@@ -1,0 +1,24 @@
+# The desktop shell (Tauri): a window that shows the shared page from web/
+# and starts the native ocr-pdf-core. Built by mk/desktop.mk.
+[package]
+name = "ocr-pdf"
+version = "2.0.0"
+edition = "2021"
+license = "AGPL-3.0-or-later"
+publish = false
+
+[build-dependencies]
+tauri-build = { version = "2.7", features = [] }
+
+[dependencies]
+tauri = { version = "2.12", features = [] }
+tauri-plugin-dialog = "2.8"
+tauri-plugin-opener = "2.7"
+tauri-plugin-shell = "2.5"
+
+[profile.release]
+codegen-units = 1
+lto = true
+opt-level = "s"
+panic = "abort"
+strip = true

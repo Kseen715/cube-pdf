@@ -1,6 +1,26 @@
+# Build output (Makefile, tools/docker-make.sh)
+out/
+dist/
+
+# Written by Tauri when it builds or checks desktop/
+desktop/gen/
+desktop/target/
+desktop/icons/
+desktop/binaries/
+desktop/tessdata/
+
+# Python tools (tools/)
 .venv/
 __pycache__/
 *.pyc
-build/
-dist/
-vendor/
+.ruff_cache/
+
+# JavaScript tools, if any are installed for local testing
+node_modules/
+
+# Editors and operating systems
+*.swp
+*~
+.DS_Store
+Thumbs.db
+desktop.ini

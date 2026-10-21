@@ -2,91 +2,94 @@
 
 ## Keep the legal information in sync with the code
 
-OCR-PDF.exe redistributes third-party software, so every release has to carry correct
-license notices and the source code of its copyleft parts. These files hold that information:
+OCR-PDF ships third-party code in three builds (Windows, Linux, web), so every release has to
+carry correct license notices and the source code of its copyleft parts. These files hold that
+information:
 
 | File | What it holds |
 | --- | --- |
 | `LICENSE` | AGPL-3.0 text for this project's own code |
-| `tools/collect_licenses.py` | `REQUIREMENTS` (top-level runtime Python packages), `NATIVE` (every bundled non-Python component, with version, SPDX license, license files and source location), the notices header (it imports `SOURCE_URL` from the app) |
-| `licenses/` | Upstream license files of the native libraries, referenced from `NATIVE` |
-| `tools/fetch_vendor.py` | Pinned installers, plus `SOURCES`: exact source tarballs of every (A)GPL/LGPL native component, attached to each release |
-| `src/ocr_app/__init__.py` | `SOURCE_URL`, shown in the app and in the notices |
-| `src/ocr_app/dialogs.py` | `ABOUT`: copyright line, license statement, no-warranty statement |
-| `ocr_app.spec`, `build.ps1`, `.github/workflows/build.yml` | Bundle `LICENSE` and `THIRD-PARTY-NOTICES.txt` into the exe, copy them to `dist/`, attach them and the sources to releases |
-| `README.md` | "What is inside the exe" table, "License" section |
+| `deps/versions.mk` | Every source tarball the build compiles, with URL and SHA-256; `SOURCE_PACKAGES` lists the ones every release attaches |
+| `deps/patches/` | Our changes to upstream sources, applied while unpacking |
+| `tools/collect_licenses.py` | `components()`: every component in the programs, with version, SPDX license, license files and source location, per target; `ALLOWED_LICENSES` for Rust crates; the notices header |
+| `licenses/` | License files for what has no source tree in the build (the GCC and MinGW-w64 runtimes) |
+| `web/js/config.js` | `SOURCE_URL`, shown in the app and in the notices |
+| `web/js/dialogs.js` | `ABOUT`: copyright line, license statement, no-warranty statement |
+| `mk/desktop.mk`, `mk/web.mk`, `mk/windows.mk`, `mk/linux.mk`, `.github/workflows/build.yml` | Put `LICENSE` and `THIRD-PARTY-NOTICES.txt` into every package and site, and attach them and the source tarballs (`make sources`) to releases |
+| `README.md` | "What is inside" table, "License" section |
 
 Treat the legal update as part of the change itself, made in the same commit and never left
 for later.
 
-### When you change Python dependencies (`requirements.txt`)
+### When you change a library or tool in `deps/versions.mk`
 
-- The notices pick up transitive dependencies automatically. If you add a new **top-level**
-  runtime package, add it to `REQUIREMENTS` in `tools/collect_licenses.py`. Build-only tools
-  such as PyInstaller do not belong there.
-- Check the new package's license (and its dependencies' licenses). This project is AGPL-3.0,
-  so do not add anything proprietary, non-commercial, "no derivatives", or GPL-2.0-only.
-  If a license is unclear, stop and ask the user. Do not guess.
-- If the package ships native libraries whose license files are missing from its `.dist-info`
-  (as with the Qt LGPL text in PySide6), add the missing text to the notices the way
-  `collect_licenses.py` already does for PySide6.
+- Update its entry in `components()` in `tools/collect_licenses.py`. The libraries that
+  MuPDF and Ghostscript bundle (FreeType, libjpeg, OpenJPEG, jbig2dec, lcms2, libpng, Brotli,
+  extract) have their versions written there by hand: read them from the new source tree
+  (`freetype.h`, `jversion.h`, `lcms2mt.h`, `opj_config_private.h`, `jbig2.h`, `png.h`,
+  brotli's `version.h`) and update them.
+- Check which third-party code the new version compiles in: `ls $B/<target>/build/mupdf/thirdparty`
+  for MuPDF, the object files in `$B/<target>/src/ghostscript/obj` for Ghostscript. Every
+  library found there needs a `components()` entry; remove the entries of the ones that are
+  gone.
+- License texts are read from the unpacked sources (`src:` paths). If a file moved, fix the
+  path; never copy upstream license texts into this repository when the build has the source.
+- Keep `deps/patches/` applying cleanly, and say in the notices header what they change.
 - Update the README table when a major component's version changes.
 
-### When you change Tesseract, tessdata or Ghostscript (`tools/fetch_vendor.py`)
+### When you change the Rust crates of the desktop app (`desktop/Cargo.toml`)
 
-- Update the versions in `NATIVE` in `tools/collect_licenses.py`.
-- Run `tools/fetch_vendor.py --force`, then compare the DLLs in `vendor/tesseract/` with
-  `NATIVE`:
-  - Each new DLL needs a `NATIVE` entry and its upstream license file in `licenses/`,
-    downloaded from the release tag that matches the bundled version.
-  - Remove the entries and license files of DLLs that are gone.
-  - `tesseract --version` prints most library versions. For the others, read the DLL's
-    exported version symbol, for example `curl_version`, `_libiconv_version`,
-    `_libunistring_version`, `libintl_version` or `idn2_check_version`.
-- For every (A)GPL or LGPL component whose version changed, put the matching source tarball
-  in `SOURCES`, with its SHA-256 hash. Keep the tarball file names in `NATIVE`'s "source"
-  field matching.
-- Check that `tesseract.exe` and `gswin64c.exe` still work after the DLL pruning by OCRing a
-  test image through the built exe.
+- `collect_licenses.py` lists the crates from `cargo metadata` and stops the build when a crate
+  is under a license outside `ALLOWED_LICENSES`. Only add a license to that set after checking
+  that it allows combining with the AGPL-3.0. Never add proprietary, non-commercial,
+  "no derivatives" or GPL-2.0-only licenses. If a license is unclear, stop and ask the user.
+  Do not guess.
+- Commit the updated `desktop/Cargo.lock`.
 
 ### When you bundle anything new
 
-This covers any new file in `ocr_app.spec` `datas`/`binaries`, `vendor/`, fonts, icons,
-images and models.
+This covers any new file in the packages (`mk/desktop.mk` stage, `mk/web.mk` site, Tauri
+`resources` and `externalBin`), fonts, icons, images and models.
 
-- Give it a `NATIVE` entry with its license, plus its license file in `licenses/`.
-- If its license is (A)GPL or LGPL, add its exact source to `SOURCES`.
+- Give it a `components()` entry with its license and the targets it ships in.
+- If its license is (A)GPL or LGPL, add its exact source tarball to `deps/versions.mk` and
+  `SOURCE_PACKAGES`.
 - Assets this project creates itself (such as `tools/make_assets.py` output) are covered by
   `LICENSE` and need no entry.
-- Microsoft runtime DLLs may only be ones on Microsoft's Visual C++ redistributable list.
-  Mention any new one in the notices header.
+- Do not bundle libraries of the operating system (GTK, WebKitGTK, the Visual C++ runtime
+  DLLs). That is why there is no AppImage: it would have to carry GTK and WebKitGTK and their
+  LGPL sources. The MSVC runtime is linked statically; mention any other Microsoft component
+  in the notices header.
 
 ### Things that must not be removed or weakened
 
-- `LICENSE`, the About dialog (`show_about` in `src/ocr_app/dialogs.py`, opened with F1 and
-  the button in `src/ocr_app/gui.py`) and its no-warranty text. The AGPL requires
-  interactive programs to show these notices.
-- Bundling `LICENSE` and `THIRD-PARTY-NOTICES.txt` in the spec, copying them in `build.ps1`,
-  and attaching them and `dist/sources/*` to releases in the workflow.
-- The README sentence saying the project is not affiliated with OCRmyPDF, Tesseract or
-  Ghostscript. Do not use those projects' names or logos as this product's name or icon.
+- `LICENSE`, the About dialog (`showAbout` in `web/js/dialogs.js`, opened with F1 and the link
+  at the bottom of the window) and its no-warranty text. The AGPL requires interactive programs
+  to show these notices.
+- Putting `LICENSE` and `THIRD-PARTY-NOTICES.txt` into the desktop packages and the web site,
+  and attaching them and the source tarballs to releases in the workflow.
+- The README sentence saying the project is not affiliated with OCRmyPDF, Tesseract,
+  MuPDF or Ghostscript. Do not use those projects' names or logos as this product's name or
+  icon.
 
 ### Keep these consistent
 
-- `SOURCE_URL` in `src/ocr_app/__init__.py` must point at this repository. If the
-  repository moves or is renamed, update it; `tools/collect_licenses.py` imports it.
-- The copyright holder and year in `ABOUT` (`src/ocr_app/dialogs.py`) and the license named there,
-  in `LICENSE`, in the notices header and in the README "License" section must agree.
+- `SOURCE_URL` in `web/js/config.js` must point at this repository. If the repository moves or
+  is renamed, update it; `tools/collect_licenses.py` reads it.
+- The copyright holder and year in `ABOUT` (`web/js/dialogs.js`), in `desktop/tauri.conf.json`
+  and the license named there, in `LICENSE`, in the notices header and in the README "License"
+  section must agree.
 - Keep the files in `licenses/` exactly as upstream ships them. Do not edit their text.
 
 ### Before finishing a change that touches any of the above
 
-1. Run `powershell -ExecutionPolicy Bypass -File build.ps1`. It must regenerate
-   `build/THIRD-PARTY-NOTICES.txt` without errors.
+1. Build the targets the change affects, for example `tools/docker-make.sh linux`; each
+   regenerates `out/<target>/THIRD-PARTY-NOTICES.txt` and fails on a missing license file or a
+   refused crate. `tools/docker-make.sh <target> notices` does only that step.
 2. Read the "Components" list at the top of the notices and confirm that it matches what the
-   exe contains.
-3. If `SOURCES` changed, run `python tools/fetch_vendor.py --sources <scratch dir>` to confirm
-   every URL downloads and its hash matches.
+   programs contain.
+3. If `deps/versions.mk` changed, run `make TARGET=wasm SOURCES_DIR=<scratch dir> sources` to
+   confirm every URL downloads and its hash matches.
 4. In the final message to the user, list what changed in the legal files.
 
 ## Code style
@@ -106,7 +109,14 @@ is already there.
 - Do not repeat yourself (DRY): one constant, helper or table per fact.
 - Constants and shared variables go at the top of the file, under the imports, where
   possible.
-- Formatting and linting use Ruff, configured in `ruff.toml` (80 columns, single quotes).
-  Install it with `.venv\Scripts\python -m pip install -r requirements-dev.txt`, then run
+- The OCR pipeline is one C/C++ code base (`core/src`) for every target. Code that calls
+  MuPDF lives in C files (`pdf.c`): MuPDF reports errors with longjmp, which must never cross
+  C++ frames. Platform code stays in `cli.cpp`/`process.cpp` (native) and `wasm.cpp` (web).
+  C++ headers end in `.hpp`; `.h` is only for C headers such as `pdf.h`.
+- The window is one page (`web/`) for every target; the engines (`engine-desktop.js`,
+  `engine-web.js`) are the only place where the desktop and the web differ.
+- Python tools (`tools/`) are formatted and linted with Ruff, configured in `ruff.toml`
+  (80 columns, single quotes). Install it with
+  `.venv\Scripts\python -m pip install -r requirements-dev.txt`, then run
   `.venv\Scripts\python -m ruff format .` and `.venv\Scripts\python -m ruff check .` before
   finishing a change. Both must pass.

@@ -1,0 +1,28 @@
+Tesseract picks its SIMD code by asking the CPU (cpuid), which WebAssembly
+cannot do. Under Emscripten, skip that and use the SSE4.1 kernels, which
+Emscripten compiles to WebAssembly SIMD (128-bit) instructions.
+
+--- a/src/arch/simddetect.cpp
++++ b/src/arch/simddetect.cpp
+@@ -40,7 +40,7 @@
+ 
+ #endif
+ 
+-#if defined(HAVE_AVX) || defined(HAVE_AVX2) || defined(HAVE_FMA) || defined(HAVE_SSE4_1)
++#if (defined(HAVE_AVX) || defined(HAVE_AVX2) || defined(HAVE_FMA) || defined(HAVE_SSE4_1)) && !defined(__EMSCRIPTEN__)
+ // See https://en.wikipedia.org/wiki/CPUID.
+ #  define HAS_CPUID
+ #endif
+@@ -223,6 +223,12 @@
+ #  endif
+ #endif
+ 
++#if defined(__EMSCRIPTEN__) && defined(HAVE_SSE4_1)
++  // Emscripten maps the SSE4.1 intrinsics to WebAssembly SIMD, which the
++  // build requires, so there is nothing to detect.
++  sse_available_ = true;
++#endif
++
+ #if defined(HAVE_NEON) && !defined(__aarch64__)
+ #  if defined(HAVE_ANDROID_GETCPUFAMILY)
+   {

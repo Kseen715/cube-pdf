@@ -1,0 +1,5 @@
+# The build runs in Linux containers, also from a Windows checkout: make,
+# sh and the compilers need LF line ends
+* text=auto eol=lf
+*.png binary
+*.ico binary
