@@ -64,10 +64,20 @@ versions in `NATIVE` in `tools/collect_licenses.py` too. The DLL versions can be
 To work on the code without building, run `.venv\Scripts\python app.py` after the first build
 (it reuses `vendor/`).
 
+Code is formatted and linted with [Ruff](https://docs.astral.sh/ruff/) (settings in `ruff.toml`):
+
+```powershell
+.venv\Scripts\python -m pip install -r requirements-dev.txt
+.venv\Scripts\python -m ruff format .
+.venv\Scripts\python -m ruff check .
+```
+
 ## How it works
 
-- `src/ocr_app/gui.py` is the window. Each file is processed by starting the same exe again as
-  `OCR-PDF.exe --worker <json>`, so the UI never freezes and **Stop** can kill a job.
+- `src/ocr_app/gui.py` is the window, built from `task_list.py` (the file list), `dialogs.py`
+  (message boxes, About) and `widgets.py` (style and small helpers). Each file is processed by
+  starting the same exe again as `OCR-PDF.exe --worker <json>` (`worker_process.py`), so the UI
+  never freezes and **Stop** can kill a job.
 - `src/ocr_app/worker.py` puts the bundled `tesseract` and `gswin64c` first on `PATH`, sets
   `TESSDATA_PREFIX`, and calls `ocrmypdf.ocr()`. It reports progress, log lines and errors as
   JSON lines on stdout (`ipc.py`, `progress_plugin.py`).

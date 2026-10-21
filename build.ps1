@@ -1,5 +1,7 @@
-# Build dist\OCR-PDF.exe: venv, Python packages, bundled programs, license notices, PyInstaller.
-# Needs: Python 3.11+ and 7-Zip on PATH. Run: powershell -ExecutionPolicy Bypass -File build.ps1
+# Build dist\OCR-PDF.exe: venv, Python packages, bundled programs, license
+# notices, PyInstaller.
+# Needs: Python 3.11+ and 7-Zip on PATH.
+# Run: powershell -ExecutionPolicy Bypass -File build.ps1
 $ErrorActionPreference = 'Stop'
 Set-Location $PSScriptRoot
 

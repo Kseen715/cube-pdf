@@ -21,7 +21,7 @@ def emit(event: str, **fields: Any) -> None:
 
 
 def parse(line: str) -> dict[str, Any] | None:
-    """Return the message in *line*, or None if it is stray text, not a message."""
+    """The message in *line*, or None if the line is stray text."""
     line = line.strip()
     if not line.startswith('{'):
         return None
