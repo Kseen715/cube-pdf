@@ -1,4 +1,4 @@
-# Builds OCR-PDF from source, Unix style: every library is compiled from the
+# Builds CUBE-PDF from source, Unix style: every library is compiled from the
 # tarball pinned in deps/versions.mk, with its own build system.
 #
 # Run it inside the matching toolchain container (docker/*.Dockerfile).
@@ -27,6 +27,7 @@ STAMP := $(T)/stamp
 include deps/versions.mk
 include mk/$(TARGET).mk
 include mk/fetch.mk
+include mk/fonts.mk
 include mk/deps.mk
 include mk/core.mk
 include mk/notices.mk

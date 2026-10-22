@@ -1,8 +1,9 @@
-"""Draw assets/icon.png: a page under a magnifier.
+"""Draw assets/icon.png: a cube whose side is a page of text.
 
 The build makes every other icon from it (Tauri's "icon" command), and the
-web page uses it as is. Run it after changing the drawing; the result is
-committed, so building does not need Pillow.
+web page uses it as is. The cube in the page's top bar (web/index.html) is
+the same drawing; change both together. Run it after changing the drawing;
+the result is committed, so building does not need Pillow.
 """
 
 from pathlib import Path
@@ -14,56 +15,50 @@ ASSETS = ROOT / 'assets'
 
 CANVAS = 1024
 
-BLUE = '#1e66c8'
+PAPER = '#f3f3f1'
+INK = '#141414'
+BLUE = '#1d5fbf'
 PALE_BLUE = '#b9cdea'
-TEXT_GREY = '#7a8ba3'
-AMBER = '#ffb300'
 
-PAGE = (230, 150, 730, 830)  # left, top, right, bottom
-FOLD = 140
-TEXT_LINE_WIDTHS = (330, 380, 300, 380, 250)
-LENS_CENTER = (650, 640)
-LENS_RADIUS = 165
+# An isometric cube: the corners of its outline and its centre
+TOP = (512, 92)
+UPPER_LEFT = (148, 302)
+UPPER_RIGHT = (876, 302)
+CENTRE = (512, 512)
+LOWER_LEFT = (148, 722)
+LOWER_RIGHT = (876, 722)
+BOTTOM = (512, 932)
 
-
-def draw_page(draw: ImageDraw.ImageDraw) -> None:
-    left, top, right, bottom = PAGE
-    outline = [
-        (left, top),
-        (right - FOLD, top),
-        (right, top + FOLD),
-        (right, bottom),
-        (left, bottom),
-    ]
-    corner = [
-        (right - FOLD, top),
-        (right - FOLD, top + FOLD),
-        (right, top + FOLD),
-    ]
-    draw.polygon(outline, fill='white')
-    draw.polygon(corner, fill=PALE_BLUE)
-
-    for i, width in enumerate(TEXT_LINE_WIDTHS):
-        y = 330 + i * 85
-        line = (300, y, 300 + width, y + 36)
-        draw.rounded_rectangle(line, radius=18, fill=TEXT_GREY)
+# The text lines on the left side run along its edges, at 30 degrees
+SLOPE = 0.577
+LINE_START_X = 210
+LINE_WIDTHS = (240, 270, 200)
+LINE_PITCH = 100
+LINE_HEIGHT = 34
 
 
-def draw_magnifier(draw: ImageDraw.ImageDraw) -> None:
-    cx, cy = LENS_CENTER
-    r = LENS_RADIUS
-    draw.ellipse((cx - r, cy - r, cx + r, cy + r), outline=AMBER, width=58)
-    handle = (cx + 115, cy + 115, cx + 270, cy + 270)
-    draw.line(handle, fill=AMBER, width=95)
+def draw_text_lines(draw: ImageDraw.ImageDraw) -> None:
+    x0 = LINE_START_X
+    top = UPPER_LEFT[1] + (x0 - UPPER_LEFT[0]) * SLOPE + 100
+    for i, width in enumerate(LINE_WIDTHS):
+        y0 = top + i * LINE_PITCH
+        x1, y1 = x0 + width, y0 + width * SLOPE
+        line = [
+            (x0, y0),
+            (x1, y1),
+            (x1, y1 + LINE_HEIGHT),
+            (x0, y0 + LINE_HEIGHT),
+        ]
+        draw.polygon(line, fill=PALE_BLUE)
 
 
 def draw_icon() -> Image.Image:
     image = Image.new('RGBA', (CANVAS, CANVAS), (0, 0, 0, 0))
     draw = ImageDraw.Draw(image)
-    background = (40, 40, CANVAS - 40, CANVAS - 40)
-    draw.rounded_rectangle(background, radius=180, fill=BLUE)
-    draw_page(draw)
-    draw_magnifier(draw)
+    draw.polygon([TOP, UPPER_RIGHT, CENTRE, UPPER_LEFT], fill=PAPER)
+    draw.polygon([UPPER_LEFT, CENTRE, BOTTOM, LOWER_LEFT], fill=BLUE)
+    draw.polygon([CENTRE, UPPER_RIGHT, LOWER_RIGHT, BOTTOM], fill=INK)
+    draw_text_lines(draw)
     return image
 
 

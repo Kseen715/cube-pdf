@@ -24,11 +24,13 @@ $(T)/build-info.js: deps/versions.mk
 	echo "export const TESSDATA_PATH = '$(SITE_TESSDATA)';" > $@
 
 site: $(WASM_OUT)/ocr-core.js $(WASM_OUT)/gs.js $(T)/build-info.js \
-    $(TESSDATA_LANGS:%=$(TESSDATA_DIR)/%.traineddata) $(NOTICES)
+    $(TESSDATA_LANGS:%=$(TESSDATA_DIR)/%.traineddata) $(NOTICES) \
+    $(STAMP)/fonts
 	rm -rf $(DIST)
 	mkdir -p $(DIST)/wasm $(DIST)/$(SITE_TESSDATA)
 	cp -r web/. $(DIST)/
 	cp $(T)/build-info.js $(DIST)/js/
+	rm -rf $(DIST)/fonts && cp -r $(FONTS_DIR) $(DIST)/fonts
 	cp $(WASM_OUT)/*.js $(WASM_OUT)/*.wasm $(DIST)/wasm/
 	cp $(TESSDATA_LANGS:%=$(TESSDATA_DIR)/%.traineddata) \
 	    $(DIST)/$(SITE_TESSDATA)

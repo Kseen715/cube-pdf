@@ -5,7 +5,8 @@
 NOTICES := $(T)/THIRD-PARTY-NOTICES.txt
 
 $(NOTICES): tools/collect_licenses.py deps/versions.mk web/js/config.js \
-    $(wildcard licenses/* desktop/Cargo.*) $(LIBS_STAMPS) $(STAMP)/ghostscript
+    $(wildcard licenses/* desktop/Cargo.*) $(LIBS_STAMPS) \
+    $(STAMP)/ghostscript $(STAMP)/fonts
 	mkdir -p $(@D)
 	CXX=$(CXX) CARGO_HOME=$(B)/cargo-home \
 	    python3 tools/collect_licenses.py $(TARGET) $(T) $@

@@ -1,0 +1,1362 @@
+{
+ "url": "/tmp/claude-1000/-home-kseen-projects-cube-pdf/d82336fb-d5a3-47c0-8644-56c93ee26cbd/scratchpad/demo/dark.html",
+ "at": "2026-10-22T18:32:07.158Z",
+ "allow": [],
+ "viewports": [
+  {
+   "width": 1440,
+   "height": 900,
+   "load": "load",
+   "screens": 1,
+   "filled": [
+    0.56
+   ],
+   "motion": {
+    "elements": 0,
+    "css": 0,
+    "transitions": 0,
+    "scripted": 0,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 1440,
+     "h": 900
+    },
+    "page": {
+     "height": 900,
+     "screens": 1,
+     "words": 168,
+     "img": 0,
+     "video": 0,
+     "canvas": 0,
+     "svg": 1,
+     "sections": 3,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 0,
+     "uiAbuse": false,
+     "realPictures": 0,
+     "videoCount": 0,
+     "uiPictures": 0,
+     "pictureSamples": [],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "Сделать PDF, в котором можно искать текст",
+     "words": 7,
+     "chars": 41,
+     "lines": 1,
+     "size": 32,
+     "vw": 2.2,
+     "font": "IBM Plex Serif",
+     "weight": 500,
+     "tracking": -0.01,
+     "leading": 1.15,
+     "top": 97,
+     "tag": "h1",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "h1": {
+     "text": "Сделать PDF, в котором можно искать текст",
+     "words": 7,
+     "lines": 1,
+     "size": 32,
+     "font": "IBM Plex Serif"
+    },
+    "headings": [
+     {
+      "text": "Сделать PDF, в котором можно искать текст",
+      "words": 7,
+      "chars": 41,
+      "lines": 1,
+      "size": 32,
+      "vw": 2.2,
+      "font": "IBM Plex Serif",
+      "weight": 500,
+      "tracking": -0.01,
+      "leading": 1.15,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.83,
+      "top": 97,
+      "tag": "h1",
+      "kind": "heading"
+     }
+    ],
+    "headingSummary": {
+     "count": 1,
+     "maxLines": 1,
+     "over2Lines": 0,
+     "statements": 0,
+     "centered": 0,
+     "medianWords": null,
+     "mixedFontHeadings": 0
+    },
+    "type": {
+     "families": [
+      {
+       "family": "IBM Plex Sans",
+       "share": 0.94,
+       "mono": false
+      },
+      {
+       "family": "IBM Plex Serif",
+       "share": 0.06,
+       "mono": false
+      }
+     ],
+     "familyCount": 2,
+     "sizes": [
+      13,
+      14,
+      15,
+      16,
+      19,
+      32
+     ],
+     "sizeCount": 6,
+     "notLoaded": [],
+     "body": {
+      "font": "IBM Plex Sans",
+      "size": 16,
+      "leading": 1.55,
+      "weight": 400,
+      "tracking": 0,
+      "contrast": 8.8
+     },
+     "measureChars": 82,
+     "max": {
+      "size": 32,
+      "vw": 2.2,
+      "font": "IBM Plex Serif",
+      "text": "Сделать PDF, в котором можно искать текс"
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [],
+     "monoSamples": [],
+     "microLabels": 0,
+     "microLabelShare": 0,
+     "microSamples": [],
+     "upperShare": 0.01,
+     "centerShare": 0.1,
+     "smallText": 0
+    },
+    "eyebrows": [],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#0f0f0f",
+     "bodyBgHsl": {
+      "h": 0,
+      "s": 0,
+      "l": 0.06
+     },
+     "dark": true,
+     "sectionBgs": [
+      {
+       "color": "#171717",
+       "top": 252,
+       "hsl": {
+        "h": 0,
+        "s": 0,
+        "l": 0.09
+       }
+      }
+     ],
+     "textColors": [
+      {
+       "color": "#b0b0b0",
+       "share": 0.62
+      },
+      {
+       "color": "#f2f2f2",
+       "share": 0.34
+      },
+      {
+       "color": "#e5566f",
+       "share": 0.02
+      },
+      {
+       "color": "#3fc07a",
+       "share": 0.01
+      },
+      {
+       "color": "#171717",
+       "share": 0.01
+      }
+     ],
+     "button": {
+      "bg": "#f2f2f2",
+      "hsl": {
+       "h": 0,
+       "s": 0,
+       "l": 0.95
+      },
+      "fg": "#171717"
+     },
+     "lowContrast": []
+    },
+    "buttons": {
+     "count": 5,
+     "inHero": 5,
+     "radius": 0,
+     "height": 32,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": [
+      "Светлая",
+      "Тёмная",
+      "Как в системе",
+      "Добавить файлы",
+      "Остановить"
+     ]
+    },
+    "surfaces": {
+     "shadowStatic": 0,
+     "shadowOverlay": 0,
+     "shadowSamples": [],
+     "gradients": 0,
+     "scrims": 0,
+     "gradientSamples": [],
+     "gradientText": 0,
+     "hairlines": 12,
+     "hairlineSamples": [
+      "header.bar 1440px",
+      "li.done 782px",
+      "li.done 782px",
+      "li.running 782px",
+      "li.waiting 782px"
+     ],
+     "outlinedBoxes": 2,
+     "dashed": 1,
+     "blurred": 0,
+     "roundedBoxes": 0,
+     "boxRadius": 0,
+     "squareMedia": 0,
+     "roundedMedia": 0,
+     "mediaRadius": 0,
+     "textShadow": 0,
+     "cardRows": []
+    },
+    "heroMedia": [],
+    "nav": {
+     "links": 0,
+     "fixed": false,
+     "height": 57,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": [
+     "ibm plex sans",
+     "ibm plex serif"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 1440,
+     "h": 900
+    },
+    "pageH": 900,
+    "margins": {
+     "left": 120,
+     "right": 120
+    },
+    "sections": [
+     {
+      "sel": "div.title",
+      "tag": "div",
+      "top": 57,
+      "height": 195,
+      "words": 37,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "Сделать PDF, в котором можно искать текст",
+       "size": 32,
+       "tag": "h1"
+      },
+      "left": 120,
+      "right": 628,
+      "textLeft": 120,
+      "textRight": 628,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "div.layout",
+      "tag": "div",
+      "top": 252,
+      "height": 556,
+      "words": 125,
+      "media": 0,
+      "middle": 74,
+      "heading": {
+       "text": "Файлы",
+       "size": 19,
+       "tag": "h2"
+      },
+      "left": 145,
+      "right": 145,
+      "textLeft": 145,
+      "textRight": 151,
+      "fullBleed": false,
+      "footer": true,
+      "hero": true,
+      "continues": false,
+      "pinned": true
+     }
+    ],
+    "gaps": [],
+    "h1s": [
+     {
+      "text": "Сделать PDF, в котором можно искать текст",
+      "size": 32,
+      "top": 97,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [
+     {
+      "x": 120,
+      "n": 2
+     },
+     {
+      "x": 145,
+      "n": 2
+     },
+     {
+      "x": 985,
+      "n": 2
+     }
+    ],
+    "leftBlocks": 6,
+    "bodySize": 13,
+    "stage": false,
+    "explains": false,
+    "slivers": [],
+    "voidShare": 0.11,
+    "voidBox": {
+     "x": 0,
+     "y": 780,
+     "w": 1140,
+     "h": 120
+    }
+   },
+   "app": {
+    "viewport": {
+     "w": 1440,
+     "h": 900
+    },
+    "dark": true,
+    "ground": "#0f0f0f",
+    "sidebar": null,
+    "topbar": {
+     "h": 57
+    },
+    "canvas": {
+     "left": 120,
+     "right": 120
+    },
+    "hero": {
+     "text": "Сделать PDF, в котором можно искать текст",
+     "words": 7,
+     "chars": 41,
+     "lines": 1,
+     "size": 32,
+     "vw": 2.2,
+     "font": "IBM Plex Serif",
+     "weight": 500,
+     "tracking": -0.01,
+     "leading": 1.15,
+     "top": 97,
+     "tag": "h1",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "charts": 0,
+    "layout": {
+     "panels": 2,
+     "firstScreen": 2,
+     "ragged": [],
+     "voids": []
+    },
+    "tiles": 0,
+    "panels": {
+     "count": 3,
+     "radii": [
+      [
+       0,
+       3
+      ]
+     ],
+     "heavyBorders": 1,
+     "borderSamples": [
+      "#555555 on #0f0f0f (2.57:1)"
+     ],
+     "heavyShadows": 0,
+     "softShadows": 0,
+     "shadowSamples": [],
+     "glass": 0
+    },
+    "chips": {
+     "count": 0,
+     "hues": 0,
+     "samples": []
+    },
+    "numbers": {
+     "cells": 0,
+     "leftAligned": 0,
+     "figures": 1,
+     "tabularShare": 1,
+     "kpiMax": 13
+    },
+    "rows": null,
+    "chartHues": 0,
+    "placeholders": [],
+    "type": {
+     "under13": 0,
+     "tiny": 0,
+     "tinySamples": [],
+     "sizes": [
+      13,
+      14,
+      15,
+      16,
+      19,
+      32
+     ]
+    },
+    "title": {
+     "text": "Сделать PDF, в котором можно искать текст",
+     "size": 32,
+     "top": 97
+    },
+    "colourShare": 0.001
+   },
+   "consoleErrors": []
+  },
+  {
+   "width": 768,
+   "height": 1024,
+   "load": "load",
+   "screens": 2,
+   "filled": [
+    0.77,
+    0.75
+   ],
+   "motion": {
+    "elements": 0,
+    "css": 0,
+    "transitions": 0,
+    "scripted": 0,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 768,
+     "h": 1024
+    },
+    "page": {
+     "height": 1537,
+     "screens": 1.5,
+     "words": 165,
+     "img": 0,
+     "video": 0,
+     "canvas": 0,
+     "svg": 1,
+     "sections": 3,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 0,
+     "uiAbuse": false,
+     "realPictures": 0,
+     "videoCount": 0,
+     "uiPictures": 0,
+     "pictureSamples": [],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "Сделать PDF, в котором можно искать текст",
+     "words": 7,
+     "chars": 41,
+     "lines": 1,
+     "size": 32,
+     "vw": 4.2,
+     "font": "IBM Plex Serif",
+     "weight": 500,
+     "tracking": -0.01,
+     "leading": 1.15,
+     "top": 97,
+     "tag": "h1",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "h1": {
+     "text": "Сделать PDF, в котором можно искать текст",
+     "words": 7,
+     "lines": 1,
+     "size": 32,
+     "font": "IBM Plex Serif"
+    },
+    "headings": [
+     {
+      "text": "Сделать PDF, в котором можно искать текст",
+      "words": 7,
+      "chars": 41,
+      "lines": 1,
+      "size": 32,
+      "vw": 4.2,
+      "font": "IBM Plex Serif",
+      "weight": 500,
+      "tracking": -0.01,
+      "leading": 1.15,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.92,
+      "top": 97,
+      "tag": "h1",
+      "kind": "heading"
+     }
+    ],
+    "headingSummary": {
+     "count": 1,
+     "maxLines": 1,
+     "over2Lines": 0,
+     "statements": 0,
+     "centered": 0,
+     "medianWords": null,
+     "mixedFontHeadings": 0
+    },
+    "type": {
+     "families": [
+      {
+       "family": "IBM Plex Sans",
+       "share": 0.94,
+       "mono": false
+      },
+      {
+       "family": "IBM Plex Serif",
+       "share": 0.06,
+       "mono": false
+      }
+     ],
+     "familyCount": 2,
+     "sizes": [
+      13,
+      14,
+      15,
+      16,
+      19,
+      32
+     ],
+     "sizeCount": 6,
+     "notLoaded": [],
+     "body": {
+      "font": "IBM Plex Sans",
+      "size": 16,
+      "leading": 1.55,
+      "weight": 400,
+      "tracking": 0,
+      "contrast": 8.8
+     },
+     "measureChars": 82,
+     "max": {
+      "size": 32,
+      "vw": 4.2,
+      "font": "IBM Plex Serif",
+      "text": "Сделать PDF, в котором можно искать текс"
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [],
+     "monoSamples": [],
+     "microLabels": 0,
+     "microLabelShare": 0,
+     "microSamples": [],
+     "upperShare": 0.01,
+     "centerShare": 0.11,
+     "smallText": 0
+    },
+    "eyebrows": [],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#0f0f0f",
+     "bodyBgHsl": {
+      "h": 0,
+      "s": 0,
+      "l": 0.06
+     },
+     "dark": true,
+     "sectionBgs": [
+      {
+       "color": "#171717",
+       "top": 252,
+       "hsl": {
+        "h": 0,
+        "s": 0,
+        "l": 0.09
+       }
+      }
+     ],
+     "textColors": [
+      {
+       "color": "#b0b0b0",
+       "share": 0.63
+      },
+      {
+       "color": "#f2f2f2",
+       "share": 0.34
+      },
+      {
+       "color": "#e5566f",
+       "share": 0.02
+      },
+      {
+       "color": "#3fc07a",
+       "share": 0.01
+      },
+      {
+       "color": "#171717",
+       "share": 0.01
+      }
+     ],
+     "button": {
+      "bg": "#f2f2f2",
+      "hsl": {
+       "h": 0,
+       "s": 0,
+       "l": 0.95
+      },
+      "fg": "#171717"
+     },
+     "lowContrast": []
+    },
+    "buttons": {
+     "count": 5,
+     "inHero": 4,
+     "radius": 0,
+     "height": 32,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": [
+      "Светлая",
+      "Тёмная",
+      "Как в системе",
+      "Добавить файлы"
+     ]
+    },
+    "surfaces": {
+     "shadowStatic": 0,
+     "shadowOverlay": 0,
+     "shadowSamples": [],
+     "gradients": 0,
+     "scrims": 0,
+     "gradientSamples": [],
+     "gradientText": 0,
+     "hairlines": 12,
+     "hairlineSamples": [
+      "header.bar 768px",
+      "li.done 670px",
+      "li.done 670px",
+      "li.running 670px",
+      "li.waiting 670px"
+     ],
+     "outlinedBoxes": 2,
+     "dashed": 1,
+     "blurred": 0,
+     "roundedBoxes": 0,
+     "boxRadius": 0,
+     "squareMedia": 0,
+     "roundedMedia": 0,
+     "mediaRadius": 0,
+     "textShadow": 0,
+     "cardRows": []
+    },
+    "heroMedia": [],
+    "nav": {
+     "links": 0,
+     "fixed": false,
+     "height": 57,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": [
+     "ibm plex sans",
+     "ibm plex serif"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 768,
+     "h": 1024
+    },
+    "pageH": 1537,
+    "margins": {
+     "left": 32,
+     "right": 32
+    },
+    "sections": [
+     {
+      "sel": "div.title",
+      "tag": "div",
+      "top": 57,
+      "height": 195,
+      "words": 37,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "Сделать PDF, в котором можно искать текст",
+       "size": 32,
+       "tag": "h1"
+      },
+      "left": 32,
+      "right": 44,
+      "textLeft": 32,
+      "textRight": 44,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "div.layout",
+      "tag": "div",
+      "top": 252,
+      "height": 1192,
+      "words": 122,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "Файлы",
+       "size": 19,
+       "tag": "h2"
+      },
+      "left": 57,
+      "right": 40,
+      "textLeft": 57,
+      "textRight": 40,
+      "fullBleed": false,
+      "footer": true,
+      "hero": true,
+      "continues": false,
+      "pinned": false
+     }
+    ],
+    "gaps": [],
+    "h1s": [
+     {
+      "text": "Сделать PDF, в котором можно искать текст",
+      "size": 32,
+      "top": 97,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [
+     {
+      "x": 57,
+      "n": 4
+     },
+     {
+      "x": 32,
+      "n": 2
+     }
+    ],
+    "leftBlocks": 6,
+    "bodySize": 13,
+    "stage": false,
+    "explains": false,
+    "slivers": [],
+    "voidShare": 0,
+    "voidBox": null
+   },
+   "app": {
+    "viewport": {
+     "w": 768,
+     "h": 1024
+    },
+    "dark": true,
+    "ground": "#0f0f0f",
+    "sidebar": null,
+    "topbar": {
+     "h": 57
+    },
+    "canvas": {
+     "left": 32,
+     "right": 32
+    },
+    "hero": {
+     "text": "Сделать PDF, в котором можно искать текст",
+     "words": 7,
+     "chars": 41,
+     "lines": 1,
+     "size": 32,
+     "vw": 4.2,
+     "font": "IBM Plex Serif",
+     "weight": 500,
+     "tracking": -0.01,
+     "leading": 1.15,
+     "top": 97,
+     "tag": "h1",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "charts": 0,
+    "layout": {
+     "panels": 2,
+     "firstScreen": 2,
+     "ragged": [],
+     "voids": []
+    },
+    "tiles": 0,
+    "panels": {
+     "count": 8,
+     "radii": [
+      [
+       0,
+       8
+      ]
+     ],
+     "heavyBorders": 1,
+     "borderSamples": [
+      "#555555 on #0f0f0f (2.57:1)"
+     ],
+     "heavyShadows": 0,
+     "softShadows": 0,
+     "shadowSamples": [],
+     "glass": 0
+    },
+    "chips": {
+     "count": 0,
+     "hues": 0,
+     "samples": []
+    },
+    "numbers": {
+     "cells": 0,
+     "leftAligned": 0,
+     "figures": 1,
+     "tabularShare": 1,
+     "kpiMax": 13
+    },
+    "rows": null,
+    "chartHues": 0,
+    "placeholders": [],
+    "type": {
+     "under13": 0,
+     "tiny": 0,
+     "tinySamples": [],
+     "sizes": [
+      13,
+      14,
+      15,
+      16,
+      19,
+      32
+     ]
+    },
+    "title": {
+     "text": "Сделать PDF, в котором можно искать текст",
+     "size": 32,
+     "top": 97
+    },
+    "colourShare": 0.003
+   },
+   "consoleErrors": []
+  },
+  {
+   "width": 390,
+   "height": 844,
+   "load": "load",
+   "screens": 2,
+   "filled": [
+    0.84,
+    0.76
+   ],
+   "motion": {
+    "elements": 0,
+    "css": 0,
+    "transitions": 0,
+    "scripted": 0,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 390,
+     "h": 844
+    },
+    "page": {
+     "height": 1616,
+     "screens": 1.9,
+     "words": 165,
+     "img": 0,
+     "video": 0,
+     "canvas": 0,
+     "svg": 1,
+     "sections": 3,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 0,
+     "uiAbuse": false,
+     "realPictures": 0,
+     "videoCount": 0,
+     "uiPictures": 0,
+     "pictureSamples": [],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "Сделать PDF, в котором можно искать текст",
+     "words": 7,
+     "chars": 41,
+     "lines": 2,
+     "size": 24,
+     "vw": 6.2,
+     "font": "IBM Plex Serif",
+     "weight": 500,
+     "tracking": -0.01,
+     "leading": 1.15,
+     "top": 81,
+     "tag": "h1",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "h1": {
+     "text": "Сделать PDF, в котором можно искать текст",
+     "words": 7,
+     "lines": 2,
+     "size": 24,
+     "font": "IBM Plex Serif"
+    },
+    "headings": [
+     {
+      "text": "Сделать PDF, в котором можно искать текст",
+      "words": 7,
+      "chars": 41,
+      "lines": 2,
+      "size": 24,
+      "vw": 6.2,
+      "font": "IBM Plex Serif",
+      "weight": 500,
+      "tracking": -0.01,
+      "leading": 1.15,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.92,
+      "top": 81,
+      "tag": "h1",
+      "kind": "heading"
+     }
+    ],
+    "headingSummary": {
+     "count": 1,
+     "maxLines": 2,
+     "over2Lines": 0,
+     "statements": 0,
+     "centered": 0,
+     "medianWords": null,
+     "mixedFontHeadings": 0
+    },
+    "type": {
+     "families": [
+      {
+       "family": "IBM Plex Sans",
+       "share": 0.93,
+       "mono": false
+      },
+      {
+       "family": "IBM Plex Serif",
+       "share": 0.07,
+       "mono": false
+      }
+     ],
+     "familyCount": 2,
+     "sizes": [
+      13,
+      14,
+      15,
+      16,
+      19,
+      24
+     ],
+     "sizeCount": 6,
+     "notLoaded": [],
+     "body": {
+      "font": "IBM Plex Sans",
+      "size": 16,
+      "leading": 1.55,
+      "weight": 400,
+      "tracking": 0,
+      "contrast": 8.8
+     },
+     "measureChars": 45,
+     "max": {
+      "size": 24,
+      "vw": 6.2,
+      "font": "IBM Plex Serif",
+      "text": "Сделать PDF, в котором можно искать текс"
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [],
+     "monoSamples": [],
+     "microLabels": 0,
+     "microLabelShare": 0,
+     "microSamples": [],
+     "upperShare": 0.01,
+     "centerShare": 0.08,
+     "smallText": 0
+    },
+    "eyebrows": [],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#0f0f0f",
+     "bodyBgHsl": {
+      "h": 0,
+      "s": 0,
+      "l": 0.06
+     },
+     "dark": true,
+     "sectionBgs": [
+      {
+       "color": "#171717",
+       "top": 292,
+       "hsl": {
+        "h": 0,
+        "s": 0,
+        "l": 0.09
+       }
+      }
+     ],
+     "textColors": [
+      {
+       "color": "#b0b0b0",
+       "share": 0.63
+      },
+      {
+       "color": "#f2f2f2",
+       "share": 0.35
+      },
+      {
+       "color": "#e5566f",
+       "share": 0.02
+      },
+      {
+       "color": "#3fc07a",
+       "share": 0.01
+      }
+     ],
+     "button": {
+      "bg": "#0f0f0f",
+      "hsl": {
+       "h": 0,
+       "s": 0,
+       "l": 0.06
+      },
+      "fg": "#f2f2f2"
+     },
+     "lowContrast": []
+    },
+    "buttons": {
+     "count": 2,
+     "inHero": 1,
+     "radius": 0,
+     "height": 73,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": [
+      "Добавить файлы"
+     ]
+    },
+    "surfaces": {
+     "shadowStatic": 0,
+     "shadowOverlay": 0,
+     "shadowSamples": [],
+     "gradients": 0,
+     "scrims": 0,
+     "gradientSamples": [],
+     "gradientText": 0,
+     "hairlines": 12,
+     "hairlineSamples": [
+      "header.bar 390px",
+      "li.done 340px",
+      "li.done 340px",
+      "li.running 340px",
+      "li.waiting 340px"
+     ],
+     "outlinedBoxes": 2,
+     "dashed": 1,
+     "blurred": 0,
+     "roundedBoxes": 0,
+     "boxRadius": 0,
+     "squareMedia": 0,
+     "roundedMedia": 0,
+     "mediaRadius": 0,
+     "textShadow": 0,
+     "cardRows": []
+    },
+    "heroMedia": [],
+    "nav": {
+     "links": 0,
+     "fixed": false,
+     "height": 57,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": [
+     "ibm plex sans",
+     "ibm plex serif"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 390,
+     "h": 844
+    },
+    "pageH": 1616,
+    "margins": {
+     "left": 16,
+     "right": 16
+    },
+    "sections": [
+     {
+      "sel": "div.title",
+      "tag": "div",
+      "top": 57,
+      "height": 235,
+      "words": 37,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "Сделать PDF, в котором можно искать текст",
+       "size": 24,
+       "tag": "h1"
+      },
+      "left": 16,
+      "right": 20,
+      "textLeft": 16,
+      "textRight": 20,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "div.layout",
+      "tag": "div",
+      "top": 292,
+      "height": 1232,
+      "words": 122,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "Файлы",
+       "size": 19,
+       "tag": "h2"
+      },
+      "left": 33,
+      "right": 33,
+      "textLeft": 33,
+      "textRight": -314,
+      "fullBleed": false,
+      "footer": true,
+      "hero": true,
+      "continues": false,
+      "pinned": false
+     }
+    ],
+    "gaps": [],
+    "h1s": [
+     {
+      "text": "Сделать PDF, в котором можно искать текст",
+      "size": 24,
+      "top": 81,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [
+     {
+      "x": 33,
+      "n": 4
+     },
+     {
+      "x": 16,
+      "n": 2
+     }
+    ],
+    "leftBlocks": 6,
+    "bodySize": 13,
+    "stage": false,
+    "explains": false,
+    "slivers": [],
+    "voidShare": 0,
+    "voidBox": null
+   },
+   "app": {
+    "viewport": {
+     "w": 390,
+     "h": 844
+    },
+    "dark": true,
+    "ground": "#0f0f0f",
+    "sidebar": null,
+    "topbar": {
+     "h": 57
+    },
+    "canvas": {
+     "left": 16,
+     "right": -12
+    },
+    "hero": {
+     "text": "Сделать PDF, в котором можно искать текст",
+     "words": 7,
+     "chars": 41,
+     "lines": 2,
+     "size": 24,
+     "vw": 6.2,
+     "font": "IBM Plex Serif",
+     "weight": 500,
+     "tracking": -0.01,
+     "leading": 1.15,
+     "top": 81,
+     "tag": "h1",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "charts": 0,
+    "layout": {
+     "panels": 2,
+     "firstScreen": 1,
+     "ragged": [],
+     "voids": []
+    },
+    "tiles": 0,
+    "panels": {
+     "count": 8,
+     "radii": [
+      [
+       0,
+       8
+      ]
+     ],
+     "heavyBorders": 1,
+     "borderSamples": [
+      "#555555 on #0f0f0f (2.57:1)"
+     ],
+     "heavyShadows": 0,
+     "softShadows": 0,
+     "shadowSamples": [],
+     "glass": 0
+    },
+    "chips": {
+     "count": 0,
+     "hues": 0,
+     "samples": []
+    },
+    "numbers": {
+     "cells": 0,
+     "leftAligned": 0,
+     "figures": 1,
+     "tabularShare": 1,
+     "kpiMax": 13
+    },
+    "rows": null,
+    "chartHues": 0,
+    "placeholders": [],
+    "type": {
+     "under13": 0,
+     "tiny": 0,
+     "tinySamples": [],
+     "sizes": [
+      13,
+      14,
+      15,
+      16,
+      19,
+      24
+     ]
+    },
+    "title": {
+     "text": "Сделать PDF, в котором можно искать текст",
+     "size": 24,
+     "top": 81
+    },
+    "colourShare": 0.004
+   },
+   "consoleErrors": []
+  }
+ ],
+ "findings": [],
+ "images": [
+  {
+   "viewport": "desktop",
+   "width": 1440,
+   "fold": "/home/kseen/projects/cube-pdf/.taste-skill/demo-dark/desktop-fold.jpg",
+   "pages": [
+    "/home/kseen/projects/cube-pdf/.taste-skill/demo-dark/desktop-page-01.jpg"
+   ],
+   "film": []
+  },
+  {
+   "viewport": "tablet",
+   "width": 768,
+   "fold": "/home/kseen/projects/cube-pdf/.taste-skill/demo-dark/tablet-fold.jpg",
+   "pages": [
+    "/home/kseen/projects/cube-pdf/.taste-skill/demo-dark/tablet-page-01.jpg"
+   ],
+   "film": []
+  },
+  {
+   "viewport": "mobile",
+   "width": 390,
+   "fold": "/home/kseen/projects/cube-pdf/.taste-skill/demo-dark/mobile-fold.jpg",
+   "pages": [
+    "/home/kseen/projects/cube-pdf/.taste-skill/demo-dark/mobile-page-01.jpg"
+   ],
+   "film": []
+  }
+ ]
+}

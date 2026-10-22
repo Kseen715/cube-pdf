@@ -44,15 +44,15 @@ TAURI_BUILD_FLAGS := --runner cargo-xwin
 
 # The installer, plus a zip that runs from any folder: the same files the
 # installer puts next to each other
-PORTABLE := $(T)/portable/OCR-PDF
+PORTABLE := $(T)/portable/CUBE-PDF
 
 define package_desktop
 	cp $(TAURI_BUNDLE)/nsis/*-setup.exe $(DIST)/
 	rm -rf $(T)/portable && mkdir -p $(PORTABLE)
-	cp $(T)/cargo/$(TAURI_TRIPLE)/release/OCR-PDF.exe $(PORTABLE)/
+	cp $(T)/cargo/$(TAURI_TRIPLE)/release/CUBE-PDF.exe $(PORTABLE)/
 	cp $(BIN)/ocr-pdf-core.exe $(BIN)/ocr-pdf-gs.exe $(PORTABLE)/
 	cp -r $(BIN)/tessdata $(PORTABLE)/
 	cp LICENSE $(PORTABLE)/LICENSE.txt
 	cp $(NOTICES) $(PORTABLE)/
-	cd $(T)/portable && zip -qr $(DIST)/OCR-PDF-windows-portable.zip OCR-PDF
+	cd $(T)/portable && zip -qr $(DIST)/CUBE-PDF-windows-portable.zip CUBE-PDF
 endef

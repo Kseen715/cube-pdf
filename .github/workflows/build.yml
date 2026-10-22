@@ -45,7 +45,7 @@ jobs:
 
       - uses: actions/upload-artifact@v7
         with:
-          name: OCR-PDF-${{ matrix.target }}
+          name: CUBE-PDF-${{ matrix.target }}
           path: dist/${{ matrix.target }}
           if-no-files-found: error
 
@@ -62,7 +62,7 @@ jobs:
     steps:
       - uses: actions/download-artifact@v8
         with:
-          name: OCR-PDF-wasm
+          name: CUBE-PDF-wasm
           path: site
 
       - uses: actions/configure-pages@v6
@@ -96,13 +96,13 @@ jobs:
         run: |
           mkdir -p release
           for target in linux windows wasm; do
-            cp "dist/OCR-PDF-$target/THIRD-PARTY-NOTICES.txt" \
+            cp "dist/CUBE-PDF-$target/THIRD-PARTY-NOTICES.txt" \
               "release/THIRD-PARTY-NOTICES-$target.txt"
           done
-          cp dist/OCR-PDF-linux/*.deb dist/OCR-PDF-linux/*.rpm release/
-          cp dist/OCR-PDF-windows/*-setup.exe \
-            dist/OCR-PDF-windows/*-portable.zip release/
-          (cd dist/OCR-PDF-wasm && zip -qr ../../release/OCR-PDF-web.zip .)
+          cp dist/CUBE-PDF-linux/*.deb dist/CUBE-PDF-linux/*.rpm release/
+          cp dist/CUBE-PDF-windows/*-setup.exe \
+            dist/CUBE-PDF-windows/*-portable.zip release/
+          (cd dist/CUBE-PDF-wasm && zip -qr ../../release/CUBE-PDF-web.zip .)
           cp LICENSE release/
 
       - name: Publish release

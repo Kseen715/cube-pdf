@@ -11,11 +11,12 @@ SIDECAR = $(STAGE)/desktop/binaries/$(1)-$(TAURI_TRIPLE)$(EXE)
 # Crates and the downloaded MSVC runtime are kept in the build directory
 TAURI_ENV_COMMON := CARGO_HOME=$(B)/cargo-home CARGO_TARGET_DIR=$(T)/cargo
 
-$(STAMP)/stage: core $(NOTICES) LICENSE assets/icon.png \
+$(STAMP)/stage: core $(NOTICES) $(STAMP)/fonts LICENSE assets/icon.png \
     $(shell find desktop web -type f)
 	rm -rf $(STAGE)
 	mkdir -p $(STAGE)/desktop/binaries
 	cp -r desktop web $(STAGE)/
+	rm -rf $(STAGE)/web/fonts && cp -r $(FONTS_DIR) $(STAGE)/web/fonts
 	cp $(BIN)/ocr-pdf-core$(EXE) $(call SIDECAR,ocr-pdf-core)
 	cp $(BIN)/ocr-pdf-gs$(EXE) $(call SIDECAR,ocr-pdf-gs)
 	cp -r $(BIN)/tessdata $(STAGE)/desktop/

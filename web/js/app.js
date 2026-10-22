@@ -6,16 +6,26 @@ import {
     APP_NAME, DEFAULT_LANGUAGES, LANGUAGES, hasInputExtension,
 } from './config.js';
 import * as dialogs from './dialogs.js';
-import { FileProgress } from './progress.js';
 import { State, TaskList } from './tasks.js';
 
-const START_TEXT = '▶  НАЧАТЬ РАСПОЗНАВАНИЕ';
-const STOP_TEXT = '■  ОСТАНОВИТЬ';
+const START_TEXT = 'Начать распознавание';
+const STOP_TEXT = 'Остановить';
+const FILE_WORDS = ['файл', 'файла', 'файлов'];
 const REJECTED_PREFIX = 'Пропущены (это не PDF и не картинки): ';
 const LOG_LINES_IN_DETAILS = 200;
 const SETTINGS_KEY = 'ocr-pdf-settings';
 
 const $ = (id) => document.getElementById(id);
+
+// The Russian noun form for a count: 1 файл, 2 файла, 5 файлов
+function plural(count, [one, few, many]) {
+    const tens = count % 100;
+    const units = count % 10;
+    if (tens >= 11 && tens <= 14) return many;
+    if (units === 1) return one;
+    if (units >= 2 && units <= 4) return few;
+    return many;
+}
 
 function loadSettings() {
     try {
@@ -28,7 +38,8 @@ function loadSettings() {
 class App {
     constructor(engine) {
         this.engine = engine;
-        this.list = new TaskList($('tasks'));
+        this.list = new TaskList($('tasks'),
+            (task) => this.taskActivated(task));
         this.settings = loadSettings();
         this.running = false;
         this.run = null;
@@ -53,7 +64,8 @@ class App {
             const box = document.createElement('input');
             box.type = 'checkbox';
             box.addEventListener('change', () => this.languageToggled(box));
-            label.append(box, ` ${name}`);
+            label.className = 'choice';
+            label.append(box, name);
             $('languages').append(label);
             this.languageBoxes[code] = box;
         }
@@ -64,8 +76,6 @@ class App {
         $('clear').addEventListener('click', () => this.clearList());
         $('start').addEventListener('click', () => this.startOrStop());
         $('about').addEventListener('click', () => dialogs.showAbout());
-        $('tasks').addEventListener('dblclick', (event) =>
-            this.itemActivated(event.target));
         document.addEventListener('keydown', (event) => {
             if (event.key === 'F1') {
                 event.preventDefault();
@@ -90,7 +100,6 @@ class App {
             box.checked = codes.includes(code);
         $('deskew').checked = Boolean(this.settings.deskew);
         $('force').checked = Boolean(this.settings.force);
-        $('more').open = Boolean(this.settings.showMore);
     }
 
     saveSettings() {
@@ -98,7 +107,6 @@ class App {
             languages: this.languages(),
             deskew: $('deskew').checked,
             force: $('force').checked,
-            showMore: $('more').open,
         });
         try {
             localStorage.setItem(SETTINGS_KEY, JSON.stringify(this.settings));
@@ -171,10 +179,9 @@ class App {
         this.batch = this.batch.filter((task) => !removed.includes(task));
     }
 
-    itemActivated(item) {
-        const task = this.list.tasks.find((t) => t.item === item);
-        if (task?.state === State.DONE) this.engine.actions.open(task);
-        else if (task?.state === State.FAILED) dialogs.showError(task);
+    taskActivated(task) {
+        if (task.state === State.DONE) this.engine.actions.open(task);
+        else if (task.state === State.FAILED) dialogs.showError(task);
     }
 
     // --- running ---------------------------------------------------------
@@ -219,10 +226,9 @@ class App {
         }
 
         this.current = task;
-        this.fileProgress = new FileProgress();
         this.log = [];
         task.state = State.RUNNING;
-        this.list.paint(task, 0);
+        this.list.paint(task);
         task.item.scrollIntoView({ block: 'nearest' });
         this.setStatus('Запускаю');
         try {
@@ -243,9 +249,9 @@ class App {
         if (message.event === 'log') {
             this.log.push(`${message.level}: ${message.msg}`);
         } else if (message.event === 'progress') {
-            this.setStatus(this.fileProgress.update(
+            this.setStatus(task.progress.update(
                 message.stage, message.done, message.total));
-            this.list.paint(task, Math.floor(this.fileProgress.percent));
+            this.list.paint(task);
         } else if (message.event === 'error') {
             task.setError(message.kind, message.detail ?? '');
         }
@@ -258,7 +264,10 @@ class App {
         if (this.cancelling) task.state = State.CANCELLED;
         else if (code === 0) task.state = State.DONE;
         else this.taskFailed(task, task.error ? null : 'crash');
+        if (task.state === State.DONE)
+            task.progress.pagesDone = task.progress.pages;
         this.list.paint(task);
+        this.refresh();
         this.next();
     }
 
@@ -279,7 +288,7 @@ class App {
 
         const prefix = count > 1 ? `Файл ${index + 1} из ${count}: ` : '';
         $('status').textContent = `${prefix}${task.source.name}\n${text}…`;
-        const fileFraction = this.fileProgress.percent / 100;
+        const fileFraction = task.progress.percent / 100;
         $('progress').value = ((index + fileFraction) / count) * 100;
     }
 
@@ -326,6 +335,19 @@ class App {
             box.disabled = this.running;
         $('clear').disabled = !this.list.tasks.length;
         if (!this.running && !this.list.tasks.length) $('progress').value = 0;
+        $('files').classList.toggle('has-files', this.list.tasks.length > 0);
+        $('count').textContent = this.countText();
+    }
+
+    countText() {
+        const total = this.list.tasks.length;
+        if (!total) return '';
+        const parts = [`${total} ${plural(total, FILE_WORDS)}`];
+        const done = this.list.count(State.DONE);
+        const failed = this.list.count(State.FAILED);
+        if (done) parts.push(`готово ${done}`);
+        if (failed) parts.push(`с ошибкой ${failed}`);
+        return parts.join(' · ');
     }
 
     async confirmClose() {

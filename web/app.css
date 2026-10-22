@@ -1,32 +1,121 @@
-:root {
-    --text: #1d1d1f;
-    --muted: #6b6b70;
-    --surface: #ffffff;
-    --panel: #f4f5f7;
-    --line: #c9ccd2;
-    --accent: #1e66c8;
-    --go: #2e7d32;
-    --go-hover: #388e3c;
-    --stop: #c62828;
-    --stop-hover: #d32f2f;
-    --done: #2e7d32;
-    --failed: #d32f2f;
-    --selected: #dde8f8;
-    color-scheme: light dark;
+/* The typefaces come from the build (mk/fonts.mk puts them in fonts/).
+   Without them the page falls back to the system's faces. */
+@font-face {
+    font-family: "IBM Plex Sans";
+    font-weight: 100 700;
+    font-display: swap;
+    src: url("fonts/plex-sans-latin1.woff2") format("woff2");
+    unicode-range: U+0000, U+000D, U+0020-007E, U+00A0-00FF, U+0131,
+        U+0152-0153, U+02C6, U+02DA, U+02DC, U+2013-2014, U+2018-201A,
+        U+201C-201E, U+2020-2022, U+2026, U+2030, U+2039-203A, U+2044,
+        U+20AC, U+2122, U+2212, U+FB01-FB02;
 }
 
-@media (prefers-color-scheme: dark) {
-    :root {
-        --text: #ececee;
-        --muted: #a0a0a8;
-        --surface: #1e1f22;
-        --panel: #2a2b2f;
-        --line: #4a4c52;
-        --accent: #6ea4ef;
-        --done: #66bb6a;
-        --failed: #ef5350;
-        --selected: #2f3d52;
-    }
+@font-face {
+    font-family: "IBM Plex Sans";
+    font-weight: 100 700;
+    font-display: swap;
+    src: url("fonts/plex-sans-cyrillic.woff2") format("woff2");
+    unicode-range: U+0400-045F, U+0462-0463, U+046A-046B, U+0472-0475,
+        U+0490-04C2, U+04CF-04D9, U+04DC-04E9, U+04EE-04F9, U+0524-0525;
+}
+
+@font-face {
+    font-family: "IBM Plex Serif";
+    font-weight: 100 700;
+    font-display: swap;
+    src: url("fonts/plex-serif-latin1.woff2") format("woff2");
+    unicode-range: U+0000, U+000D, U+0020-007E, U+00A0-00FF, U+0131,
+        U+0152-0153, U+02C6, U+02DA, U+02DC, U+2013-2014, U+2018-201A,
+        U+201C-201E, U+2020-2022, U+2026, U+2030, U+2039-203A, U+2044,
+        U+20AC, U+2122, U+2212, U+FB01-FB02;
+}
+
+@font-face {
+    font-family: "IBM Plex Serif";
+    font-weight: 100 700;
+    font-display: swap;
+    src: url("fonts/plex-serif-cyrillic.woff2") format("woff2");
+    unicode-range: U+0400-045F, U+0462-0463, U+046A-046B, U+0472-0475,
+        U+0490-04C2, U+04CF-04D9, U+04DC-04E9, U+04EE-04F9, U+0524-0525;
+}
+
+/* Ink on paper: no colour in the chrome. The one hue (--data) marks the
+   recognised pages; status colours appear only on finished files.
+   Every corner is square. */
+:root {
+    --ground: #f3f3f1;
+    --surface: #ffffff;
+    --raised: #ecece9;
+    --active: #e6e6e2;
+    --border: #e2e2de;
+    --rule: #eeeeeb;
+    --control: #b9b9b4;
+    --text: #121212;
+    --muted: #5d5d59;
+    --primary: #141414;
+    --primary-hover: #333333;
+    --on-primary: #ffffff;
+    --data: #1d5fbf;
+    --mark-top: #d3d3ce;
+    --mark-lines: #b9cdea;
+    --positive-bg: #dcfae5;
+    --positive-ink: #04250e;
+    --negative: #c4242a;
+    --negative-bg: #ffedea;
+    --negative-ink: #831c1e;
+    --check: url("data:image/svg+xml,%3Csvg \
+xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E\
+%3Cpath d='M3.5 8.5l3 3 6-7' fill='none' stroke='%23fff' \
+stroke-width='2'/%3E%3C/svg%3E");
+
+    --font-text: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+    --font-head: "IBM Plex Serif", Georgia, "Times New Roman", serif;
+    --fs-title: 32px;
+    --fs-head: 19px;
+    --fs-body: 15px;
+    --fs-small: 13px;
+
+    /* The column: 1200 = (1fr) 816 + 24 gap + 360 settings */
+    --column: 1200px;
+    --gutter: 32px;
+    --gap: 24px;
+    --pad: 24px;
+    --settings: 360px;
+    --row: 60px;
+    --control-height: 36px;
+    --cell: 8px;
+
+    color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+    --ground: #0f0f0f;
+    --surface: #171717;
+    --raised: #222222;
+    --active: #2a2a2a;
+    --border: #2a2a2a;
+    --rule: #222222;
+    --control: #555555;
+    --text: #f2f2f2;
+    --muted: #b0b0b0;
+    --primary: #f2f2f2;
+    --primary-hover: #d0d0d0;
+    --on-primary: #111111;
+    --data: #6b9be6;
+    --mark-top: #4a4a4a;
+    --mark-lines: #b9cdea;
+    --positive-bg: #172a1d;
+    --positive-ink: #3fc07a;
+    --negative: #e5566f;
+    --negative-bg: #2c1a20;
+    --negative-ink: #e5566f;
+    --check: url("data:image/svg+xml,%3Csvg \
+xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E\
+%3Cpath d='M3.5 8.5l3 3 6-7' fill='none' stroke='%23111' \
+stroke-width='2'/%3E%3C/svg%3E");
+
+    color-scheme: dark;
 }
 
 * {
@@ -35,235 +124,654 @@
 
 body {
     margin: 0;
-    background: var(--surface);
+    background: var(--ground);
     color: var(--text);
-    font: 16px/1.4 "Segoe UI", system-ui, sans-serif;
+    font: var(--fs-body) / 1.55 var(--font-text);
 }
 
-main {
-    max-width: 760px;
-    margin: 0 auto;
-    padding: 18px 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-h1 {
-    font-size: 26px;
-    margin: 0;
-}
-
+h1,
 h2 {
-    font-size: 19px;
-    margin: 10px 0 0;
+    margin: 0;
+    font-family: var(--font-head);
+    font-weight: 500;
 }
 
 p {
     margin: 0;
 }
 
-.hint {
-    color: var(--muted);
-}
-
-.row {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    flex-wrap: wrap;
-}
-
-.grow {
-    flex: 1;
-}
-
 button {
     font: inherit;
     color: inherit;
-    padding: 6px 14px;
-    border: 1px solid var(--line);
-    border-radius: 6px;
-    background: var(--panel);
     cursor: pointer;
 }
 
 button:disabled {
-    opacity: 0.5;
     cursor: default;
 }
 
-.drop {
-    font-size: 19px;
-    padding: 22px;
-    border: 3px dashed var(--line);
-    border-radius: 12px;
-    background: transparent;
+:focus-visible {
+    outline: 2px solid var(--data);
+    outline-offset: 2px;
 }
 
-.drop:hover {
-    border-color: var(--accent);
+/* --- top bar --------------------------------------------------------- */
+
+.bar {
+    border-bottom: 1px solid var(--border);
+}
+
+.bar-inner,
+main {
+    max-width: calc(var(--column) + 2 * var(--gutter));
+    margin: 0 auto;
+    padding: 0 var(--gutter);
+}
+
+.bar-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    min-height: 56px;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    font-size: 16px;
+    letter-spacing: 0.02em;
+}
+
+.mark {
+    width: 22px;
+    height: 25px;
+}
+
+.mark-top {
+    fill: var(--mark-top);
+}
+
+.mark-left {
+    fill: var(--data);
+}
+
+.mark-right {
+    fill: var(--text);
+}
+
+.mark-lines {
+    fill: var(--mark-lines);
+}
+
+.theme {
+    display: flex;
+}
+
+.theme button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 32px;
+    padding: 0 12px;
+    border: 1px solid var(--control);
+    background: transparent;
+    color: var(--muted);
+    font-size: var(--fs-small);
+}
+
+.theme button + button {
+    margin-left: -1px;
+}
+
+.theme button:hover {
+    color: var(--text);
+}
+
+.theme button[aria-pressed="true"] {
+    position: relative;
+    border-color: var(--text);
+    background: var(--text);
+    color: var(--surface);
+}
+
+.swatch {
+    width: 12px;
+    height: 12px;
+    border: 1.5px solid currentColor;
+}
+
+[data-theme-choice="dark"] .swatch {
+    background: currentColor;
+}
+
+[data-theme-choice="auto"] .swatch {
+    box-shadow: inset 5px 0 0 currentColor;
+}
+
+/* --- title ----------------------------------------------------------- */
+
+.title {
+    padding: 40px 0 32px;
+}
+
+h1 {
+    font-size: var(--fs-title);
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+}
+
+.lede {
+    max-width: 68ch;
+    margin-top: 12px;
+    color: var(--muted);
+    font-size: 16px;
+}
+
+/* --- the two panels -------------------------------------------------- */
+
+.layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) var(--settings);
+    gap: var(--gap);
+}
+
+.panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: var(--pad);
+}
+
+.panel h2 {
+    font-size: var(--fs-head);
+    line-height: 1.3;
+}
+
+.text-button {
+    padding: 4px 0;
+    white-space: nowrap;
+    border: none;
+    background: none;
+    color: var(--text);
+    text-decoration: underline;
+    text-decoration-color: var(--control);
+    text-underline-offset: 3px;
+}
+
+.text-button:hover {
+    text-decoration-color: currentColor;
+}
+
+.text-button:disabled {
+    color: var(--muted);
+    text-decoration: none;
+}
+
+/* --- files ----------------------------------------------------------- */
+
+.files {
+    display: flex;
+    flex-direction: column;
+    container-type: inline-size;
+}
+
+.panel-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 12px;
+    padding-bottom: 16px;
+}
+
+.count {
+    color: var(--muted);
+    font-size: var(--fs-small);
+    font-variant-numeric: tabular-nums;
+}
+
+.panel-head .text-button {
+    margin-left: auto;
+    font-size: var(--fs-small);
+}
+
+.files:not(.has-files) .panel-head .text-button {
+    display: none;
 }
 
 .tasks {
     list-style: none;
     margin: 0;
-    padding: 4px 0;
-    min-height: 120px;
-    max-height: 40vh;
-    overflow: auto;
-    border: 1px solid var(--line);
-    border-radius: 6px;
-    font-size: 16px;
+    padding: 0;
     user-select: none;
 }
 
 .tasks li {
-    padding: 3px 10px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 248px 104px 64px;
+    align-items: center;
+    gap: 16px;
+    min-height: var(--row);
+    margin: 0 -8px;
+    padding: 8px;
+    border-top: 1px solid var(--rule);
     cursor: default;
 }
 
 .tasks li.selected {
-    background: var(--selected);
+    background: var(--active);
 }
 
-.tasks li[data-state="done"] {
-    color: var(--done);
-}
-
-.tasks li[data-state="failed"] {
-    color: var(--failed);
-}
-
-.options label {
-    font-size: 17px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.options.column {
+.task-name {
     display: flex;
     flex-direction: column;
+    min-width: 0;
+}
+
+.task-name span {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.sub {
+    color: var(--muted);
+    font-size: var(--fs-small);
+}
+
+.task-pages {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    white-space: nowrap;
+    font-size: var(--fs-small);
+    font-variant-numeric: tabular-nums;
+}
+
+.cells {
+    display: flex;
+    gap: 2px;
+}
+
+.cells i {
+    width: var(--cell);
+    height: var(--cell);
+    background: var(--raised);
+    outline: 1px solid var(--border);
+    outline-offset: -1px;
+}
+
+.cells i.read {
+    background: var(--data);
+    outline: none;
+}
+
+.task-pages .none,
+.waiting .task-state,
+.cancelled .task-state {
+    color: var(--muted);
+}
+
+.task-state {
+    font-size: var(--fs-small);
+    font-variant-numeric: tabular-nums;
+}
+
+.pill {
+    display: inline-block;
+    padding: 1px 8px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.done .pill {
+    background: var(--positive-bg);
+    color: var(--positive-ink);
+}
+
+.failed .pill {
+    background: var(--negative-bg);
+    color: var(--negative-ink);
+}
+
+.task-action {
+    text-align: right;
+    font-size: var(--fs-small);
+}
+
+.drop {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
     gap: 6px;
-    padding: 6px 0 0 24px;
+    flex: 1;
+    min-height: 320px;
+    padding: 24px;
+    border: 1px dashed var(--control);
+    background: var(--ground);
+    text-align: center;
 }
 
-input[type="checkbox"] {
-    width: 22px;
-    height: 22px;
-    margin: 0;
+.drop:hover {
+    border-color: var(--text);
 }
 
-details summary {
-    cursor: pointer;
-    padding: 2px;
+.drop-title {
+    font-family: var(--font-head);
+    font-size: 21px;
 }
 
-.start {
-    font-size: 26px;
-    font-weight: bold;
-    padding: 14px;
-    color: white;
-    background: var(--go);
-    border: none;
-    border-radius: 10px;
+.drop-more {
+    max-width: 36ch;
+    color: var(--muted);
 }
 
-.start:hover {
-    background: var(--go-hover);
+.drop-again,
+.has-files .drop-title,
+.has-files .drop-more {
+    display: none;
 }
 
-.start.running {
-    background: var(--stop);
+.has-files .drop {
+    min-height: 52px;
+    margin-top: 12px;
 }
 
-.start.running:hover {
-    background: var(--stop-hover);
+.has-files .drop-again {
+    display: inline;
+}
+
+.panel-foot {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-top: 16px;
 }
 
 .status {
-    font-size: 16px;
     white-space: pre-line;
-    min-height: 2.8em;
+    font-size: 14px;
+}
+
+.status:empty {
+    display: none;
 }
 
 progress {
+    appearance: none;
     width: 100%;
-    height: 28px;
-    accent-color: var(--go);
+    height: 4px;
+    border: none;
+    background: var(--raised);
+    color: var(--text);
 }
 
-footer {
+progress::-webkit-progress-bar {
+    background: var(--raised);
+}
+
+progress::-webkit-progress-value {
+    background: var(--text);
+}
+
+progress::-moz-progress-bar {
+    background: var(--text);
+}
+
+.files:not(.has-files) progress {
+    display: none;
+}
+
+/* --- settings -------------------------------------------------------- */
+
+.settings {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    align-self: start;
+    position: sticky;
+    top: 24px;
+}
+
+.group h2 {
+    padding-bottom: 8px;
+}
+
+.choice {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 10px 0;
+    border-top: 1px solid var(--rule);
+    cursor: pointer;
+}
+
+.choice:has(input:disabled) {
+    color: var(--muted);
+    cursor: default;
+}
+
+.note {
+    padding-top: 10px;
+    border-top: 1px solid var(--rule);
+    color: var(--muted);
+    font-size: var(--fs-small);
+}
+
+input[type="checkbox"] {
+    appearance: none;
+    flex: none;
+    width: 18px;
+    height: 18px;
+    margin: 3px 0 0;
+    border: 1.5px solid var(--control);
+    background: var(--surface);
+    cursor: inherit;
+}
+
+input[type="checkbox"]:hover:enabled {
+    border-color: var(--text);
+}
+
+input[type="checkbox"]:checked {
+    border-color: var(--text);
+    background: var(--text) var(--check) center / 14px no-repeat;
+}
+
+input[type="checkbox"]:disabled {
+    opacity: 0.6;
+}
+
+.start {
+    height: 52px;
+    border: 1px solid var(--primary);
+    background: var(--primary);
+    color: var(--on-primary);
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.start:hover {
+    border-color: var(--primary-hover);
+    background: var(--primary-hover);
+}
+
+.start:active {
+    transform: translateY(1px);
+}
+
+.start.running {
+    border-color: var(--negative);
+    background: transparent;
+    color: var(--negative);
+}
+
+.start.running:hover {
+    background: var(--negative-bg);
+}
+
+/* --- footer ---------------------------------------------------------- */
+
+.foot {
     display: flex;
     justify-content: flex-end;
+    padding: 24px 0 40px;
+    font-size: var(--fs-small);
 }
 
-.link {
-    border: none;
-    background: none;
-    color: var(--accent);
-    text-decoration: underline;
-}
+/* --- dialogs --------------------------------------------------------- */
 
 dialog {
     max-width: min(560px, calc(100vw - 32px));
-    border: 1px solid var(--line);
-    border-radius: 10px;
+    padding: 24px;
+    border: 1px solid var(--border);
     background: var(--surface);
     color: var(--text);
-    padding: 18px 22px;
+    box-shadow: 0 16px 48px rgb(0 0 0 / 0.18);
+}
+
+dialog::backdrop {
+    background: rgb(0 0 0 / 0.4);
 }
 
 dialog.wide {
-    max-width: min(900px, calc(100vw - 32px));
     width: 900px;
+    max-width: min(900px, calc(100vw - 32px));
 }
 
 dialog h3 {
-    margin: 0 0 10px;
-    font-size: 17px;
+    margin: 0 0 12px;
+    font-family: var(--font-head);
+    font-size: var(--fs-head);
+    font-weight: 500;
 }
 
 .dialog-body {
     white-space: pre-line;
 }
 
+/* Plain messages keep their line breaks; the About text is HTML */
+.dialog-body:has(> p) {
+    white-space: normal;
+}
+
 .dialog-body p {
     margin: 0 0 10px;
-    white-space: normal;
+}
+
+.dialog-body a {
+    color: var(--text);
+}
+
+dialog details {
+    margin-top: 12px;
+}
+
+dialog summary {
+    cursor: pointer;
 }
 
 dialog pre {
     max-height: 60vh;
     overflow: auto;
-    background: var(--panel);
-    padding: 10px;
-    font: 13px/1.35 Consolas, "DejaVu Sans Mono", monospace;
+    background: var(--raised);
+    padding: 12px;
+    font: 13px/1.4 Consolas, "DejaVu Sans Mono", monospace;
     white-space: pre-wrap;
 }
 
 .dialog-buttons {
     display: flex;
     justify-content: flex-end;
-    gap: 8px;
-    margin-top: 14px;
     flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 20px;
 }
 
-@media (max-width: 520px) {
-    main {
-        padding: 12px 16px;
+.dialog-buttons button {
+    height: var(--control-height);
+    padding: 0 16px;
+    border: 1px solid var(--control);
+    background: var(--surface);
+}
+
+.dialog-buttons button:hover {
+    border-color: var(--text);
+}
+
+/* --- narrow windows -------------------------------------------------- */
+
+/* A narrow list puts the file name on a line of its own, so the name is
+   never the column that gets cut */
+@container (max-width: 680px) {
+    .tasks li {
+        grid-template-columns: minmax(0, 1fr) auto;
+        grid-template-areas: "name action" "pages state";
+        gap: 6px 16px;
+        --cell: 7px;
     }
 
-    h1 {
-        font-size: 22px;
+    .task-name {
+        grid-area: name;
     }
 
-    .start {
-        font-size: 20px;
+    .task-pages {
+        grid-area: pages;
+    }
+
+    .task-state {
+        grid-area: state;
+        text-align: right;
+    }
+
+    .task-action {
+        grid-area: action;
+        align-self: start;
+    }
+
+    .unit {
+        display: none;
+    }
+}
+
+@media (max-width: 960px) {
+    .layout {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .settings {
+        position: static;
+    }
+}
+
+@media (max-width: 640px) {
+    :root {
+        --gutter: 16px;
+        --pad: 16px;
+        --fs-title: 24px;
+    }
+
+    .theme .label {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+    }
+
+    .theme button {
+        width: 44px;
+        height: 36px;
+        justify-content: center;
+    }
+
+    .title {
+        padding: 24px 0 20px;
+    }
+
+    .drop {
+        min-height: 200px;
     }
 }

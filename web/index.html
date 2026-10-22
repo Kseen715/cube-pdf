@@ -3,47 +3,89 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Распознавание PDF</title>
+<title>CUBE-PDF</title>
 <link rel="icon" href="icon.png">
 <link rel="stylesheet" href="app.css">
+<script src="js/theme.js"></script>
 <script type="module" src="js/app.js"></script>
 </head>
 <body>
-<main>
-  <h1>Сделать PDF, в котором можно искать текст</h1>
-  <p class="hint" id="intro"></p>
+<header class="bar">
+  <div class="bar-inner">
+    <span class="brand">
+      <!-- the drawing of tools/make_assets.py, in the theme's colours -->
+      <svg class="mark" viewBox="148 92 728 840" aria-hidden="true">
+        <path class="mark-top" d="M512 92 876 302 512 512 148 302Z"/>
+        <path class="mark-left" d="M148 302 512 512V932L148 722Z"/>
+        <path class="mark-right" d="M512 512 876 302V722L512 932Z"/>
+        <path class="mark-lines" d="M210 438l240 138v34L210 472Z
+          M210 538l270 156v34L210 572Z M210 638l200 115v34L210 672Z"/>
+      </svg>
+      CUBE-PDF
+    </span>
+    <div class="theme" role="group" aria-label="Тема оформления">
+      <button type="button" data-theme-choice="light">
+        <span class="swatch" aria-hidden="true"></span>
+        <span class="label">Светлая</span></button>
+      <button type="button" data-theme-choice="dark">
+        <span class="swatch" aria-hidden="true"></span>
+        <span class="label">Тёмная</span></button>
+      <button type="button" data-theme-choice="auto">
+        <span class="swatch" aria-hidden="true"></span>
+        <span class="label">Как в системе</span></button>
+    </div>
+  </div>
+</header>
 
-  <h2>1. Выберите файлы</h2>
-  <button id="drop" class="drop" type="button">
-    Нажмите сюда, чтобы выбрать файлы<br>или перетащите их в это окно
-  </button>
-  <ul id="tasks" class="tasks"></ul>
-  <div class="row">
-    <span class="hint grow">Двойной щелчок по готовому файлу откроет его.</span>
-    <button id="clear" type="button">Очистить список</button>
+<main>
+  <div class="title">
+    <h1>Сделать PDF, в котором можно искать текст</h1>
+    <p class="lede" id="intro"></p>
   </div>
 
-  <h2>2. На каком языке текст в документе?</h2>
-  <div class="row options" id="languages"></div>
-  <p class="hint">Можно отметить несколько. Не уверены — оставьте как есть.</p>
+  <div class="layout">
+    <section class="panel files" id="files" aria-labelledby="files-title">
+      <div class="panel-head">
+        <h2 id="files-title">Файлы</h2>
+        <span class="count" id="count"></span>
+        <button id="clear" class="text-button" type="button">
+          Очистить список</button>
+      </div>
+      <ul id="tasks" class="tasks"></ul>
+      <button id="drop" class="drop" type="button">
+        <span class="drop-title">Перетащите сюда файлы или папку</span>
+        <span class="drop-more">или нажмите, чтобы выбрать.
+          Подходят PDF, JPG, PNG и TIFF.</span>
+        <span class="drop-again">Добавить файлы</span>
+      </button>
+      <div class="panel-foot">
+        <p id="status" class="status" aria-live="polite"></p>
+        <progress id="progress" max="100" value="0"></progress>
+      </div>
+    </section>
 
-  <details id="more">
-    <summary>Дополнительные настройки</summary>
-    <div class="options column">
-      <label><input type="checkbox" id="deskew">
-        Выпрямлять кривые (наклонённые) страницы</label>
-      <label><input type="checkbox" id="force">
-        Распознать заново, даже если в файле уже есть текст</label>
-    </div>
-  </details>
+    <aside class="panel settings" aria-label="Настройки распознавания">
+      <section class="group" aria-labelledby="languages-title">
+        <h2 id="languages-title">Язык текста</h2>
+        <div class="choices" id="languages"></div>
+        <p class="note">Можно отметить несколько. Не уверены — оставьте
+          как есть.</p>
+      </section>
+      <section class="group" aria-labelledby="processing-title">
+        <h2 id="processing-title">Обработка</h2>
+        <div class="choices">
+          <label class="choice"><input type="checkbox" id="deskew">
+            Выпрямлять наклонённые страницы</label>
+          <label class="choice"><input type="checkbox" id="force">
+            Распознать заново, даже если в файле уже есть текст</label>
+        </div>
+      </section>
+      <button id="start" class="start" type="button"></button>
+    </aside>
+  </div>
 
-  <h2>3. Нажмите кнопку</h2>
-  <button id="start" class="start" type="button"></button>
-  <p id="status" class="status"></p>
-  <progress id="progress" max="100" value="0"></progress>
-
-  <footer>
-    <button id="about" class="link" type="button">
+  <footer class="foot">
+    <button id="about" class="text-button" type="button">
       О программе и лицензиях</button>
   </footer>
 </main>

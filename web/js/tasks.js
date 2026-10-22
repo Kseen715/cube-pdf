@@ -1,13 +1,14 @@
 // One input file in the list, and the list itself
 
 import { outputName } from './config.js';
+import { FileProgress } from './progress.js';
 
 // Engine error kind -> what we tell the user
 const ERROR_MESSAGES = {
     encrypted: 'Файл защищён паролем. Снимите пароль и попробуйте ещё раз.',
     has_text:
-        'В файле уже есть текст. Чтобы распознать его заново, нажмите ' +
-        '«Дополнительные настройки» и отметьте «Распознать заново».',
+        'В файле уже есть текст. Чтобы распознать его заново, отметьте ' +
+        '«Распознать заново» в разделе «Обработка».',
     output_access:
         'Не получилось сохранить результат. Наверное, файл «{output}» ' +
         'открыт в другой программе. Закройте его и попробуйте ещё раз.',
@@ -19,6 +20,9 @@ const ERROR_MESSAGES = {
     crash: 'Распознавание неожиданно прервалось.',
 };
 
+// A long document shows this many cells; each then stands for several pages
+const MAX_CELLS = 16;
+
 export const State = {
     WAITING: 'waiting',
     RUNNING: 'running',
@@ -27,21 +31,30 @@ export const State = {
     CANCELLED: 'cancelled',
 };
 
+// State -> [the word in the state column, the row's action]
+const STATE_VIEW = {
+    [State.WAITING]: ['Ждёт', ''],
+    [State.RUNNING]: ['', ''],
+    [State.DONE]: ['Готово', 'Открыть'],
+    [State.FAILED]: ['Ошибка', 'Причина'],
+    [State.CANCELLED]: ['Остановлено', ''],
+};
+
 export class Task {
     // source: {name, key, path} on the desktop, {name, key, file} on the web
     constructor(source) {
         this.source = source;
         this.output = outputName(source.name);
-        this.state = State.WAITING;
-        this.error = '';
-        this.details = '';
         this.result = null; // the engine's handle on the finished file
+        this.selected = false;
+        this.reset();
     }
 
     reset() {
         this.state = State.WAITING;
         this.error = '';
         this.details = '';
+        this.progress = new FileProgress();
     }
 
     setError(kind, details) {
@@ -50,25 +63,51 @@ export class Task {
         this.details = details;
     }
 
-    stateText(percent) {
+    // The second line under the file name
+    note() {
         switch (this.state) {
-            case State.WAITING:
-                return 'ждёт';
             case State.RUNNING:
-                return `в работе… ${percent ?? 0}%`;
+                return `${this.progress.label || 'Запускаю'}…`;
             case State.DONE:
-                return `✔ готово → ${this.output}`;
+                return `Сохранён как ${this.output}`;
             case State.FAILED:
-                return '✖ не получилось (двойной щелчок — подробности)';
+                return this.error;
             default:
-                return 'остановлено';
+                return `Получится ${this.output}`;
         }
     }
 }
 
+function element(tag, className = '', text = '') {
+    const node = document.createElement(tag);
+    node.className = className;
+    node.textContent = text;
+    return node;
+}
+
+function pagesCell({ pages, pagesDone }) {
+    const cell = element('div', 'task-pages');
+    if (!pages) {
+        cell.append(element('span', 'none', '—'));
+        return cell;
+    }
+    const perCell = Math.ceil(pages / MAX_CELLS);
+    const cells = element('span', 'cells');
+    for (let i = 0; i < Math.ceil(pages / perCell); i++) {
+        const read = (i + 1) * perCell <= pagesDone || pagesDone === pages;
+        cells.append(element('i', read ? 'read' : ''));
+    }
+    const count = element('span', '', `${pagesDone} / ${pages}`);
+    count.append(element('span', 'unit', ' стр.'));
+    cell.append(cells, count);
+    return cell;
+}
+
 export class TaskList {
-    constructor(element) {
-        this.element = element;
+    // onActivate(task): open a finished file or explain a failed one
+    constructor(list, onActivate) {
+        this.element = list;
+        this.onActivate = onActivate;
         this.tasks = [];
     }
 
@@ -96,31 +135,59 @@ export class TaskList {
     }
 
     selected() {
-        return this.tasks.filter((t) => t.item.classList.contains('selected'));
+        return this.tasks.filter((task) => task.selected);
     }
 
     pending() {
         return this.tasks.filter((task) => task.state !== State.DONE);
     }
 
-    paint(task, percent) {
-        task.item.textContent =
-            `${task.source.name}   —   ${task.stateText(percent)}`;
+    count(state) {
+        return this.tasks.filter((task) => task.state === state).length;
+    }
+
+    paint(task) {
+        const [word, action] = STATE_VIEW[task.state];
+        const name = element('div', 'task-name');
+        name.append(element('span', 'file', task.source.name),
+            element('span', 'sub', task.note()));
+
+        const state = element('div', 'task-state');
+        if (task.state === State.RUNNING)
+            state.textContent = `${Math.floor(task.progress.percent)} %`;
+        else if (task.state === State.DONE || task.state === State.FAILED)
+            state.append(element('span', 'pill', word));
+        else state.textContent = word;
+
+        const actionCell = element('div', 'task-action');
+        if (action) {
+            const button = element('button', 'text-button', action);
+            button.type = 'button';
+            button.addEventListener('click', () => this.onActivate(task));
+            actionCell.append(button);
+        }
+
+        task.item.className = task.state;
+        task.item.classList.toggle('selected', task.selected);
         task.item.title = [task.source.path ?? task.source.name, task.error]
             .filter(Boolean)
             .join('\n\n');
-        task.item.dataset.state = task.state;
+        task.item.replaceChildren(name, pagesCell(task.progress), state,
+            actionCell);
     }
 
     append(task) {
         task.item = document.createElement('li');
         task.item.addEventListener('click', (event) => {
-            if (!event.ctrlKey && !event.metaKey && !event.shiftKey) {
-                for (const other of this.tasks)
-                    other.item.classList.remove('selected');
+            if (event.target.closest('button')) return;
+            const only = !event.ctrlKey && !event.metaKey && !event.shiftKey;
+            for (const other of this.tasks) {
+                if (other === task) other.selected = !other.selected;
+                else if (only) other.selected = false;
+                other.item.classList.toggle('selected', other.selected);
             }
-            task.item.classList.toggle('selected');
         });
+        task.item.addEventListener('dblclick', () => this.onActivate(task));
         this.tasks.push(task);
         this.element.append(task.item);
         this.paint(task);

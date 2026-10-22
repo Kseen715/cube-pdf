@@ -8,7 +8,7 @@ define download
 	mv $@.part $@
 endef
 
-$(foreach p,$(SOURCE_PACKAGES),$(eval \
+$(foreach p,$(SOURCE_PACKAGES) $(FONT_PACKAGES),$(eval \
     $(DL)/$($(p)_FILE): ; $$(call download,$($(p)_URL),$($(p)_SHA256))))
 
 TESSDATA_DIR := $(DL)/tessdata-$(TESSDATA_VERSION)
@@ -29,9 +29,10 @@ endef
 lc = $(shell echo $(1) | tr A-Z a-z)
 
 SOURCE_FILES := $(foreach p,$(SOURCE_PACKAGES),$(DL)/$($(p)_FILE))
+FONT_FILES := $(foreach p,$(FONT_PACKAGES),$(DL)/$($(p)_FILE))
 SOURCES_DIR ?= $(DIST)/sources
 
-downloads: $(SOURCE_FILES) $(TESSDATA_FILES)
+downloads: $(SOURCE_FILES) $(FONT_FILES) $(TESSDATA_FILES)
 
 # The source of everything compiled into the programs, for releases
 sources: $(SOURCE_FILES)

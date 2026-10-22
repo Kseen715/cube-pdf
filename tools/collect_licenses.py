@@ -104,6 +104,10 @@ def components(v: dict[str, str]) -> list[Component]:
     def attached(package: str) -> str:
         return f'{v[package + "_FILE"]}, attached to every release'
 
+    def font_license(package: str, folder: str) -> str:
+        subsets = v[package + '_WOFF2'].rsplit('/', 1)[0]
+        return f'src:{folder}/{subsets}/license.txt'
+
     both = 'compiled into MuPDF and Ghostscript'
     return [
         Component(
@@ -203,6 +207,20 @@ def components(v: dict[str, str]) -> list[Component]:
             'AGPL-3.0-or-later',
             ['src:ghostscript/extract/COPYING'],
             'part of the Ghostscript sources',
+        ),
+        Component(
+            'IBM Plex Sans, the typeface of the window',
+            v['PLEX_SANS_VERSION'],
+            'OFL-1.1',
+            [font_license('PLEX_SANS', 'plex-sans')],
+            v['PLEX_HOME'],
+        ),
+        Component(
+            'IBM Plex Serif, the typeface of the headings',
+            v['PLEX_SERIF_VERSION'],
+            'OFL-1.1',
+            [font_license('PLEX_SERIF', 'plex-serif')],
+            v['PLEX_HOME'],
         ),
         Component(
             'GCC runtime libraries (libstdc++, libgcc), linked statically',
@@ -355,34 +373,35 @@ def check_crates(crates: list[Crate]) -> None:
     refused = [c for c in crates if not license_allowed(c.spdx)]
     if refused:
         names = ', '.join(f'{c.name} {c.version} ({c.spdx})' for c in refused)
-        sys.exit(f'Crates under licenses not cleared for OCR-PDF: {names}')
+        sys.exit(f'Crates under licenses not cleared for CUBE-PDF: {names}')
 
 
 # --- the notices file --------------------------------------------------------
 
 PROGRAMS = {
-    'linux': 'The Linux packages of OCR-PDF (OCR-PDF, ocr-pdf-core and\n'
+    'linux': 'The Linux packages of CUBE-PDF (CUBE-PDF, ocr-pdf-core and\n'
     'ocr-pdf-gs)',
-    'windows': 'The Windows build of OCR-PDF (OCR-PDF.exe, ocr-pdf-core.exe\n'
+    'windows': 'The Windows build of CUBE-PDF (CUBE-PDF.exe, ocr-pdf-core.exe\n'
     'and ocr-pdf-gs.exe)',
-    'wasm': 'The web version of OCR-PDF (ocr-core.wasm, gs.wasm and the\n'
+    'wasm': 'The web version of CUBE-PDF (ocr-core.wasm, gs.wasm and the\n'
     'JavaScript that loads them)',
 }
 
 HEADER = """\
-OCR-PDF: third-party notices
-============================
+CUBE-PDF: third-party notices
+=============================
 
-OCR-PDF is free software under the GNU Affero General Public License v3 or
+CUBE-PDF is free software under the GNU Affero General Public License v3 or
 later (see LICENSE). Its source code, the build scripts and this file are at
 {url}
 
 {programs} contain the third-party components listed below,
 each under its own license. The full license texts follow the list. Every
-component is built from the source tarball named in deps/versions.mk. The
-(A)GPL ones are unmodified, and their exact source code is attached to every
-GitHub release of OCR-PDF. Tesseract carries one small patch (deps/patches)
-that only changes the WebAssembly build.
+component is built from the source tarball named in deps/versions.mk, or,
+for the fonts, taken from the release archive named there. The (A)GPL ones
+are unmodified, and their exact source code is attached to every GitHub
+release of CUBE-PDF. Tesseract carries one small patch (deps/patches) that
+only changes the WebAssembly build.
 
 Portions of this software are copyright (C) The FreeType Project
 (https://freetype.org). All rights reserved.
@@ -392,7 +411,7 @@ This software is based in part on the work of the Independent JPEG Group.
 
 PLATFORM_NOTES = {
     'windows': """
-OCR-PDF.exe links the Microsoft Visual C++ runtime (vcruntime) statically,
+CUBE-PDF.exe links the Microsoft Visual C++ runtime (vcruntime) statically,
 under the Microsoft Visual Studio license terms for Distributable Code. The
 Universal C Runtime and Microsoft Edge WebView2, which show its window, are
 part of Windows and not shipped here.

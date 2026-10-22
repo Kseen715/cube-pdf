@@ -1,4 +1,4 @@
-# OCR-PDF
+# CUBE-PDF
 
 Turns scans and photos of documents into searchable PDF/A files. You pick files, press one
 button, and get `<name>_ocr.pdf`. The interface is in Russian.
@@ -26,6 +26,7 @@ first visit it also downloads about 70 MB of language models, which the browser 
 | [Ghostscript](https://ghostscript.com) | 10.08.0 | PDF/A-2b |
 | [zlib](https://zlib.net) | 1.3.2 | compression |
 | [Tauri](https://tauri.app) | 2.12 | the desktop window (WebView2 on Windows, WebKitGTK on Linux) |
+| [IBM Plex](https://github.com/IBM/plex) Sans and Serif | 0.2.0, 2.0.0 | the typefaces of the window |
 
 `deps/versions.mk` pins every source tarball by SHA-256. The full list, with the libraries
 MuPDF and Ghostscript bundle, is in each build's `THIRD-PARTY-NOTICES.txt`.
@@ -35,6 +36,7 @@ MuPDF and Ghostscript bundle, is in each build's `THIRD-PARTY-NOTICES.txt`.
 ```text
 web/            the window: HTML/CSS/JS, the same page everywhere
   js/app.js        file list, options, progress, dialogs
+  js/theme.js      light, dark or the system's theme
   js/engine-desktop.js   runs ocr-pdf-core through Tauri (desktop)
   js/engine-web.js       runs the WebAssembly core in Web Workers (browser)
 core/src/       the OCR pipeline, C/C++, compiled natively and to WebAssembly
@@ -131,7 +133,7 @@ python -m ruff check .
 
 ## License
 
-OCR-PDF is licensed under the GNU Affero General Public License v3.0 or later (see `LICENSE`).
+CUBE-PDF is licensed under the GNU Affero General Public License v3.0 or later (see `LICENSE`).
 It is built from third-party software under its own licenses: MuPDF and Ghostscript
 (AGPL-3.0), Tesseract (Apache-2.0), Leptonica (BSD-2-Clause), Tauri (MIT/Apache-2.0) and
 others. `THIRD-PARTY-NOTICES.txt` lists every component of a build with its full license text;
@@ -141,17 +143,17 @@ of every library in the programs.
 There is no AppImage: it would have to carry GTK, WebKitGTK and their dependencies. The `.deb`
 and `.rpm` packages use the distribution's own copies instead.
 
-OCR-PDF is not affiliated with or endorsed by the OCRmyPDF, Tesseract, MuPDF or Ghostscript
+CUBE-PDF is not affiliated with or endorsed by the OCRmyPDF, Tesseract, MuPDF or Ghostscript
 projects.
 
 ## Как пользоваться
 
-1. Установите программу (Windows: `OCR-PDF_…_x64-setup.exe` или распакуйте zip; Linux: `.deb`
+1. Установите программу (Windows: `CUBE-PDF_…_x64-setup.exe` или распакуйте zip; Linux: `.deb`
    или `.rpm`), либо откройте веб-версию в браузере. Можно сразу перетащить PDF или папку на
    значок программы.
-2. Нажмите на большую рамку и выберите файлы, или перетащите их (или папку) в окно. Подходят
-   PDF, JPG, PNG и TIFF.
+2. Нажмите на рамку «Перетащите сюда файлы или папку» и выберите файлы, или перетащите их
+   (или папку) в окно. Подходят PDF, JPG, PNG и TIFF.
 3. Отметьте языки текста.
-4. Нажмите зелёную кнопку **НАЧАТЬ РАСПОЗНАВАНИЕ**.
+4. Нажмите кнопку **Начать распознавание**.
 5. Готовый файл `имя_ocr.pdf` появится рядом с исходным (в веб-версии — скачается). Исходный
    файл не меняется.

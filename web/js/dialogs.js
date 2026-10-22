@@ -20,6 +20,7 @@ const LEGAL_FILES = [
     ['Сторонние компоненты', 'THIRD-PARTY-NOTICES.txt'],
 ];
 const CLOSE = 'Закрыть';
+const FAILED_HINT = 'Почему — видно по кнопке «Причина» в списке файлов.';
 
 const dialog = document.getElementById('dialog');
 
@@ -78,8 +79,7 @@ export async function showDone(done, failed, actions) {
         ? `Готово! Новый файл:\n\n${done[0].output}\n\n${actions.whereSingle}`
         : `Готово! Распознано файлов: ${done.length}.\n${actions.whereMany}`;
     if (failed.length) {
-        text += `\n\nНе получилось: ${failed.length}. Дважды щёлкните по ` +
-            'красному файлу в списке, чтобы узнать причину.';
+        text += `\n\nНе получилось: ${failed.length}. ${FAILED_HINT}`;
     }
 
     const buttons = [];
@@ -102,8 +102,7 @@ export function showError(task) {
 
 export function showAllFailed() {
     return show({
-        text: 'Ни один файл не получилось распознать.\nДважды щёлкните по ' +
-            'файлу в списке, чтобы узнать причину.',
+        text: `Ни один файл не получилось распознать.\n${FAILED_HINT}`,
     });
 }
 

@@ -1,8 +1,8 @@
 // Facts about the program that more than one place needs.
 // tools/collect_licenses.py reads SOURCE_URL from here too.
 
-export const APP_NAME = 'Распознавание PDF';
-export const SOURCE_URL = 'https://github.com/Kseen715/ocrmypdf-app';
+export const APP_NAME = 'CUBE-PDF';
+export const SOURCE_URL = 'https://github.com/Kseen715/cube-pdf';
 export const OUTPUT_SUFFIX = '_ocr';
 
 // Tesseract code -> label shown in the UI, in display order

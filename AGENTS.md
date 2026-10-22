@@ -2,7 +2,7 @@
 
 ## Keep the legal information in sync with the code
 
-OCR-PDF ships third-party code in three builds (Windows, Linux, web), so every release has to
+CUBE-PDF ships third-party code in three builds (Windows, Linux, web), so every release has to
 carry correct license notices and the source code of its copyleft parts. These files hold that
 information:
 
