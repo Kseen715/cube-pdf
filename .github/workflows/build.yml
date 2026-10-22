@@ -136,6 +136,8 @@ jobs:
       - name: Collect source tarballs
         run: make TARGET=wasm B=out SOURCES_DIR=sources sources
 
+      # The apps are named <name>-<version>-<platform>[-<libc>]-<arch>.<ext>,
+      # the version taken from the tag
       - name: Assemble release files
         run: |
           mkdir -p release
@@ -143,10 +145,12 @@ jobs:
             cp "dist/CUBE-PDF-$target/THIRD-PARTY-NOTICES.txt" \
               "release/THIRD-PARTY-NOTICES-$target.txt"
           done
-          cp dist/CUBE-PDF-linux/*.deb dist/CUBE-PDF-linux/*.rpm release/
-          cp dist/CUBE-PDF-windows/*-setup.exe \
-            dist/CUBE-PDF-windows/*-portable.zip release/
-          (cd dist/CUBE-PDF-wasm && zip -qr ../../release/CUBE-PDF-web.zip .)
+          app="release/CUBE-PDF-${GITHUB_REF_NAME#v}"
+          cp dist/CUBE-PDF-linux/*.deb "$app-linux-glibc-x86_64.deb"
+          cp dist/CUBE-PDF-linux/*.rpm "$app-linux-glibc-x86_64.rpm"
+          cp dist/CUBE-PDF-windows/*-setup.exe "$app-windows-x86_64.exe"
+          cp dist/CUBE-PDF-windows/*-portable.zip "$app-windows-x86_64.zip"
+          (cd dist/CUBE-PDF-wasm && zip -qr "../../$app-web-wasm32.zip" .)
           cp LICENSE release/
 
       - name: Publish release

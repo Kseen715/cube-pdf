@@ -110,7 +110,9 @@ To try the web version locally, serve `dist/wasm` with any static server, for ex
 Pushes to `main` also publish the web version on GitHub Pages; this needs **Settings → Pages →
 Source: GitHub Actions** once. Pushing a tag that starts with `v` creates a GitHub release with:
 
-- the Windows installer and portable zip, the Linux `.deb` and `.rpm`, the web site as a zip
+- the apps, named `CUBE-PDF-<version>-<platform>[-<libc>]-<arch>.<extension>`: the Windows
+  installer (`-windows-x86_64.exe`) and portable zip (`-windows-x86_64.zip`), the Linux
+  `-linux-glibc-x86_64.deb` and `.rpm`, the web site as `-web-wasm32.zip`
 - `LICENSE` and the `THIRD-PARTY-NOTICES-<target>.txt` files
 - the source tarballs of everything compiled into the programs
 
@@ -148,9 +150,9 @@ projects.
 
 ## Как пользоваться
 
-1. Установите программу (Windows: `CUBE-PDF_…_x64-setup.exe` или распакуйте zip; Linux: `.deb`
-   или `.rpm`), либо откройте веб-версию в браузере. Можно сразу перетащить PDF или папку на
-   значок программы.
+1. Установите программу (Windows: `CUBE-PDF-…-windows-x86_64.exe` или распакуйте
+   `CUBE-PDF-…-windows-x86_64.zip`; Linux: `.deb` или `.rpm`), либо откройте веб-версию
+   в браузере. Можно сразу перетащить PDF или папку на значок программы.
 2. Нажмите на рамку «Перетащите сюда файлы или папку» и выберите файлы, или перетащите их
    (или папку) в окно. Подходят PDF, JPG, PNG и TIFF.
 3. Отметьте языки текста.
