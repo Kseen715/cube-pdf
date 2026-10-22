@@ -774,4 +774,8 @@ dialog pre {
     .drop {
         min-height: 200px;
     }
+
+    .dialog-buttons {
+        flex-direction: column;
+    }
 }
