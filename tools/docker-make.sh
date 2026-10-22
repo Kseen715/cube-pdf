@@ -10,7 +10,8 @@ target=$1
 shift
 cd "$(dirname "$0")/.."
 
-docker build -q -t "ocr-$target" -f "docker/$target.Dockerfile" docker \
-    > /dev/null
+# CI builds the image in a step of its own, which caches its layers
+[ -n "$OCR_IMAGE_BUILT" ] || docker build -q -t "ocr-$target" \
+    -f "docker/$target.Dockerfile" docker > /dev/null
 exec docker run --rm -v "$PWD:/src" -v "${OCR_BUILD:-$PWD/out}:/build" \
     -w /src "ocr-$target" make TARGET="$target" B=/build "$@"

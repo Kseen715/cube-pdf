@@ -25,22 +25,66 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
+      # The cached builds below keep the times they were made at, which
+      # are older than a fresh checkout; dated back, the checkout no longer
+      # looks newer to make. The cache keys cover what each build is made
+      # from.
+      - name: Date the checkout back
+        run: git ls-files -z | xargs -0 touch -h -d @0
+
       # Source tarballs and language models; make checks their hashes
       - uses: actions/cache@v6
         with:
           path: out/downloads
           key: downloads-${{ hashFiles('deps/versions.mk') }}
 
-      # Crates and the MSVC runtime that cargo-xwin downloads
+      # The libraries, with their unpacked sources: the notices read the
+      # license files there
+      - uses: actions/cache@v6
+        with:
+          path: |
+            out/${{ matrix.target }}/src
+            out/${{ matrix.target }}/build
+            out/${{ matrix.target }}/prefix
+            out/${{ matrix.target }}/obj/utf8-manifest.o
+            out/${{ matrix.target }}/stamp/zlib
+            out/${{ matrix.target }}/stamp/leptonica
+            out/${{ matrix.target }}/stamp/tesseract
+            out/${{ matrix.target }}/stamp/mupdf
+            out/${{ matrix.target }}/stamp/ghostscript-src
+            out/${{ matrix.target }}/stamp/ghostscript
+          key: libs-${{ matrix.target }}-${{ hashFiles('Makefile', 'mk/**',
+            'deps/**', format('docker/{0}.Dockerfile', matrix.target)) }}
+
+      # Crates, the MSVC runtime that cargo-xwin downloads and the compiled
+      # crates; the Dockerfile sets the Rust version
       - uses: actions/cache@v6
         if: matrix.target != 'wasm'
         with:
           path: |
             out/cargo-home/registry
             out/xwin
-          key: cargo-${{ matrix.target }}-${{ hashFiles('**/Cargo.lock') }}
+            out/${{ matrix.target }}/cargo
+            !out/${{ matrix.target }}/cargo/*/release/bundle
+          key: cargo-${{ matrix.target }}-${{ hashFiles('**/Cargo.lock',
+            format('docker/{0}.Dockerfile', matrix.target)) }}
+
+      # Building the toolchain image compiles tauri-cli and cargo-xwin,
+      # which takes minutes, so its layers are cached between runs
+      - uses: docker/setup-buildx-action@v4
+
+      - uses: docker/build-push-action@v7
+        with:
+          context: docker
+          file: docker/${{ matrix.target }}.Dockerfile
+          tags: ocr-${{ matrix.target }}
+          load: true
+          cache-from: type=gha,scope=${{ matrix.target }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.target }}
 
       - name: Build
+        env:
+          OCR_IMAGE_BUILT: 1
         run: tools/docker-make.sh ${{ matrix.target }}
 
       - uses: actions/upload-artifact@v7

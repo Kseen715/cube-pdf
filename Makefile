@@ -15,6 +15,9 @@ TARGET ?= linux
 B ?= $(CURDIR)/out
 DIST ?= $(CURDIR)/dist/$(TARGET)
 JOBS ?= $(shell nproc)
+# Independent libraries build in parallel; each target's output is printed
+# in one piece, so a failure log stays readable
+MAKEFLAGS += -j$(JOBS) --output-sync=target
 
 T := $(B)/$(TARGET)
 DL := $(B)/downloads

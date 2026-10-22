@@ -1,4 +1,8 @@
 # Third-party libraries, each built with its own build system into $(PREFIX)
+#
+# They build at the same time and share make's job slots: the sub-makes
+# get no -j of their own, and "+" hands the slots to the make that
+# cmake --build starts.
 
 LIB_CFLAGS := $(OPT_FLAGS)
 # Looked up by the shell: make itself would trip over the cmake/ folder
@@ -55,7 +59,7 @@ $(STAMP)/zlib: $(DL)/$(ZLIB_FILE)
 	cd $(T)/src/zlib && CC="$(CC)" AR="$(AR)" RANLIB="$(RANLIB)" \
 	    CFLAGS="$(LIB_CFLAGS)" CHOST=$(HOST) ./configure --static \
 	    --prefix=$(PREFIX)
-	$(MAKE) -C $(T)/src/zlib -j$(JOBS) libz.a
+	$(MAKE) -C $(T)/src/zlib libz.a
 	$(MAKE) -C $(T)/src/zlib install
 	mkdir -p $(@D) && touch $@
 
@@ -63,7 +67,7 @@ $(STAMP)/leptonica: $(DL)/$(LEPTONICA_FILE) $(STAMP)/zlib
 	$(call unpack,LEPTONICA,$(T)/src/leptonica)
 	$(CMAKE) -S $(T)/src/leptonica -B $(T)/build/leptonica \
 	    $(CMAKE_COMMON) $(LEPTONICA_CMAKE)
-	$(CMAKE_BIN) --build $(T)/build/leptonica -j$(JOBS)
+	+$(CMAKE_BIN) --build $(T)/build/leptonica
 	$(CMAKE_BIN) --install $(T)/build/leptonica
 	mkdir -p $(@D) && touch $@
 
@@ -71,13 +75,13 @@ $(STAMP)/tesseract: $(DL)/$(TESSERACT_FILE) $(STAMP)/leptonica
 	$(call unpack,TESSERACT,$(T)/src/tesseract)
 	$(CMAKE) -S $(T)/src/tesseract -B $(T)/build/tesseract \
 	    $(CMAKE_COMMON) $(TESSERACT_CMAKE)
-	$(CMAKE_BIN) --build $(T)/build/tesseract -j$(JOBS)
+	+$(CMAKE_BIN) --build $(T)/build/tesseract
 	$(CMAKE_BIN) --install $(T)/build/tesseract
 	mkdir -p $(@D) && touch $@
 
 $(STAMP)/mupdf: $(DL)/$(MUPDF_FILE) $(STAMP)/zlib
 	$(call unpack,MUPDF,$(T)/src/mupdf)
-	$(MAKE) -C $(T)/src/mupdf -j$(JOBS) build=release \
+	$(MAKE) -C $(T)/src/mupdf build=release \
 	    OUT=$(T)/build/mupdf $(MUPDF_TARGET_FLAGS) $(MUPDF_FEATURES) \
 	    XCFLAGS="$(MUPDF_DEFINES) $(MUPDF_TARGET_DEFINES) $(LIB_CFLAGS)" libs
 	mkdir -p $(PREFIX)/include $(PREFIX)/lib
@@ -93,7 +97,7 @@ $(STAMP)/ghostscript-src: $(DL)/$(GHOSTSCRIPT_FILE)
 $(STAMP)/ghostscript: $(STAMP)/ghostscript-src $(GS_DEPS)
 	cd $(T)/src/ghostscript && $(GS_CONFIGURE_ENV) ./configure \
 	    CFLAGS="$(LIB_CFLAGS)" $(GS_CONFIGURE) $(GS_TARGET_FLAGS)
-	$(MAKE) -C $(T)/src/ghostscript -j$(JOBS) gs
+	$(MAKE) -C $(T)/src/ghostscript gs
 	touch $@
 
 LIBS_STAMPS := $(STAMP)/tesseract $(STAMP)/mupdf
