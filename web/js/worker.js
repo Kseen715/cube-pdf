@@ -25,21 +25,25 @@ const ready = OcrCore().then((core) => {
 });
 const loadedLanguages = new Set();
 
-// Language models are large, so they are kept in the Cache Storage
+// Language models are large, so they are kept in the Cache Storage. The
+// cache is only a speed-up: storing is retried on the next run when the
+// browser refuses it (quota, private mode, a body it could not stream).
 async function fetchModel(lang) {
     const url = new URL(`../${TESSDATA_PATH}${lang}.traineddata`,
         import.meta.url);
     const cache = await caches.open(TESSDATA_CACHE).catch(() => null);
-    let response = await cache?.match(url);
-    if (!response) {
-        response = await fetch(url);
-        if (!response.ok) {
-            throw { error: 'missing_dependency', detail: `${url}: ` +
-                `${response.status}` };
-        }
-        await cache?.put(url, response.clone());
+    const cached = await cache?.match(url).catch(() => null);
+    if (cached) return new Uint8Array(await cached.arrayBuffer());
+
+    const response = await fetch(url);
+    if (!response.ok) {
+        throw { error: 'missing_dependency', detail: `${url}: ` +
+            `${response.status}` };
     }
-    return new Uint8Array(await response.arrayBuffer());
+    const model = new Uint8Array(await response.arrayBuffer());
+
+    await cache?.put(url, new Response(model)).catch(() => {});
+    return model;
 }
 
 async function loadLanguages(core, languages) {
