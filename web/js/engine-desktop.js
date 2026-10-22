@@ -26,9 +26,11 @@ export class DesktopEngine {
         this.actions = {
             whereSingle: 'Он лежит рядом с исходным.',
             whereMany: 'Новые файлы лежат рядом с исходными.',
+            rowLabel: 'Открыть',
             openLabel: 'Открыть файл',
             open: (task) => tauri.opener.openPath(task.result),
             reveal: (task) => tauri.opener.revealItemInDir(task.result),
+            doneDialog: true,
         };
     }
 

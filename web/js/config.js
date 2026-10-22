@@ -3,6 +3,7 @@
 
 export const APP_NAME = 'CUBE-PDF';
 export const SOURCE_URL = 'https://github.com/Kseen715/cube-pdf';
+export const RELEASES_URL = `${SOURCE_URL}/releases`;
 export const OUTPUT_SUFFIX = '_ocr';
 
 // Tesseract code -> label shown in the UI, in display order

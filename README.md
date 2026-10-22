@@ -9,7 +9,7 @@ One code base, three builds:
 | --- | --- | --- |
 | Windows app (installer or portable zip) | natively, one Tesseract per CPU core | next to the original |
 | Linux app (`.deb`, `.rpm`) | natively, one Tesseract per CPU core | next to the original |
-| Web version (GitHub Pages) | in the browser: WebAssembly in Web Workers, on the visitor's CPU | downloaded; files never leave the computer |
+| Web version (GitHub Pages) | in the browser: WebAssembly in Web Workers, on the visitor's CPU | downloaded with the file's button; files never leave the computer |
 
 The web version gives the same text as the apps (same engine, same models). It is slower: a
 24-page scan took 4.6 s in the Windows app and 7–12 s in Chromium on a 16-thread CPU. On the
@@ -155,5 +155,5 @@ projects.
    (или папку) в окно. Подходят PDF, JPG, PNG и TIFF.
 3. Отметьте языки текста.
 4. Нажмите кнопку **Начать распознавание**.
-5. Готовый файл `имя_ocr.pdf` появится рядом с исходным (в веб-версии — скачается). Исходный
+5. Готовый файл `имя_ocr.pdf` появится рядом с исходным (в веб-версии — скачивается кнопкой **Скачать** в строке файла). Исходный
    файл не меняется.

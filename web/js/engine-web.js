@@ -1,6 +1,6 @@
 // The web engine: the same OCR core, compiled to WebAssembly, runs in Web
 // Workers on this computer's processor. Files never leave the browser; each
-// result is downloaded.
+// result waits in memory until its row's button downloads it.
 
 import { OUTPUT_SUFFIX, hasInputExtension } from './config.js';
 
@@ -109,16 +109,16 @@ function download(blob, name) {
 export class WebEngine {
     constructor() {
         this.kind = 'web';
-        this.intro = 'Программа читает текст на сканах и фотографиях ' +
-            'документов. Файлы не покидают ваш компьютер: всё распознаётся ' +
-            'прямо в браузере. Готовый файл, с ' +
-            `«${OUTPUT_SUFFIX}» в конце названия, скачается сам.`;
+        this.intro = 'CUBE-PDF распознаёт текст на сканах и фотографиях ' +
+            'документов (OCR) с помощью Tesseract. Распознавание идёт ' +
+            'прямо на вашем устройстве: файлы никуда не отправляются и не ' +
+            'покидают его. Готовый PDF, в котором можно искать и копировать ' +
+            'текст, скачивается кнопкой «Скачать» рядом с названием файла.';
+        // The row's button is the download, so no dialog after a batch
         this.actions = {
-            whereSingle: 'Он сохранён в папку загрузок.',
-            whereMany: 'Новые файлы сохранены в папку загрузок.',
-            openLabel: 'Открыть файл',
-            open: (task) => window.open(URL.createObjectURL(task.result)),
-            reveal: null,
+            rowLabel: 'Скачать',
+            open: (task) => download(task.result, task.output),
+            doneDialog: false,
         };
         this.pool = [];
         this.input = document.getElementById('file-input');
@@ -165,7 +165,6 @@ export class WebEngine {
         const finished = this.process(task, options, onMessage).then(
             (blob) => {
                 task.result = blob;
-                download(blob, task.output);
                 onMessage({ event: 'done', output: task.output });
                 return 0;
             },

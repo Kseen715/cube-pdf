@@ -270,6 +270,10 @@ h1 {
     font-size: 16px;
 }
 
+.lede a {
+    color: var(--text);
+}
+
 /* --- the two panels -------------------------------------------------- */
 
 .layout {

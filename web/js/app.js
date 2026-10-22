@@ -3,7 +3,7 @@
 // app (engine-desktop.js); the engine is the only difference.
 
 import {
-    APP_NAME, DEFAULT_LANGUAGES, LANGUAGES, hasInputExtension,
+    APP_NAME, DEFAULT_LANGUAGES, LANGUAGES, RELEASES_URL, hasInputExtension,
 } from './config.js';
 import * as dialogs from './dialogs.js';
 import { State, TaskList } from './tasks.js';
@@ -38,7 +38,7 @@ function loadSettings() {
 class App {
     constructor(engine) {
         this.engine = engine;
-        this.list = new TaskList($('tasks'),
+        this.list = new TaskList($('tasks'), engine.actions.rowLabel,
             (task) => this.taskActivated(task));
         this.settings = loadSettings();
         this.running = false;
@@ -50,6 +50,8 @@ class App {
 
         document.title = APP_NAME;
         $('intro').textContent = engine.intro;
+        $('native').hidden = engine.kind !== 'web';
+        $('releases').href = RELEASES_URL;
         this.buildLanguages();
         this.connect();
         this.applySettings();
@@ -311,7 +313,7 @@ class App {
 
         this.engine.attention();
         if (batch.length === 1 && failed.length) dialogs.showError(failed[0]);
-        else if (done.length)
+        else if (done.length && this.engine.actions.doneDialog)
             dialogs.showDone(done, failed, this.engine.actions);
         else if (failed.length) dialogs.showAllFailed();
     }

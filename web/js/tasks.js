@@ -31,11 +31,12 @@ export const State = {
     CANCELLED: 'cancelled',
 };
 
-// State -> [the word in the state column, the row's action]
+// State -> [the word in the state column, the row's action]; a finished
+// file's action is named by the engine
 const STATE_VIEW = {
     [State.WAITING]: ['Ждёт', ''],
     [State.RUNNING]: ['', ''],
-    [State.DONE]: ['Готово', 'Открыть'],
+    [State.DONE]: ['Готово', ''],
     [State.FAILED]: ['Ошибка', 'Причина'],
     [State.CANCELLED]: ['Остановлено', ''],
 };
@@ -104,9 +105,11 @@ function pagesCell({ pages, pagesDone }) {
 }
 
 export class TaskList {
+    // doneLabel: the action of a finished file;
     // onActivate(task): open a finished file or explain a failed one
-    constructor(list, onActivate) {
+    constructor(list, doneLabel, onActivate) {
         this.element = list;
+        this.doneLabel = doneLabel;
         this.onActivate = onActivate;
         this.tasks = [];
     }
@@ -147,7 +150,8 @@ export class TaskList {
     }
 
     paint(task) {
-        const [word, action] = STATE_VIEW[task.state];
+        const [word, view] = STATE_VIEW[task.state];
+        const action = task.state === State.DONE ? this.doneLabel : view;
         const name = element('div', 'task-name');
         name.append(element('span', 'file', task.source.name),
             element('span', 'sub', task.note()));
