@@ -620,9 +620,15 @@ input[type="checkbox"]:disabled {
 
 .foot {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
+    align-items: center;
     padding: 24px 0 40px;
     font-size: var(--fs-small);
+}
+
+.version {
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
 }
 
 /* --- dialogs --------------------------------------------------------- */

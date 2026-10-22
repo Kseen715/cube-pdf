@@ -7,6 +7,7 @@ import {
 } from './config.js';
 import * as dialogs from './dialogs.js';
 import { State, TaskList } from './tasks.js';
+import { APP_VERSION } from './version.js';
 
 const START_TEXT = 'Начать распознавание';
 const STOP_TEXT = 'Остановить';
@@ -52,6 +53,7 @@ class App {
         $('intro').textContent = engine.intro;
         $('native').hidden = engine.kind !== 'web';
         $('releases').href = RELEASES_URL;
+        $('version').textContent = APP_VERSION;
         this.buildLanguages();
         this.connect();
         this.applySettings();

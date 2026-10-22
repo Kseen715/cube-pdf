@@ -28,3 +28,8 @@ RUN curl -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal \
     && cargo install tauri-cli --version $TAURI_CLI_VERSION --locked \
     && cargo install cargo-xwin --version $CARGO_XWIN_VERSION --locked \
     && rm -rf $CARGO_HOME/registry $CARGO_HOME/git
+
+# The checkout is mounted from the host and owned by another user; git
+# refuses to read such a repository unless it is trusted. The build reads
+# the commit for the version shown in the window (mk/version.mk).
+RUN git config --system --add safe.directory '*'

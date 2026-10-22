@@ -34,6 +34,7 @@ include mk/fonts.mk
 include mk/deps.mk
 include mk/core.mk
 include mk/notices.mk
+include mk/version.mk
 include mk/$(PACKAGE).mk
 
 clean:
