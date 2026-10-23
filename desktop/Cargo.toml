@@ -2,7 +2,8 @@
 # and starts the native ocr-pdf-core. Built by mk/desktop.mk and mk/apk.mk.
 [package]
 name = "ocr-pdf"
-version = "2.0.0"
+# The apps take their version from the git tag (mk/version.mk)
+version = "0.0.0"
 edition = "2021"
 license = "AGPL-3.0-or-later"
 publish = false

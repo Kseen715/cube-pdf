@@ -20,6 +20,8 @@ define stage_app
 	mkdir -p $(STAGE)
 	tar -c --exclude=desktop/target desktop web | tar -x -C $(STAGE)
 	cp $(VERSION_JS) $(STAGE)/web/js/
+	sed -i 's/^  "productName": .*/&\n  "version": "$(PACKAGE_VERSION)",/' \
+	    $(STAGE)/desktop/tauri.conf.json
 	rm -rf $(STAGE)/web/fonts && cp -r $(FONTS_DIR) $(STAGE)/web/fonts
 	for dir in desktop web; do \
 	    cp LICENSE $(STAGE)/$$dir/LICENSE.txt; \

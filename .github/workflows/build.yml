@@ -24,7 +24,11 @@ jobs:
         target: [linux, windows, wasm, android]
     runs-on: ubuntu-latest
     steps:
+      # The whole history with its tags: the version is the latest tag
+      # (mk/version.mk)
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
 
       # The cached builds below keep the times they were made at, which
       # are older than a fresh checkout; dated back, the checkout no longer

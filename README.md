@@ -137,9 +137,12 @@ Source: GitHub Actions** once. Pushing a tag that starts with `v` creates a GitH
 - `LICENSE` and the `THIRD-PARTY-NOTICES-<target>.txt` files
 - the source tarballs of everything compiled into the programs
 
+The apps take their version from the latest tag `v<x.y.z>`, so a release needs no version bump in
+the code; builds after the tag show it with the commit, such as `v2.2.1+b4c2406`.
+
 ```sh
-git tag v2.0.0
-git push origin v2.0.0
+git tag v2.2.1
+git push origin v2.2.1
 ```
 
 The APK is signed when the repository has the secrets `ANDROID_KEYSTORE_BASE64` (the keystore,
