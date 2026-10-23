@@ -68,7 +68,8 @@ jobs:
             out/xwin
             out/${{ matrix.target }}*/cargo
             !out/${{ matrix.target }}*/cargo/*/release/bundle
-          key: cargo-${{ matrix.target }}-${{ hashFiles('**/Cargo.lock',
+          key: cargo-${{ matrix.target }}-${{ hashFiles('Cargo.lock',
+            'desktop/Cargo.lock',
             format('docker/{0}.Dockerfile', matrix.target)) }}
 
       # Gradle itself and the Android libraries, which gradle.lockfile pins
