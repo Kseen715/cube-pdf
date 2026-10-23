@@ -1,9 +1,8 @@
 # Builds everything from source in the Docker toolchains (docker/), on every
 # push and pull request: the Linux and Windows desktop apps, the Android
-# app and the web version. Pushes to main also publish the web version on
-# GitHub Pages. Pushing a tag like v2.0.0 publishes a GitHub release with
-# the apps, their license notices and the source tarballs of everything
-# compiled into them.
+# app and the web version. Pushing a tag like v2.0.0 publishes the web
+# version on GitHub Pages and a GitHub release with the apps, their license
+# notices and the source tarballs of everything compiled into them.
 name: Build
 
 on:
@@ -128,7 +127,7 @@ jobs:
           if-no-files-found: error
 
   pages:
-    if: github.ref == 'refs/heads/main'
+    if: startsWith(github.ref, 'refs/tags/v')
     needs: build
     runs-on: ubuntu-latest
     permissions:

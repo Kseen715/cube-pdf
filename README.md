@@ -127,8 +127,9 @@ To try the web version locally, serve `dist/wasm` with any static server, for ex
 ### GitHub Actions
 
 `.github/workflows/build.yml` builds all four targets for every push and pull request.
-Pushes to `main` also publish the web version on GitHub Pages; this needs **Settings → Pages →
-Source: GitHub Actions** once. Pushing a tag that starts with `v` creates a GitHub release with:
+Tags that start with `v` also publish the web version on GitHub Pages; this needs **Settings →
+Pages → Source: GitHub Actions** once, and the tag rule `v*` in **Settings → Environments →
+github-pages → Deployment branches and tags**. Pushing a tag that starts with `v` creates a GitHub release with:
 
 - the apps, named `CUBE-PDF-<version>-<platform>[-<libc>]-<arch>.<extension>`: the Windows
   installer (`-windows-x86_64.exe`) and portable zip (`-windows-x86_64.zip`), the Linux
