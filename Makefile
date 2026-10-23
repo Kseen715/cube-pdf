@@ -9,7 +9,8 @@
 #   tools/docker-make.sh wasm      web version (a static site)
 #   tools/docker-make.sh android   Android app (.apk)
 #
-# Other goals: core (just ocr-pdf-core and the libraries), notices, clean.
+# Other goals: core (just ocr-pdf-core and the libraries), test (the core's
+# tests, Linux only), notices, clean.
 # Finished packages land in dist/<target>/.
 
 TARGET ?= linux
@@ -41,6 +42,7 @@ include mk/fetch.mk
 include mk/fonts.mk
 include mk/deps.mk
 include mk/core.mk
+include mk/test.mk
 include mk/notices.mk
 include mk/version.mk
 include mk/$(PACKAGE).mk

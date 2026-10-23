@@ -131,3 +131,7 @@ is already there.
   `.venv\Scripts\python -m pip install -r requirements-dev.txt`, then run
   `.venv\Scripts\python -m ruff format .` and `.venv\Scripts\python -m ruff check .` before
   finishing a change. Both must pass.
+- Tests live in `tests/`: `tests/tools` (unittest), `tests/web` (`node:test`) and
+  `tests/core` (a C/C++ program, run with `tools/docker-make.sh linux test`). Add or update the
+  tests of the part a change touches, and run that part's tests before finishing it (see the
+  README, "Tests"). They must pass.

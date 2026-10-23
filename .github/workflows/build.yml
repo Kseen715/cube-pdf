@@ -1,15 +1,27 @@
-# Builds everything from source in the Docker toolchains (docker/), on every
-# push and pull request: the Linux and Windows desktop apps, the Android
-# app and the web version. Pushing a tag like v2.0.0 publishes the web
-# version on GitHub Pages and a GitHub release with the apps, their license
-# notices and the source tarballs of everything compiled into them.
+# Builds everything from source in the Docker toolchains (docker/): the
+# Linux and Windows desktop apps, the Android app and the web version. It
+# runs for a tag like v2.0.0, when started by hand, and on main when what
+# the build caches come from changes, so that the next tag starts from warm
+# caches. A tag also publishes the web version on GitHub Pages and a GitHub
+# release with the apps, their license notices and the source tarballs of
+# everything compiled into them. Every push runs the tests (check.yml,
+# core.yml).
 name: Build
 
+# GitHub ignores paths for tags, so every tag builds
 on:
   push:
     branches: [main]
     tags: ['v*']
-  pull_request:
+    paths:
+      - 'deps/**'
+      - 'docker/**'
+      - 'mk/**'
+      - Makefile
+      - desktop/Cargo.lock
+      - 'desktop/gen/android/**'
+      - .github/workflows/build.yml
+      - '.github/actions/**'
   workflow_dispatch:
 
 permissions:
@@ -29,37 +41,9 @@ jobs:
         with:
           fetch-depth: 0
 
-      # The cached builds below keep the times they were made at, which
-      # are older than a fresh checkout; dated back, the checkout no longer
-      # looks newer to make. The cache keys cover what each build is made
-      # from.
-      - name: Date the checkout back
-        run: git ls-files -z | xargs -0 touch -h -d @0
-
-      # Source tarballs and language models; make checks their hashes
-      - uses: actions/cache@v6
+      - uses: ./.github/actions/toolchain
         with:
-          path: out/downloads
-          key: downloads-${{ hashFiles('deps/versions.mk') }}
-
-      # The libraries, with their unpacked sources: the notices read the
-      # license files there. Android has a build directory per ABI,
-      # out/android-<abi>, hence the "*".
-      - uses: actions/cache@v6
-        with:
-          path: |
-            out/${{ matrix.target }}*/src
-            out/${{ matrix.target }}*/build
-            out/${{ matrix.target }}*/prefix
-            out/${{ matrix.target }}*/obj/utf8-manifest.o
-            out/${{ matrix.target }}*/stamp/zlib
-            out/${{ matrix.target }}*/stamp/leptonica
-            out/${{ matrix.target }}*/stamp/tesseract
-            out/${{ matrix.target }}*/stamp/mupdf
-            out/${{ matrix.target }}*/stamp/ghostscript-src
-            out/${{ matrix.target }}*/stamp/ghostscript
-          key: libs-${{ matrix.target }}-${{ hashFiles('Makefile', 'mk/**',
-            'deps/**', format('docker/{0}.Dockerfile', matrix.target)) }}
+          target: ${{ matrix.target }}
 
       # Crates, the MSVC runtime that cargo-xwin downloads and the compiled
       # crates; the Dockerfile sets the Rust version
@@ -85,19 +69,6 @@ jobs:
           key: gradle-${{ hashFiles('desktop/gen/android/**/*.kts',
             'desktop/gen/android/**/gradle.lockfile',
             'desktop/gen/android/gradle/wrapper/*.properties') }}
-
-      # Building the toolchain image compiles tauri-cli and cargo-xwin,
-      # which takes minutes, so its layers are cached between runs
-      - uses: docker/setup-buildx-action@v4
-
-      - uses: docker/build-push-action@v7
-        with:
-          context: docker
-          file: docker/${{ matrix.target }}.Dockerfile
-          tags: ocr-${{ matrix.target }}
-          load: true
-          cache-from: type=gha,scope=${{ matrix.target }}
-          cache-to: type=gha,mode=max,scope=${{ matrix.target }}
 
       # The APK is signed with the keystore in the repository's secrets;
       # without them, as in pull requests from forks, it comes out unsigned

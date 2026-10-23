@@ -1,0 +1,60 @@
+# The toolchain container of one target (docker/) and the caches its build
+# starts from. build.yml and core.yml both use it, so they share the cache
+# keys: a run on main warms the caches a tag's build restores.
+name: Toolchain
+description: The toolchain image of a target and its download and library
+  caches
+
+inputs:
+  target:
+    description: linux, windows, wasm or android
+    required: true
+
+runs:
+  using: composite
+  steps:
+    # The cached builds below keep the times they were made at, which
+    # are older than a fresh checkout; dated back, the checkout no longer
+    # looks newer to make. The cache keys cover what each build is made
+    # from.
+    - name: Date the checkout back
+      shell: bash
+      run: git ls-files -z | xargs -0 touch -h -d @0
+
+    # Source tarballs and language models; make checks their hashes
+    - uses: actions/cache@v6
+      with:
+        path: out/downloads
+        key: downloads-${{ hashFiles('deps/versions.mk') }}
+
+    # The libraries, with their unpacked sources: the notices read the
+    # license files there. Android has a build directory per ABI,
+    # out/android-<abi>, hence the "*".
+    - uses: actions/cache@v6
+      with:
+        path: |
+          out/${{ inputs.target }}*/src
+          out/${{ inputs.target }}*/build
+          out/${{ inputs.target }}*/prefix
+          out/${{ inputs.target }}*/obj/utf8-manifest.o
+          out/${{ inputs.target }}*/stamp/zlib
+          out/${{ inputs.target }}*/stamp/leptonica
+          out/${{ inputs.target }}*/stamp/tesseract
+          out/${{ inputs.target }}*/stamp/mupdf
+          out/${{ inputs.target }}*/stamp/ghostscript-src
+          out/${{ inputs.target }}*/stamp/ghostscript
+        key: libs-${{ inputs.target }}-${{ hashFiles('Makefile', 'mk/**',
+          'deps/**', format('docker/{0}.Dockerfile', inputs.target)) }}
+
+    # Building the toolchain image compiles tauri-cli and cargo-xwin,
+    # which takes minutes, so its layers are cached between runs
+    - uses: docker/setup-buildx-action@v4
+
+    - uses: docker/build-push-action@v7
+      with:
+        context: docker
+        file: docker/${{ inputs.target }}.Dockerfile
+        tags: ocr-${{ inputs.target }}
+        load: true
+        cache-from: type=gha,scope=${{ inputs.target }}
+        cache-to: type=gha,mode=max,scope=${{ inputs.target }}

@@ -1,0 +1,40 @@
+# Checks every push to main and every pull request without building the
+# apps (build.yml does that): Ruff and the tests of tools/, and the tests of
+# the page in web/. The core has its own tests (core.yml).
+name: Check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install Ruff and Pillow
+        run: |
+          python3 -m venv .venv
+          .venv/bin/python -m pip install -q -r requirements-dev.txt
+
+      - name: Format
+        run: .venv/bin/python -m ruff format --check .
+
+      - name: Lint
+        run: .venv/bin/python -m ruff check .
+
+      - name: Test
+        run: .venv/bin/python -m unittest discover -s tests/tools
+
+  web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Test
+        run: node --test tests/web/*.test.js

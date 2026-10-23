@@ -113,6 +113,7 @@ Other goals, passed after the target:
 
 - `core`: only `ocr-pdf-core`, `ocr-pdf-gs` and the models, in `out/<target>/bin`
 - `notices`: only `THIRD-PARTY-NOTICES.txt`
+- `test` (Linux only): the core's tests, see [Tests](#tests)
 - `sources`: the source tarballs that every release attaches
 
 `ocr-pdf-core` can be used on its own:
@@ -126,10 +127,15 @@ To try the web version locally, serve `dist/wasm` with any static server, for ex
 
 ### GitHub Actions
 
-`.github/workflows/build.yml` builds all four targets for every push and pull request.
-Tags that start with `v` also publish the web version on GitHub Pages; this needs **Settings →
-Pages → Source: GitHub Actions** once, and the tag rule `v*` in **Settings → Environments →
-github-pages → Deployment branches and tags**. Pushing a tag that starts with `v` creates a GitHub release with:
+`.github/workflows/check.yml` runs Ruff and the tests of `tools/` and `web/` on every push to
+`main` and every pull request; `core.yml` runs the core's tests when the core or what it is built
+from changes. `.github/workflows/build.yml` builds all four targets for tags that start with `v`,
+when started by hand from the Actions tab, and on `main` when what its caches come from changes
+(`deps/`, `docker/`, `mk/`, the `Makefile`, `desktop/Cargo.lock`, `desktop/gen/android/`), so the
+next tag starts from warm caches. A tag also publishes the web version on GitHub Pages; this needs
+**Settings → Pages → Source: GitHub Actions** once, and the tag rule `v*` in **Settings →
+Environments → github-pages → Deployment branches and tags**. A tag also creates a GitHub release
+with:
 
 - the apps, named `CUBE-PDF-<version>-<platform>[-<libc>]-<arch>.<extension>`: the Windows
   installer (`-windows-x86_64.exe`) and portable zip (`-windows-x86_64.zip`), the Linux
@@ -160,6 +166,22 @@ python -m pip install -r requirements-dev.txt
 python -m ruff format .
 python -m ruff check .
 ```
+
+### Tests
+
+`tests/` holds the tests of each part, with no test framework to install:
+
+```sh
+python -m unittest discover -s tests/tools   # tools/ and the legal files
+node --test tests/web/*.test.js              # the page's logic (web/js)
+tools/docker-make.sh linux test              # the OCR core, end to end
+```
+
+The core's tests (`tests/core`) are a C/C++ program, `out/linux/test-core`, linked with the
+core and run against the built `ocr-pdf-core`, Ghostscript and language models: they make PDFs
+and scans of a page of text with MuPDF and check what comes out, including Tesseract's
+recognition and PDF/A. The window's DOM, the engines and the Rust shell are not tested; the
+builds cover them.
 
 ## License
 
