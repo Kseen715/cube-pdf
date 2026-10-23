@@ -7,6 +7,7 @@
 #   tools/docker-make.sh linux     Linux desktop app (.deb, .AppImage)
 #   tools/docker-make.sh windows   Windows desktop app (installer, .zip)
 #   tools/docker-make.sh wasm      web version (a static site)
+#   tools/docker-make.sh android   Android app (.apk)
 #
 # Other goals: core (just ocr-pdf-core and the libraries), notices, clean.
 # Finished packages land in dist/<target>/.
@@ -19,7 +20,14 @@ JOBS ?= $(shell nproc)
 # in one piece, so a failure log stays readable
 MAKEFLAGS += -j$(JOBS) --output-sync=target
 
-T := $(B)/$(TARGET)
+# Android builds the libraries once per ABI, each in a build directory of
+# its own; the build of the first ABI also makes the APK (mk/apk.mk)
+ANDROID_ABIS := arm64-v8a x86_64
+ifeq ($(TARGET),android)
+ABI ?= $(firstword $(ANDROID_ABIS))
+endif
+
+T := $(B)/$(TARGET)$(ABI:%=-%)
 DL := $(B)/downloads
 PREFIX := $(T)/prefix
 STAMP := $(T)/stamp

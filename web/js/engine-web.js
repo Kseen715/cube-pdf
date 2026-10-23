@@ -2,11 +2,11 @@
 // Workers on this computer's processor. Files never leave the browser; each
 // result waits in memory until its row's button downloads it.
 
-import { OUTPUT_SUFFIX, hasInputExtension } from './config.js';
+import {
+    OUTPUT_SUFFIX, hasInputExtension, parallelPages,
+} from './config.js';
 
 const MAX_WORKERS = 8;
-// Each worker holds Tesseract and its models: about this much memory
-const WORKER_MEMORY_GB = 0.5;
 // Matches ocr_action in core/src/pdf.h
 const SKIP = 0;
 
@@ -46,11 +46,7 @@ class WorkerClient {
 }
 
 function workerCount(pages) {
-    const cores = navigator.hardwareConcurrency || 2;
-    const memory = navigator.deviceMemory
-        ? Math.floor(navigator.deviceMemory / WORKER_MEMORY_GB)
-        : MAX_WORKERS;
-    return Math.max(1, Math.min(pages, cores, memory, MAX_WORKERS));
+    return Math.max(1, Math.min(pages, parallelPages(), MAX_WORKERS));
 }
 
 function source(file) {

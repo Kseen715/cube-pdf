@@ -1,0 +1,16 @@
+On Android, Tesseract asks Google's cpu_features library whether the CPU
+has NEON. Only 32-bit ARM needs that question: every 64-bit ARM CPU has
+NEON, and x86 CPUs are asked with cpuid. Require the library only for
+32-bit ARM, so the 64-bit builds need no extra dependency.
+
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -850,6 +850,8 @@
+ 
+ if(ANDROID)
+   add_definitions(-DANDROID)
++endif()
++if(ANDROID AND ANDROID_ABI MATCHES "^armeabi")
+   find_package(CpuFeaturesNdkCompat REQUIRED)
+   target_include_directories(
+     libtesseract

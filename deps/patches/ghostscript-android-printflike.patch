@@ -1,0 +1,31 @@
+Android's C library (bionic) defines __printflike with the name printf,
+which Ghostscript's gsio.h turns into an error on purpose. On Android, use
+Ghostscript's own definition instead, which says __printf__. Other
+platforms are not affected.
+
+--- a/base/gserrors.h
++++ b/base/gserrors.h
+@@ -159,6 +159,10 @@
+  *
+  */
+ 
++/* Android's bionic defines it with "printf", which gsio.h redefines */
++#ifdef __BIONIC__
++#  undef __printflike
++#endif
+ #ifndef __printflike
+ #if __GNUC__ > 2 || __GNUC__ == 2 && __GNUC_MINOR__ >= 7
+ #define __printflike(fmtarg, firstvararg) \
+--- a/base/std.h
++++ b/base/std.h
+@@ -216,6 +216,10 @@
+  * The maximum string length is 1023 characters.
+  */
+ #ifdef __PROTOTYPES__
++#  ifdef __BIONIC__
++     /* bionic defines it with "printf", which gsio.h redefines */
++#    undef __printflike
++#  endif
+ #  ifndef __printflike
+    /* error checking for printf format args gcc only */
+ #    if __GNUC__ > 2 || __GNUC__ == 2 && __GNUC_MINOR__ >= 7

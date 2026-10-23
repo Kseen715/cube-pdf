@@ -1,6 +1,7 @@
 // The window. Deliberately simple: pick files, tick languages, press start.
 // The same page runs in the browser (engine-web.js) and inside the desktop
-// app (engine-desktop.js); the engine is the only difference.
+// and Android apps (engine-desktop.js, engine-android.js); the engine is the
+// only difference.
 
 import {
     APP_NAME, DEFAULT_LANGUAGES, LANGUAGES, RELEASES_URL, hasInputExtension,
@@ -365,10 +366,16 @@ class App {
     }
 }
 
+async function loadEngine() {
+    if (!window.__TAURI__)
+        return new (await import('./engine-web.js')).WebEngine();
+    if (navigator.userAgent.includes('Android'))
+        return new (await import('./engine-android.js')).AndroidEngine();
+    return new (await import('./engine-desktop.js')).DesktopEngine();
+}
+
 async function main() {
-    const engine = window.__TAURI__
-        ? new (await import('./engine-desktop.js')).DesktopEngine()
-        : new (await import('./engine-web.js')).WebEngine();
+    const engine = await loadEngine();
     await engine.init();
     new App(engine);
 }

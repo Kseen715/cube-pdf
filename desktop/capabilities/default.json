@@ -3,6 +3,7 @@
   "identifier": "default",
   "description": "Pick files, open the results, run ocr-pdf-core",
   "windows": ["main"],
+  "platforms": ["linux", "windows", "macOS"],
   "permissions": [
     "core:default",
     "core:window:allow-destroy",

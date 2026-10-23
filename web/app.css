@@ -472,6 +472,21 @@ h1 {
     color: var(--muted);
 }
 
+/* Touch screens cannot drag files onto the page */
+.touch {
+    display: none;
+}
+
+@media (pointer: coarse) {
+    .pointer {
+        display: none;
+    }
+
+    .touch {
+        display: revert;
+    }
+}
+
 .drop-again,
 .has-files .drop-title,
 .has-files .drop-more {

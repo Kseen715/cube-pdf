@@ -2,7 +2,8 @@
 // and reads its progress from stdout, one JSON message per line:
 //
 //   ocr-pdf-core run --input IN --output OUT --languages rus+eng
-//                    [--force] [--deskew] [--tessdata DIR] [--jobs N]
+//                    [--force] [--deskew] [--tessdata DIR] [--gs PROGRAM]
+//                    [--jobs N]
 //   ocr-pdf-core expand --extensions .pdf,.png --skip-suffix _ocr PATH...
 //
 // The messages are the same ones the web version's workers send, see
@@ -35,7 +36,8 @@ const char EXE_SUFFIX[] = "";
 const char GS_NAME[] = "ocr-pdf-gs";
 const char USAGE[] =
     "usage: ocr-pdf-core run --input IN --output OUT --languages LANGS\n"
-    "           [--force] [--deskew] [--tessdata DIR] [--jobs N]\n"
+    "           [--force] [--deskew] [--tessdata DIR] [--gs PROGRAM]\n"
+    "           [--jobs N]\n"
     "       ocr-pdf-core expand --extensions EXTS --skip-suffix S PATH...\n";
 
 struct Job {
@@ -227,6 +229,8 @@ Job parse_job(const std::vector<std::string> &args)
             job.options.languages = args[++i];
         else if (flag == "--tessdata" && has_value)
             job.tessdata = args[++i];
+        else if (flag == "--gs" && has_value)
+            job.gs = args[++i];
         else if (flag == "--jobs" && has_value)
             job.jobs = std::stoi(args[++i]);
         else

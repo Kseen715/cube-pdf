@@ -1,0 +1,11 @@
+/src/main/**/generated
+/src/main/jniLibs/**/*.so
+/src/main/assets/tauri.conf.json
+/tauri.build.gradle.kts
+/proguard-tauri.pro
+/tauri.properties
+# Put there by mk/apk.mk: the programs, the language models and the icons
+/src/main/assets/tessdata
+/src/main/res/mipmap-*
+/src/main/res/drawable*/ic_launcher*
+/src/main/res/values/ic_launcher_background.xml

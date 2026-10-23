@@ -1,16 +1,21 @@
 """Write THIRD-PARTY-NOTICES.txt: every third-party component of one build.
 
-Usage: python3 tools/collect_licenses.py linux|windows|wasm BUILD_DIR OUTPUT
+Usage: python3 tools/collect_licenses.py linux|windows|wasm|android \
+           BUILD_DIR OUTPUT
 
 The Makefile runs it inside the build container once the libraries are
 built, because every license text is read from where it comes from:
 
     src:<package>/<path>   the unpacked upstream source, BUILD_DIR/src
-    toolchain:<path>       the Emscripten toolchain ($EMSDK)
-    <name>                 licenses/ in this repository, for the compiler
-                           runtimes that have no source tree in the build
+    toolchain:<path>       the target's toolchain: Emscripten ($EMSDK) or
+                           the Android NDK ($NDK_HOME)
+    <name>                 licenses/ in this repository, for what has no
+                           source tree in the build: the compiler runtimes
+                           and the Android libraries
     Rust crates            their own license files, listed by
-                           `cargo metadata` for the desktop app
+                           `cargo metadata` for the app
+    Android libraries      listed in the Gradle lockfile of the Android
+                           project
 """
 
 from __future__ import annotations
@@ -28,12 +33,15 @@ LICENSES = ROOT / 'licenses'
 VERSIONS_MK = ROOT / 'deps' / 'versions.mk'
 CONFIG_JS = ROOT / 'web' / 'js' / 'config.js'
 DESKTOP = ROOT / 'desktop'
+GRADLE_LOCKFILE = DESKTOP / 'gen' / 'android' / 'app' / 'gradle.lockfile'
 
-DESKTOP_TARGETS = {
+# The Rust target whose crates each app has; every Android ABI has the same
+APP_TARGETS = {
     'linux': 'x86_64-unknown-linux-gnu',
     'windows': 'x86_64-pc-windows-msvc',
+    'android': 'aarch64-linux-android',
 }
-ALL_TARGETS = ('linux', 'windows', 'wasm')
+ALL_TARGETS = ('linux', 'windows', 'wasm', 'android')
 
 # Licenses a Rust crate may use: all of them allow combining with the AGPL
 ALLOWED_LICENSES = {
@@ -54,6 +62,26 @@ ALLOWED_LICENSES = {
     'Zlib',
 }
 LICENSE_FILE = re.compile(r'^(licen[cs]e|copying|notice|unlicense)', re.I)
+
+# The Maven groups the APK may take libraries from, with their license and
+# its text in licenses/. Only add a group after checking the license of
+# every library in it, as for ALLOWED_LICENSES.
+# A group ending in "." also stands for the groups under it.
+APACHE = ('Apache-2.0', 'Apache-2.0.txt')
+ANDROID_GROUPS = {
+    'androidx.': APACHE,
+    'com.fasterxml.jackson': APACHE,
+    'com.fasterxml.jackson.': APACHE,
+    'com.google.android.material': APACHE,
+    'com.google.errorprone': APACHE,
+    'com.google.guava': APACHE,
+    'org.jetbrains': APACHE,
+    'org.jetbrains.kotlin': APACHE,
+    'org.jetbrains.kotlinx': APACHE,
+    'org.jspecify': APACHE,
+}
+# The Gradle configuration of what goes into the release APK
+ANDROID_RUNTIME = 'universalReleaseRuntimeClasspath'
 RULE = '=' * 78
 
 
@@ -98,6 +126,15 @@ def compiler_version(command: str) -> str:
     except FileNotFoundError:
         return ''
     return result.stdout.strip()
+
+
+def ndk_version() -> str:
+    """Empty outside the Android container."""
+    properties = Path(os.environ.get('NDK_HOME', '/')) / 'source.properties'
+    if not properties.exists():
+        return ''
+    match = re.search(r'Pkg\.ReleaseName = (\S+)', properties.read_text())
+    return match.group(1) if match else ''
 
 
 def components(v: dict[str, str]) -> list[Component]:
@@ -270,17 +307,35 @@ def components(v: dict[str, str]) -> list[Component]:
             'https://github.com/llvm/llvm-project',
             ('wasm',),
         ),
+        Component(
+            'LLVM libc++, libc++abi, compiler-rt, libunwind (in the Android '
+            'NDK), linked statically',
+            ndk_version(),
+            'Apache-2.0 WITH LLVM-exception',
+            ['toolchain:toolchains/llvm/prebuilt/linux-x86_64/NOTICE'],
+            'https://github.com/llvm/llvm-project',
+            ('android',),
+        ),
     ]
 
 
-def license_text(name: str, build_dir: Path) -> str:
+def toolchain_dir(target: str) -> Path:
+    if target == 'android':
+        return Path(os.environ['NDK_HOME'])
+    return Path(os.environ['EMSDK']) / 'upstream' / 'emscripten'
+
+
+def license_text(name: str, target: str, build_dir: Path) -> str:
     if name.startswith('src:'):
         path = build_dir / 'src' / name.removeprefix('src:')
     elif name.startswith('toolchain:'):
-        emscripten = Path(os.environ['EMSDK']) / 'upstream' / 'emscripten'
-        path = emscripten / name.removeprefix('toolchain:')
+        path = toolchain_dir(target) / name.removeprefix('toolchain:')
     else:
         path = LICENSES / name
+    return read_license(path)
+
+
+def read_license(path: Path) -> str:
     if not path.exists():
         sys.exit(f'license file missing: {path}')
     return path.read_text(encoding='utf-8', errors='replace')
@@ -376,6 +431,47 @@ def check_crates(crates: list[Crate]) -> None:
         sys.exit(f'Crates under licenses not cleared for CUBE-PDF: {names}')
 
 
+# --- Android libraries of the APK --------------------------------------------
+
+
+class Library(NamedTuple):
+    name: str  # group:artifact
+    version: str
+    spdx: str
+    text: str  # the license text, in licenses/
+
+
+def library_license(name: str) -> tuple[str, str] | None:
+    group = name.split(':')[0]
+    for prefix, license in ANDROID_GROUPS.items():
+        if group == prefix or prefix.endswith('.') and group.startswith(prefix):
+            return license
+    return None
+
+
+def android_libraries() -> list[Library]:
+    """The libraries Gradle puts into the release APK, as its lockfile
+    pins them. Gradle fails the build when they differ from the lockfile."""
+    if not GRADLE_LOCKFILE.exists():
+        sys.exit(f'missing {GRADLE_LOCKFILE}')
+    libraries, refused = [], []
+    for line in GRADLE_LOCKFILE.read_text(encoding='utf-8').splitlines():
+        coordinate, _, configurations = line.partition('=')
+        if ANDROID_RUNTIME not in configurations.split(','):
+            continue
+        group, artifact, version = coordinate.split(':')
+        name = f'{group}:{artifact}'
+        license = library_license(name)
+        if license:
+            libraries.append(Library(name, version, *license))
+        else:
+            refused.append(coordinate)
+    if refused:
+        names = ', '.join(refused)
+        sys.exit(f'Android libraries not cleared for CUBE-PDF: {names}')
+    return sorted(libraries)
+
+
 # --- the notices file --------------------------------------------------------
 
 PROGRAMS = {
@@ -385,6 +481,8 @@ PROGRAMS = {
     'and ocr-pdf-gs.exe)',
     'wasm': 'The web version of CUBE-PDF (ocr-core.wasm, gs.wasm and the\n'
     'JavaScript that loads them)',
+    'android': 'The Android app of CUBE-PDF (the APK; ocr-pdf-core and\n'
+    'ocr-pdf-gs are in it as lib*.so)',
 }
 
 HEADER = """\
@@ -398,10 +496,12 @@ later (see LICENSE). Its source code, the build scripts and this file are at
 {programs} contain the third-party components listed below,
 each under its own license. The full license texts follow the list. Every
 component is built from the source tarball named in deps/versions.mk, or,
-for the fonts, taken from the release archive named there. The (A)GPL ones
-are unmodified, and their exact source code is attached to every GitHub
-release of CUBE-PDF. Tesseract carries one small patch (deps/patches) that
-only changes the WebAssembly build.
+for the fonts, taken from the release archive named there. Their exact
+source code, of the (A)GPL ones in particular, is attached to every GitHub
+release of CUBE-PDF. Small patches (deps/patches) only make the sources
+build for some targets, without changing what the programs do: Tesseract's
+SIMD detection for WebAssembly and its CPU feature library for Android,
+and a header of Ghostscript for Android's C library.
 
 Portions of this software are copyright (C) The FreeType Project
 (https://freetype.org). All rights reserved.
@@ -419,6 +519,10 @@ part of Windows and not shipped here.
     'linux': """
 The window uses GTK and WebKitGTK from the Linux distribution; they are not
 part of these packages.
+""",
+    'android': """
+The window uses the Android System WebView, which is part of Android and
+not shipped here.
 """,
 }
 
@@ -448,21 +552,37 @@ def text_sections(
     return sections
 
 
-def notices(target: str, build_dir: Path) -> str:
-    native = [c for c in components(read_versions()) if target in c.targets]
-    crates = []
-    if target in DESKTOP_TARGETS:
-        crates = shipped_crates(DESKTOP_TARGETS[target])
-        check_crates(crates)
+def crate_sections(crates: list[Crate], shown: dict[str, str]) -> list[str]:
+    sections = []
+    for crate in crates:
+        title = f'Crate {crate.name} {crate.version} ({crate.spdx})'
+        texts = crate_license_files(crate) or [
+            ('license', f'{crate.spdx}; the crate ships no license file.')
+        ]
+        sections += text_sections(title, texts, shown)
+    return sections
 
-    parts = [
-        HEADER.format(url=source_url(), programs=PROGRAMS[target]),
-        PLATFORM_NOTES.get(target, ''),
-        '\nComponents\n----------\n',
-        *(row(c.name, c.version, c.spdx, c.source) for c in native),
-    ]
+
+def library_sections(
+    libraries: list[Library], shown: dict[str, str]
+) -> list[str]:
+    """One list of the libraries, then each of their license texts once."""
+    if not libraries:
+        return []
+    listing = ''.join(
+        f'{lib.name} {lib.version} ({lib.spdx})\n' for lib in libraries
+    )
+    sections = [section('Android libraries (from Google Maven)', listing)]
+    for text in sorted({lib.text for lib in libraries}):
+        texts = [(text, read_license(LICENSES / text))]
+        sections += text_sections('Android libraries', texts, shown)
+    return sections
+
+
+def summary_rows(crates: list[Crate], libraries: list[Library]) -> list[str]:
+    rows = []
     if crates:
-        parts.append(
+        rows.append(
             row(
                 'Tauri and the other Rust crates of the window',
                 f'({len(crates)} crates)',
@@ -470,20 +590,43 @@ def notices(target: str, build_dir: Path) -> str:
                 'https://crates.io',
             )
         )
+    if libraries:
+        rows.append(
+            row(
+                'AndroidX, Kotlin and the other Android libraries',
+                f'({len(libraries)} libraries)',
+                'see the list below',
+                'https://maven.google.com, https://central.sonatype.com',
+            )
+        )
+    return rows
+
+
+def notices(target: str, build_dir: Path) -> str:
+    native = [c for c in components(read_versions()) if target in c.targets]
+    crates = []
+    if target in APP_TARGETS:
+        crates = shipped_crates(APP_TARGETS[target])
+        check_crates(crates)
+    libraries = android_libraries() if target == 'android' else []
+
+    parts = [
+        HEADER.format(url=source_url(), programs=PROGRAMS[target]),
+        PLATFORM_NOTES.get(target, ''),
+        '\nComponents\n----------\n',
+        *(row(c.name, c.version, c.spdx, c.source) for c in native),
+        *summary_rows(crates, libraries),
+    ]
 
     shown: dict[str, str] = {}
     for c in native:
         texts = [
-            (name.rsplit('/', 1)[-1], license_text(name, build_dir))
+            (name.rsplit('/', 1)[-1], license_text(name, target, build_dir))
             for name in c.files
         ]
         parts += text_sections(f'{c.name} {c.version}'.rstrip(), texts, shown)
-    for crate in crates:
-        title = f'Crate {crate.name} {crate.version} ({crate.spdx})'
-        texts = crate_license_files(crate) or [
-            ('license', f'{crate.spdx}; the crate ships no license file.')
-        ]
-        parts += text_sections(title, texts, shown)
+    parts += crate_sections(crates, shown)
+    parts += library_sections(libraries, shown)
     return ''.join(parts)
 
 

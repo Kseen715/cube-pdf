@@ -1,5 +1,5 @@
-# The desktop shell (Tauri): a window that shows the shared page from web/
-# and starts the native ocr-pdf-core. Built by mk/desktop.mk.
+# The app shell (Tauri): a window that shows the shared page from web/
+# and starts the native ocr-pdf-core. Built by mk/desktop.mk and mk/apk.mk.
 [package]
 name = "ocr-pdf"
 version = "2.0.0"
@@ -7,11 +7,19 @@ edition = "2021"
 license = "AGPL-3.0-or-later"
 publish = false
 
+# Android loads the app as a library; the desktop builds use main.rs
+[lib]
+name = "ocr_pdf_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
 [build-dependencies]
 tauri-build = { version = "2.7", features = [] }
 
 [dependencies]
 tauri = { version = "2.12", features = [] }
+serde = { version = "1", features = ["derive"] }
+
+[target.'cfg(not(target_os = "android"))'.dependencies]
 tauri-plugin-dialog = "2.8"
 tauri-plugin-opener = "2.7"
 tauri-plugin-shell = "2.5"

@@ -2,6 +2,7 @@
 // once per file. The result goes next to the original file.
 
 import { INPUT_EXTENSIONS, OUTPUT_SUFFIX } from './config.js';
+import { coreMessage, runOptions } from './core.js';
 
 const tauri = window.__TAURI__;
 const CORE = 'binaries/ocr-pdf-core';
@@ -95,21 +96,13 @@ export class DesktopEngine {
     async start(task, options, onMessage) {
         const output = this.folderOf(task.source) + task.output;
         const args = ['run', '--input', task.source.path, '--output', output,
-            '--languages', options.languages.join('+'),
-            '--tessdata', this.tessdata];
-        if (options.force) args.push('--force');
-        if (options.deskew) args.push('--deskew');
+            '--tessdata', this.tessdata, ...runOptions(options)];
 
         const command = tauri.shell.Command.sidecar(CORE, args);
-        command.stdout.on('data', (line) => {
-            try {
-                onMessage(JSON.parse(line));
-            } catch {
-                onMessage({ event: 'log', level: 'stdout', msg: line });
-            }
-        });
+        command.stdout.on('data', (line) =>
+            onMessage(coreMessage(line, 'stdout')));
         command.stderr.on('data', (line) =>
-            onMessage({ event: 'log', level: 'stderr', msg: line }));
+            onMessage(coreMessage(line, 'stderr')));
         const finished = new Promise((resolve) => {
             command.on('close', ({ code }) => resolve(code));
             command.on('error', (error) => {

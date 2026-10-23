@@ -1,8 +1,9 @@
 # Builds everything from source in the Docker toolchains (docker/), on every
-# push and pull request: the Linux and Windows desktop apps and the web
-# version. Pushes to main also publish the web version on GitHub Pages.
-# Pushing a tag like v2.0.0 publishes a GitHub release with the apps, their
-# license notices and the source tarballs of everything compiled into them.
+# push and pull request: the Linux and Windows desktop apps, the Android
+# app and the web version. Pushes to main also publish the web version on
+# GitHub Pages. Pushing a tag like v2.0.0 publishes a GitHub release with
+# the apps, their license notices and the source tarballs of everything
+# compiled into them.
 name: Build
 
 on:
@@ -20,7 +21,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        target: [linux, windows, wasm]
+        target: [linux, windows, wasm, android]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -39,20 +40,21 @@ jobs:
           key: downloads-${{ hashFiles('deps/versions.mk') }}
 
       # The libraries, with their unpacked sources: the notices read the
-      # license files there
+      # license files there. Android has a build directory per ABI,
+      # out/android-<abi>, hence the "*".
       - uses: actions/cache@v6
         with:
           path: |
-            out/${{ matrix.target }}/src
-            out/${{ matrix.target }}/build
-            out/${{ matrix.target }}/prefix
-            out/${{ matrix.target }}/obj/utf8-manifest.o
-            out/${{ matrix.target }}/stamp/zlib
-            out/${{ matrix.target }}/stamp/leptonica
-            out/${{ matrix.target }}/stamp/tesseract
-            out/${{ matrix.target }}/stamp/mupdf
-            out/${{ matrix.target }}/stamp/ghostscript-src
-            out/${{ matrix.target }}/stamp/ghostscript
+            out/${{ matrix.target }}*/src
+            out/${{ matrix.target }}*/build
+            out/${{ matrix.target }}*/prefix
+            out/${{ matrix.target }}*/obj/utf8-manifest.o
+            out/${{ matrix.target }}*/stamp/zlib
+            out/${{ matrix.target }}*/stamp/leptonica
+            out/${{ matrix.target }}*/stamp/tesseract
+            out/${{ matrix.target }}*/stamp/mupdf
+            out/${{ matrix.target }}*/stamp/ghostscript-src
+            out/${{ matrix.target }}*/stamp/ghostscript
           key: libs-${{ matrix.target }}-${{ hashFiles('Makefile', 'mk/**',
             'deps/**', format('docker/{0}.Dockerfile', matrix.target)) }}
 
@@ -64,10 +66,21 @@ jobs:
           path: |
             out/cargo-home/registry
             out/xwin
-            out/${{ matrix.target }}/cargo
-            !out/${{ matrix.target }}/cargo/*/release/bundle
+            out/${{ matrix.target }}*/cargo
+            !out/${{ matrix.target }}*/cargo/*/release/bundle
           key: cargo-${{ matrix.target }}-${{ hashFiles('**/Cargo.lock',
             format('docker/{0}.Dockerfile', matrix.target)) }}
+
+      # Gradle itself and the Android libraries, which gradle.lockfile pins
+      - uses: actions/cache@v6
+        if: matrix.target == 'android'
+        with:
+          path: |
+            out/gradle-home/caches
+            out/gradle-home/wrapper
+          key: gradle-${{ hashFiles('desktop/gen/android/**/*.kts',
+            'desktop/gen/android/**/gradle.lockfile',
+            'desktop/gen/android/gradle/wrapper/*.properties') }}
 
       # Building the toolchain image compiles tauri-cli and cargo-xwin,
       # which takes minutes, so its layers are cached between runs
@@ -82,9 +95,25 @@ jobs:
           cache-from: type=gha,scope=${{ matrix.target }}
           cache-to: type=gha,mode=max,scope=${{ matrix.target }}
 
+      # The APK is signed with the keystore in the repository's secrets;
+      # without them, as in pull requests from forks, it comes out unsigned
+      - name: Unpack the Android keystore
+        if: matrix.target == 'android'
+        env:
+          KEYSTORE: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          if [ -n "$KEYSTORE" ]; then
+            mkdir -p out
+            echo "$KEYSTORE" | base64 -d > out/release.jks
+            echo "ANDROID_KEYSTORE=/build/release.jks" >> "$GITHUB_ENV"
+          fi
+
       - name: Build
         env:
           OCR_IMAGE_BUILT: 1
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: tools/docker-make.sh ${{ matrix.target }}
 
       - uses: actions/upload-artifact@v7
@@ -141,7 +170,7 @@ jobs:
       - name: Assemble release files
         run: |
           mkdir -p release
-          for target in linux windows wasm; do
+          for target in linux windows wasm android; do
             cp "dist/CUBE-PDF-$target/THIRD-PARTY-NOTICES.txt" \
               "release/THIRD-PARTY-NOTICES-$target.txt"
           done
@@ -150,6 +179,7 @@ jobs:
           cp dist/CUBE-PDF-linux/*.rpm "$app-linux-glibc-x86_64.rpm"
           cp dist/CUBE-PDF-windows/*-setup.exe "$app-windows-x86_64.exe"
           cp dist/CUBE-PDF-windows/*-portable.zip "$app-windows-x86_64.zip"
+          cp dist/CUBE-PDF-android/*.apk "$app-android-universal.apk"
           (cd dist/CUBE-PDF-wasm && zip -qr "../../$app-web-wasm32.zip" .)
           cp LICENSE release/
 

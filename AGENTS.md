@@ -2,7 +2,7 @@
 
 ## Keep the legal information in sync with the code
 
-CUBE-PDF ships third-party code in three builds (Windows, Linux, web), so every release has to
+CUBE-PDF ships third-party code in four builds (Windows, Linux, Android, web), so every release has to
 carry correct license notices and the source code of its copyleft parts. These files hold that
 information:
 
@@ -11,11 +11,12 @@ information:
 | `LICENSE` | AGPL-3.0 text for this project's own code |
 | `deps/versions.mk` | Every source tarball the build compiles, with URL and SHA-256; `SOURCE_PACKAGES` lists the ones every release attaches |
 | `deps/patches/` | Our changes to upstream sources, applied while unpacking |
-| `tools/collect_licenses.py` | `components()`: every component in the programs, with version, SPDX license, license files and source location, per target; `ALLOWED_LICENSES` for Rust crates; the notices header |
-| `licenses/` | License files for what has no source tree in the build (the GCC and MinGW-w64 runtimes) |
+| `tools/collect_licenses.py` | `components()`: every component in the programs, with version, SPDX license, license files and source location, per target; `ALLOWED_LICENSES` for Rust crates; `ANDROID_GROUPS` for the Android libraries; the notices header |
+| `desktop/gen/android/app/gradle.lockfile` | The Android libraries (AndroidX, Kotlin, ...) in the APK, pinned; the notices list them from here |
+| `licenses/` | License files for what has no source tree in the build (the GCC and MinGW-w64 runtimes, the Apache-2.0 text of the Android libraries) |
 | `web/js/config.js` | `SOURCE_URL`, shown in the app and in the notices |
 | `web/js/dialogs.js` | `ABOUT`: copyright line, license statement, no-warranty statement |
-| `mk/desktop.mk`, `mk/web.mk`, `mk/windows.mk`, `mk/linux.mk`, `.github/workflows/build.yml` | Put `LICENSE` and `THIRD-PARTY-NOTICES.txt` into every package and site, and attach them and the source tarballs (`make sources`) to releases |
+| `mk/stage.mk`, `mk/desktop.mk`, `mk/apk.mk`, `mk/web.mk`, `mk/windows.mk`, `mk/linux.mk`, `.github/workflows/build.yml` | Put `LICENSE` and `THIRD-PARTY-NOTICES.txt` into every package and site, and attach them and the source tarballs (`make sources`) to releases |
 | `README.md` | "What is inside" table, "License" section |
 
 Treat the legal update as part of the change itself, made in the same commit and never left
@@ -46,10 +47,20 @@ for later.
   Do not guess.
 - Commit the updated `desktop/Cargo.lock`.
 
+### When you change the Android libraries (`desktop/gen/android`)
+
+- Gradle refuses to build with libraries other than those in `app/gradle.lockfile`. After
+  changing a dependency, run `./gradlew :app:dependencies --write-locks` in the staged project
+  (`out/android-arm64-v8a/stage/desktop/gen/android`) and commit the new lockfile.
+- `collect_licenses.py` stops the build when a library comes from a Maven group outside
+  `ANDROID_GROUPS`. Only add a group after checking the license of every library in it, by the
+  same rules as for the crates.
+
 ### When you bundle anything new
 
-This covers any new file in the packages (`mk/desktop.mk` stage, `mk/web.mk` site, Tauri
-`resources` and `externalBin`), fonts, icons, images and models.
+This covers any new file in the packages (`mk/desktop.mk` and `mk/apk.mk` stage, `mk/web.mk`
+site, Tauri `resources` and `externalBin`, the APK's `jniLibs` and `assets`), fonts, icons,
+images and models.
 
 - Give it a `components()` entry with its license and the targets it ships in.
 - If its license is (A)GPL or LGPL, add its exact source tarball to `deps/versions.mk` and

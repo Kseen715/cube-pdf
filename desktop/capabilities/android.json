@@ -1,0 +1,8 @@
+{
+  "$schema": "../gen/schemas/mobile-schema.json",
+  "identifier": "android",
+  "description": "The window; the app's own commands start ocr-pdf-core",
+  "windows": ["main"],
+  "platforms": ["android"],
+  "permissions": ["core:default"]
+}
