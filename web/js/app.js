@@ -4,31 +4,21 @@
 // only difference.
 
 import {
-    APP_NAME, DEFAULT_LANGUAGES, LANGUAGES, RELEASES_URL, hasInputExtension,
+    APP_NAME, DEFAULT_LANGUAGES, LANGUAGES, OUTPUT_SUFFIX, RELEASES_URL,
+    hasInputExtension,
 } from './config.js';
 import * as dialogs from './dialogs.js';
+import {
+    LOCALES, currentLocale, localizePage, onLocaleChange, setLocale, t,
+} from './i18n.js';
 import { State, TaskList } from './tasks.js';
 import { checkForUpdate } from './update.js';
 import { APP_VERSION } from './version.js';
 
-const START_TEXT = 'Начать распознавание';
-const STOP_TEXT = 'Остановить';
-const FILE_WORDS = ['файл', 'файла', 'файлов'];
-const REJECTED_PREFIX = 'Пропущены (это не PDF и не картинки): ';
 const LOG_LINES_IN_DETAILS = 200;
 const SETTINGS_KEY = 'ocr-pdf-settings';
 
 const $ = (id) => document.getElementById(id);
-
-// The Russian noun form for a count: 1 файл, 2 файла, 5 файлов
-function plural(count, [one, few, many]) {
-    const tens = count % 100;
-    const units = count % 10;
-    if (tens >= 11 && tens <= 14) return many;
-    if (units === 1) return one;
-    if (units >= 2 && units <= 4) return few;
-    return many;
-}
 
 function loadSettings() {
     try {
@@ -52,32 +42,65 @@ class App {
         this.log = [];
         this.update = null;
         this.updating = false;
+        this.statusText = null;
 
         document.title = APP_NAME;
-        $('intro').textContent = engine.intro;
         $('native').hidden = engine.kind !== 'web';
         $('releases').href = RELEASES_URL;
         $('version').textContent = APP_VERSION;
+        this.buildLocales();
         this.buildLanguages();
         this.connect();
         this.applySettings();
-        this.refresh();
+        this.localize();
         engine.startupSources().then((sources) => this.addSources(sources));
         this.checkUpdate();
     }
 
+    buildLocales() {
+        for (const [code, { name }] of Object.entries(LOCALES)) {
+            const option = new Option(name, code);
+            option.lang = code;
+            $('locale').append(option);
+        }
+        $('locale').value = currentLocale();
+        $('locale').addEventListener('change',
+            () => setLocale($('locale').value));
+        onLocaleChange(() => this.localize());
+    }
+
     buildLanguages() {
         this.languageBoxes = {};
-        for (const [code, name] of Object.entries(LANGUAGES)) {
+        for (const code of LANGUAGES) {
             const label = document.createElement('label');
             const box = document.createElement('input');
             box.type = 'checkbox';
             box.addEventListener('change', () => this.languageToggled(box));
             label.className = 'choice';
-            label.append(box, name);
+            label.append(box, document.createElement('span'));
             $('languages').append(label);
             this.languageBoxes[code] = box;
         }
+    }
+
+    // Every text in the window, again in the interface language
+    localize() {
+        localizePage();
+        $('locale-code').textContent = currentLocale().toUpperCase();
+        $('intro').textContent = t(this.engine.intro,
+            { suffix: OUTPUT_SUFFIX });
+        for (const [code, box] of Object.entries(this.languageBoxes))
+            box.nextSibling.textContent = t(`language.${code}`);
+        for (const task of this.list.tasks) this.list.paint(task);
+        this.showStatus(this.statusText);
+        this.refresh();
+    }
+
+    // text: a function that builds the line, so that it can be built
+    // again in another language; null clears it
+    showStatus(text) {
+        this.statusText = text;
+        $('status').textContent = text ? text() : '';
     }
 
     connect() {
@@ -103,9 +126,11 @@ class App {
 
     // --- settings --------------------------------------------------------
 
+    // Without saved settings, the language of the interface is ticked too
     applySettings() {
-        let codes = this.settings.languages ?? DEFAULT_LANGUAGES;
-        if (!codes.some((code) => code in LANGUAGES)) codes = DEFAULT_LANGUAGES;
+        const defaults = [LOCALES[currentLocale()].ocr, ...DEFAULT_LANGUAGES];
+        let codes = this.settings.languages ?? defaults;
+        if (!codes.some((code) => LANGUAGES.includes(code))) codes = defaults;
         for (const [code, box] of Object.entries(this.languageBoxes))
             box.checked = codes.includes(code);
         $('deskew').checked = Boolean(this.settings.deskew);
@@ -134,7 +159,7 @@ class App {
     languageToggled(box) {
         if (!box.checked && !this.languages().length) {
             box.checked = true;
-            $('status').textContent = 'Нужно оставить хотя бы один язык.';
+            this.showStatus(() => t('languages.keepOne'));
         }
     }
 
@@ -165,10 +190,10 @@ class App {
         if (this.running) this.batch.push(...added);
 
         if (rejected.length) {
-            $('status').textContent =
-                REJECTED_PREFIX + rejected.map((s) => s.name).join(', ');
+            const names = rejected.map((s) => s.name).join(', ');
+            this.showStatus(() => t('files.rejected', { names }));
         } else if (!this.running) {
-            $('status').textContent = '';
+            this.showStatus(null);
         }
         this.refresh();
     }
@@ -180,7 +205,7 @@ class App {
 
     clearList() {
         this.forget(this.list.removeIdle([...this.list.tasks]));
-        $('status').textContent = '';
+        this.showStatus(null);
         $('progress').value = 0;
         this.refresh();
     }
@@ -215,8 +240,7 @@ class App {
     async offerUpdate() {
         const update = this.update;
         if (this.running) {
-            await dialogs.showMessage(
-                'Обновить программу можно, когда распознавание закончится.');
+            await dialogs.showMessage(t('update.whenDone'));
             return;
         }
         if (!(await dialogs.confirmUpdate(update))) return;
@@ -227,14 +251,15 @@ class App {
 
         this.updating = true;
         this.refresh();
-        $('status').textContent = 'Скачиваю обновление…';
+        this.showStatus(() => t('update.downloading'));
         try {
             await this.engine.updates.install(update, (percent) => {
-                $('status').textContent = `Скачиваю обновление… ${percent} %`;
+                this.showStatus(
+                    () => t('update.downloadingPercent', { percent }));
             });
-            $('status').textContent = '';
+            this.showStatus(null);
         } catch (error) {
-            $('status').textContent = '';
+            this.showStatus(null);
             await dialogs.showUpdateFailed(`${error}`);
         }
         this.updating = false;
@@ -257,7 +282,7 @@ class App {
     stop() {
         this.cancelling = true;
         this.batch = this.current ? [this.current] : [];
-        $('status').textContent = 'Останавливаю…';
+        this.showStatus(() => t('status.stopping'));
         this.run?.cancel();
     }
 
@@ -287,7 +312,7 @@ class App {
         task.state = State.RUNNING;
         this.list.paint(task);
         task.item.scrollIntoView({ block: 'nearest' });
-        this.setStatus('Запускаю');
+        this.setStatus();
         try {
             this.run = await this.engine.start(task, this.options(),
                 (message) => this.onMessage(message));
@@ -306,8 +331,8 @@ class App {
         if (message.event === 'log') {
             this.log.push(`${message.level}: ${message.msg}`);
         } else if (message.event === 'progress') {
-            this.setStatus(task.progress.update(
-                message.stage, message.done, message.total));
+            task.progress.update(message.stage, message.done, message.total);
+            this.setStatus();
             this.list.paint(task);
         } else if (message.event === 'error') {
             task.setError(message.kind, message.detail ?? '');
@@ -333,18 +358,22 @@ class App {
         task.state = State.FAILED;
         if (kind) task.setError(kind, details);
         const log = this.log.slice(-LOG_LINES_IN_DETAILS).join('\n');
-        task.details += `\n\nЖурнал:\n${log}`;
+        task.details += `\n\n${t('task.log')}\n${log}`;
         this.list.paint(task);
     }
 
-    setStatus(text) {
+    setStatus() {
         const task = this.current;
         if (!task) return;
         const count = this.batch.length;
         const index = Math.max(this.batch.indexOf(task), 0);
 
-        const prefix = count > 1 ? `Файл ${index + 1} из ${count}: ` : '';
-        $('status').textContent = `${prefix}${task.source.name}\n${text}…`;
+        this.showStatus(() => {
+            const prefix = count > 1
+                ? t('status.file', { index: index + 1, count })
+                : '';
+            return `${prefix}${task.source.name}\n${task.note()}`;
+        });
         const fileFraction = task.progress.percent / 100;
         $('progress').value = ((index + fileFraction) / count) * 100;
     }
@@ -356,7 +385,7 @@ class App {
         this.refresh();
         if (this.cancelling) {
             this.cancelling = false;
-            $('status').textContent = 'Остановлено.';
+            this.showStatus(() => t('status.stopped'));
             $('progress').value = 0;
             return;
         }
@@ -364,7 +393,9 @@ class App {
         const done = batch.filter((task) => task.state === State.DONE);
         const failed = batch.filter((task) => task.state === State.FAILED);
         $('progress').value = done.length && !failed.length ? 100 : 0;
-        $('status').textContent = this.summary(done.length, failed.length);
+        const elapsed = Math.floor((Date.now() - this.batchStarted) / 1000);
+        this.showStatus(
+            () => this.summary(elapsed, done.length, failed.length));
 
         this.engine.attention();
         if (batch.length === 1 && failed.length) dialogs.showError(failed[0]);
@@ -373,19 +404,18 @@ class App {
         else if (failed.length) dialogs.showAllFailed();
     }
 
-    summary(done, failed) {
-        const elapsed = Math.floor((Date.now() - this.batchStarted) / 1000);
+    summary(elapsed, done, failed) {
         const minutes = Math.floor(elapsed / 60);
         const seconds = elapsed % 60;
-        const took = minutes ? `${minutes} мин ${seconds} с` : `${seconds} с`;
-        let summary = `Готово за ${took}. Получилось: ${done}`;
-        if (failed) summary += `, не получилось: ${failed}`;
-        return `${summary}.`;
+        const took = t(minutes ? 'time.minutes' : 'time.seconds',
+            { minutes, seconds });
+        return t(failed ? 'status.summaryFailed' : 'status.summary',
+            { took, done, failed });
     }
 
     refresh() {
         const start = $('start');
-        start.textContent = this.running ? STOP_TEXT : START_TEXT;
+        start.textContent = t(this.running ? 'stop' : 'start');
         start.classList.toggle('running', this.running);
         start.disabled = this.updating;
         $('update').disabled = this.updating;
@@ -401,19 +431,19 @@ class App {
     countText() {
         const total = this.list.tasks.length;
         if (!total) return '';
-        const parts = [`${total} ${plural(total, FILE_WORDS)}`];
+        const parts = [t('files.count', { count: total })];
         const done = this.list.count(State.DONE);
         const failed = this.list.count(State.FAILED);
-        if (done) parts.push(`готово ${done}`);
-        if (failed) parts.push(`с ошибкой ${failed}`);
+        if (done) parts.push(t('files.done', { count: done }));
+        if (failed) parts.push(t('files.failed', { count: failed }));
         return parts.join(' · ');
     }
 
     async confirmClose() {
-        const answer = await dialogs.showMessage(
-            'Распознавание ещё идёт. Остановить его и закрыть программу?',
-            ['Да', 'Нет']);
-        if (answer !== 'Да') return false;
+        const yes = t('dialog.yes');
+        const answer = await dialogs.showMessage(t('close.running'),
+            [yes, t('dialog.no')]);
+        if (answer !== yes) return false;
         this.stop();
         this.saveSettings();
         return true;
@@ -429,6 +459,7 @@ async function loadEngine() {
 }
 
 async function main() {
+    localizePage();
     const engine = await loadEngine();
     await engine.init();
     new App(engine);

@@ -15,14 +15,12 @@ function source({ name, uri }) {
 export class AndroidEngine {
     constructor() {
         this.kind = 'android';
-        this.intro = 'Программа читает текст на сканах и фотографиях ' +
-            'документов. Исходный файл не меняется: готовый PDF ' +
-            'сохраняется в папку «Загрузки».';
+        // The texts are keys of i18n.js
+        this.intro = 'intro.android';
         this.actions = {
-            whereSingle: 'Он сохранён в папке «Загрузки».',
-            whereMany: 'Новые файлы сохранены в папке «Загрузки».',
-            rowLabel: 'Открыть',
-            openLabel: 'Открыть файл',
+            whereSingle: 'where.downloadsOne',
+            whereMany: 'where.downloadsMany',
+            rowLabel: 'action.open',
             open: (task) => invoke('open_result', { uri: task.result }),
             doneDialog: true,
         };

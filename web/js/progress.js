@@ -1,40 +1,52 @@
 // Turn the engine's progress messages into a percentage, a label and the
 // count of recognised pages
 
-// Engine stage -> [what we tell the user, start %, end %] of a file
+import { t } from './i18n.js';
+
+// Engine stage -> [the key of what we tell the user, start %, end %] of a
+// file
 const STAGES = {
-    scan: ['Изучаю файл', 0, 5],
-    ocr: ['Распознаю текст', 5, 85],
-    save: ['Сохраняю документ', 85, 90],
-    pdfa: ['Сохраняю документ', 90, 100],
+    scan: ['stage.scan', 0, 5],
+    ocr: ['stage.ocr', 5, 85],
+    save: ['stage.save', 85, 90],
+    pdfa: ['stage.save', 90, 100],
 };
 const PAGE_STAGES = new Set(['ocr']);
-const UNKNOWN_STAGE_LABEL = 'Обрабатываю';
 
 export class FileProgress {
     constructor() {
         this.percent = 0;
-        this.label = '';
+        this.stage = null; // null until the engine's first message
         this.pages = 0; // 0 until the engine says how many there are
         this.pagesDone = 0;
+        this.page = 0;
+    }
+
+    // Built when shown, so it follows the interface language
+    get label() {
+        if (!this.stage) return '';
+        const label = t(STAGES[this.stage]?.[0] ?? 'stage.other');
+        if (!this.page) return label;
+        return t('stage.page',
+            { stage: label, page: this.page, total: this.pages });
     }
 
     // Record one progress message; return the label to show
     update(stage, done, total) {
-        const [label, start, end] = STAGES[stage] ?? [
-            UNKNOWN_STAGE_LABEL, this.percent, this.percent,
+        const [, start, end] = STAGES[stage] ?? [
+            '', this.percent, this.percent,
         ];
         const fraction = total ? Math.min(done / total, 1) : 0;
 
         // A message from a parallel page must not move the bar back
         this.percent = Math.max(this.percent, start + (end - start) * fraction);
 
-        this.label = label;
+        this.stage = stage;
+        this.page = 0;
         if (PAGE_STAGES.has(stage) && total) {
             this.pages = total;
             this.pagesDone = Math.max(this.pagesDone, Math.min(done, total));
-            const page = Math.min(done + 1, total);
-            this.label = `${label}: страница ${page} из ${total}`;
+            this.page = Math.min(done + 1, total);
         }
         return this.label;
     }

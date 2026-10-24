@@ -6,9 +6,11 @@ import unittest
 
 from support import ROOT, collect_licenses
 
-COPYRIGHT = re.compile(r'Copyright © (\d{4}) ([^<"\n]+)')
+COPYRIGHT = re.compile(r'Copyright © (\d{4}) ([^<"\'\n]+)')
 LICENSE_NAME = 'AGPL-3.0-or-later'
 PROJECTS = ('OCRmyPDF', 'Tesseract', 'MuPDF', 'Ghostscript')
+# The texts of the About dialog: license, no warranty, where the source is
+ABOUT_KEYS = ('about.license', 'about.warranty', 'about.source')
 
 
 def read(path: str) -> str:
@@ -44,10 +46,21 @@ class Legal(unittest.TestCase):
 
     def test_about_keeps_the_notices(self):
         dialogs = read('web/js/dialogs.js')
-        self.assertIn('GNU Affero General Public License', dialogs)
-        self.assertIn('без каких-либо гарантий', dialogs)
         self.assertIn('SOURCE_URL', dialogs)
         self.assertIn('THIRD-PARTY-NOTICES.txt', dialogs)
+        for key in ABOUT_KEYS:
+            self.assertIn(f"t('{key}'", dialogs)
+
+    def test_every_language_shows_the_notices(self):
+        locales = sorted((ROOT / 'web/js/locales').glob('*.js'))
+        self.assertTrue(locales)
+        for path in locales:
+            text = path.read_text(encoding='utf-8')
+            self.assertIn('GNU Affero General Public License', text, path)
+            for key in ABOUT_KEYS:
+                self.assertIn(f"'{key}':", text, path)
+        russian = read('web/js/locales/ru.js')
+        self.assertIn('без каких-либо гарантий', russian)
 
     def test_the_apps_update_from_the_source_repository(self):
         url = collect_licenses.source_url()

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ru">
+<html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -23,46 +23,56 @@
       </svg>
       CUBE-PDF
     </span>
-    <div class="theme" role="group" aria-label="Тема оформления">
-      <button type="button" data-theme-choice="light">
-        <span class="swatch" aria-hidden="true"></span>
-        <span class="label">Светлая</span></button>
-      <button type="button" data-theme-choice="dark">
-        <span class="swatch" aria-hidden="true"></span>
-        <span class="label">Тёмная</span></button>
-      <button type="button" data-theme-choice="auto">
-        <span class="swatch" aria-hidden="true"></span>
-        <span class="label">Как в системе</span></button>
+    <div class="bar-controls">
+      <div class="theme" role="group" data-i18n-label="theme.group">
+        <button type="button" data-theme-choice="light">
+          <span class="swatch" aria-hidden="true"></span>
+          <span class="label" data-i18n="theme.light"></span></button>
+        <button type="button" data-theme-choice="dark">
+          <span class="swatch" aria-hidden="true"></span>
+          <span class="label" data-i18n="theme.dark"></span></button>
+        <button type="button" data-theme-choice="auto">
+          <span class="swatch" aria-hidden="true"></span>
+          <span class="label" data-i18n="theme.auto"></span></button>
+      </div>
+      <!-- a native list over the button, so every platform picks well -->
+      <label class="locale">
+        <svg viewBox="0 0 16 16" aria-hidden="true">
+          <circle cx="8" cy="8" r="6"/>
+          <path d="M2 8h12M8 2c-2.2 2.4-2.2 9.6 0 12M8 2c2.2 2.4 2.2 9.6 0
+            12"/></svg>
+        <span id="locale-code" aria-hidden="true"></span>
+        <select id="locale" data-i18n-label="locale.group"></select>
+      </label>
     </div>
   </div>
 </header>
 
 <main>
   <div class="title">
-    <h1>Сделать PDF, в котором можно искать текст</h1>
+    <h1 data-i18n="title"></h1>
     <p class="lede" id="intro"></p>
-    <p class="lede" id="native" hidden>Приложение для Windows и Linux
-      распознаёт быстрее, чем браузер. Скачать его можно на
-      <a id="releases" target="_blank" rel="noopener">странице релизов
-      на GitHub</a>.</p>
+    <p class="lede" id="native" hidden><span data-i18n="native"></span>
+      <a id="releases" target="_blank" rel="noopener"
+        data-i18n="native.link"></a>.</p>
   </div>
 
   <div class="layout">
     <section class="panel files" id="files" aria-labelledby="files-title">
       <div class="panel-head">
-        <h2 id="files-title">Файлы</h2>
+        <h2 id="files-title" data-i18n="files.title"></h2>
         <span class="count" id="count"></span>
-        <button id="clear" class="text-button" type="button">
-          Очистить список</button>
+        <button id="clear" class="text-button" type="button"
+          data-i18n="files.clear"></button>
       </div>
       <ul id="tasks" class="tasks"></ul>
       <button id="drop" class="drop" type="button">
-        <span class="drop-title pointer">Перетащите сюда файлы или
-          папку</span>
-        <span class="drop-title touch">Выберите файлы</span>
-        <span class="drop-more"><span class="pointer">или нажмите, чтобы
-          выбрать.</span> Подходят PDF, JPG, PNG и TIFF.</span>
-        <span class="drop-again">Добавить файлы</span>
+        <span class="drop-title pointer" data-i18n="drop.title"></span>
+        <span class="drop-title touch" data-i18n="drop.titleTouch"></span>
+        <span class="drop-more"><span class="pointer"
+          data-i18n="drop.click"></span>
+          <span data-i18n="drop.types"></span></span>
+        <span class="drop-again" data-i18n="drop.again"></span>
       </button>
       <div class="panel-foot">
         <p id="status" class="status" aria-live="polite"></p>
@@ -70,20 +80,19 @@
       </div>
     </section>
 
-    <aside class="panel settings" aria-label="Настройки распознавания">
+    <aside class="panel settings" data-i18n-label="settings">
       <section class="group" aria-labelledby="languages-title">
-        <h2 id="languages-title">Язык текста</h2>
+        <h2 id="languages-title" data-i18n="languages.title"></h2>
         <div class="choices" id="languages"></div>
-        <p class="note">Можно отметить несколько. Не уверены — оставьте
-          как есть.</p>
+        <p class="note" data-i18n="languages.note"></p>
       </section>
       <section class="group" aria-labelledby="processing-title">
-        <h2 id="processing-title">Обработка</h2>
+        <h2 id="processing-title" data-i18n="processing.title"></h2>
         <div class="choices">
           <label class="choice"><input type="checkbox" id="deskew">
-            Выпрямлять наклонённые страницы</label>
+            <span data-i18n="processing.deskew"></span></label>
           <label class="choice"><input type="checkbox" id="force">
-            Распознать заново, даже если в файле уже есть текст</label>
+            <span data-i18n="processing.force"></span></label>
         </div>
       </section>
       <button id="start" class="start" type="button"></button>
@@ -94,12 +103,13 @@
     <span class="release">
       <span id="version" class="version"></span>
       <button id="update" class="update" type="button" hidden
-        title="Вышла новая версия" aria-label="Вышла новая версия">
+        data-i18n-title="update.available"
+        data-i18n-label="update.available">
         <svg viewBox="0 0 16 16" aria-hidden="true">
           <path d="M8 2.5v8M4.5 7 8 10.5 11.5 7M3 13.5h10"/></svg></button>
     </span>
-    <button id="about" class="text-button" type="button">
-      О программе и лицензиях</button>
+    <button id="about" class="text-button" type="button"
+      data-i18n="about.link"></button>
   </footer>
 </main>
 <dialog id="dialog"></dialog>

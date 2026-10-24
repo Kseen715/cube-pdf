@@ -3,7 +3,10 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
+import { setLocale } from '../../web/js/i18n.js';
 import { FileProgress } from '../../web/js/progress.js';
+
+setLocale('ru');
 
 test('each stage fills its share of the bar', () => {
     const progress = new FileProgress();

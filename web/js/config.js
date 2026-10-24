@@ -17,13 +17,11 @@ export const UPDATE_FILES = {
 };
 export const OUTPUT_SUFFIX = '_ocr';
 
-// Tesseract code -> label shown in the UI, in display order
-export const LANGUAGES = {
-    rus: 'Русский',
-    eng: 'Английский',
-    deu: 'Немецкий',
-};
-export const DEFAULT_LANGUAGES = ['rus', 'eng'];
+// The Tesseract models of the text's languages, in display order
+// (deps/versions.mk downloads them; i18n.js names them)
+export const LANGUAGES = ['rus', 'eng', 'deu', 'ita'];
+// Ticked at first, with the language of the interface
+export const DEFAULT_LANGUAGES = ['eng'];
 
 // Each page being recognized holds Tesseract and its models, and the
 // page's image: about this much memory

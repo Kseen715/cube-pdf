@@ -15,7 +15,8 @@ information:
 | `desktop/gen/android/app/gradle.lockfile` | The Android libraries (AndroidX, Kotlin, ...) in the APK, pinned; the notices list them from here |
 | `licenses/` | License files for what has no source tree in the build (the GCC and MinGW-w64 runtimes, the Apache-2.0 text of the Android libraries) |
 | `web/js/config.js` | `SOURCE_URL`, shown in the app and in the notices |
-| `web/js/dialogs.js` | `ABOUT`: copyright line, license statement, no-warranty statement |
+| `web/js/dialogs.js` | `COPYRIGHT` and the About dialog (`aboutHtml`) |
+| `web/js/locales/` | `about.*` in every language: license statement, no-warranty statement |
 | `mk/stage.mk`, `mk/desktop.mk`, `mk/apk.mk`, `mk/web.mk`, `mk/windows.mk`, `mk/linux.mk`, `.github/workflows/build.yml` | Put `LICENSE` and `THIRD-PARTY-NOTICES.txt` into every package and site, and attach them and the source tarballs (`make sources`) to releases |
 | `README.md` | "What is inside" table, "License" section |
 
@@ -75,8 +76,8 @@ images and models.
 ### Things that must not be removed or weakened
 
 - `LICENSE`, the About dialog (`showAbout` in `web/js/dialogs.js`, opened with F1 and the link
-  at the bottom of the window) and its no-warranty text. The AGPL requires interactive programs
-  to show these notices.
+  at the bottom of the window) and its no-warranty text, in every language of `web/js/locales/`.
+  The AGPL requires interactive programs to show these notices.
 - Putting `LICENSE` and `THIRD-PARTY-NOTICES.txt` into the desktop packages and the web site,
   and attaching them and the source tarballs to releases in the workflow.
 - The README sentence saying the project is not affiliated with OCRmyPDF, Tesseract,
@@ -89,7 +90,7 @@ images and models.
   is renamed, update it; `tools/collect_licenses.py` reads it. The apps update from the same
   repository's releases: `repository` in `desktop/Cargo.toml` and the `opener:allow-open-url`
   scope in `desktop/capabilities/default.json` must name it too.
-- The copyright holder and year in `ABOUT` (`web/js/dialogs.js`), in `desktop/tauri.conf.json`
+- The copyright holder and year in `COPYRIGHT` (`web/js/dialogs.js`), in `desktop/tauri.conf.json`
   and the license named there, in `LICENSE`, in the notices header and in the README "License"
   section must agree.
 - Keep the files in `licenses/` exactly as upstream ships them. Do not edit their text.

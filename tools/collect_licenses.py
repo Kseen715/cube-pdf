@@ -155,7 +155,7 @@ def components(v: dict[str, str]) -> list[Component]:
             v['TESSERACT_HOME'],
         ),
         Component(
-            'Tesseract language data (eng, rus, deu, osd)',
+            'Tesseract language data (eng, rus, deu, ita, osd)',
             v['TESSDATA_VERSION'],
             'Apache-2.0',
             ['src:tesseract/LICENSE'],

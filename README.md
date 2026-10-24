@@ -3,7 +3,9 @@
 [![Coverage](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/Kseen715/cube-pdf/badges/coverage.json)](#tests)
 
 Turns scans and photos of documents into searchable PDF/A files. You pick files, press one
-button, and get `<name>_ocr.pdf`. The interface is in Russian.
+button, and get `<name>_ocr.pdf`. The interface is in Russian, English, German and Italian:
+the button in the top bar switches it, and the first time the browser's or system's language
+is picked.
 
 One code base, four builds:
 
@@ -23,7 +25,7 @@ first visit it also downloads about 70 MB of language models, which the browser 
 | Component | Version | Used for |
 | --- | --- | --- |
 | [Tesseract](https://github.com/tesseract-ocr/tesseract) | 5.5.3 | OCR and page orientation |
-| [tessdata](https://github.com/tesseract-ocr/tessdata) | 4.1.0 | `rus`, `eng`, `deu`, `osd` models |
+| [tessdata](https://github.com/tesseract-ocr/tessdata) | 4.1.0 | `rus`, `eng`, `deu`, `ita`, `osd` models |
 | [Leptonica](https://github.com/DanBloomberg/leptonica) | 1.87.0 | deskewing, image handling for Tesseract |
 | [MuPDF](https://mupdf.com) | 1.28.5 | reading PDFs and images, rendering pages, writing the text layer |
 | [Ghostscript](https://ghostscript.com) | 10.08.0 | PDF/A-2b |
@@ -40,6 +42,7 @@ MuPDF and Ghostscript bundle, is in each build's `THIRD-PARTY-NOTICES.txt`.
 web/            the window: HTML/CSS/JS, the same page everywhere
   js/app.js        file list, options, progress, dialogs
   js/theme.js      light, dark or the system's theme
+  js/i18n.js       the interface language; js/locales/ holds the texts
   js/engine-desktop.js   runs ocr-pdf-core through Tauri (desktop)
   js/engine-android.js   runs ocr-pdf-core through the app's commands (Android)
   js/engine-web.js       runs the WebAssembly core in Web Workers (browser)
@@ -66,11 +69,11 @@ For each file:
 1. **Prepare.** A PDF is used as it is; a JPEG, PNG or TIFF becomes a PDF page as large as the
    image is at its resolution (300 dpi when the file has none). JPEGs are kept as they are.
 2. **OCR each page**, in parallel:
-   - pages that already have text are skipped, unless "Распознать заново" is ticked;
+   - pages that already have text are skipped, unless "Recognize again" is ticked;
    - the page is rendered at the resolution of its sharpest image (300–600 dpi);
    - Tesseract's orientation detection turns it upright when it is sure (threshold 14, as in
      OCRmyPDF);
-   - with "Выпрямлять", Leptonica straightens it;
+   - with "Straighten tilted pages", Leptonica straightens it;
    - Tesseract writes an invisible text layer (its own text-only PDF renderer, as OCRmyPDF
      uses).
 3. **Assemble.** Each text layer is placed over its page in a copy of the PDF, so the

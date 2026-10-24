@@ -105,14 +105,11 @@ function download(blob, name) {
 export class WebEngine {
     constructor() {
         this.kind = 'web';
-        this.intro = 'CUBE-PDF распознаёт текст на сканах и фотографиях ' +
-            'документов (OCR) с помощью Tesseract. Распознавание идёт ' +
-            'прямо на вашем устройстве: файлы никуда не отправляются и не ' +
-            'покидают его. Готовый PDF, в котором можно искать и копировать ' +
-            'текст, скачивается кнопкой «Скачать» рядом с названием файла.';
+        // The texts are keys of i18n.js
+        this.intro = 'intro.web';
         // The row's button is the download, so no dialog after a batch
         this.actions = {
-            rowLabel: 'Скачать',
+            rowLabel: 'action.download',
             open: (task) => download(task.result, task.output),
             doneDialog: false,
         };

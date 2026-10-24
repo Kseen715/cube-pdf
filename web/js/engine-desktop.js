@@ -3,6 +3,7 @@
 
 import { INPUT_EXTENSIONS, OUTPUT_SUFFIX } from './config.js';
 import { coreMessage, runOptions } from './core.js';
+import { t } from './i18n.js';
 import { appUpdates } from './update.js';
 
 const tauri = window.__TAURI__;
@@ -22,14 +23,12 @@ function source(path) {
 export class DesktopEngine {
     constructor() {
         this.kind = 'desktop';
-        this.intro = 'Программа читает текст на сканах и фотографиях ' +
-            'документов. Исходный файл не меняется: рядом с ним появится ' +
-            `новый, с «${OUTPUT_SUFFIX}» в конце названия.`;
+        // The texts are keys of i18n.js
+        this.intro = 'intro.desktop';
         this.actions = {
-            whereSingle: 'Он лежит рядом с исходным.',
-            whereMany: 'Новые файлы лежат рядом с исходными.',
-            rowLabel: 'Открыть',
-            openLabel: 'Открыть файл',
+            whereSingle: 'where.besideOne',
+            whereMany: 'where.besideMany',
+            rowLabel: 'action.open',
             open: (task) => tauri.opener.openPath(task.result),
             reveal: (task) => tauri.opener.revealItemInDir(task.result),
             doneDialog: true,
@@ -65,8 +64,9 @@ export class DesktopEngine {
             multiple: true,
             defaultPath: startDir || undefined,
             filters: [
-                { name: 'PDF и картинки', extensions: FILTER_EXTENSIONS },
-                { name: 'Все файлы', extensions: ['*'] },
+                { name: t('filter.supported'),
+                    extensions: FILTER_EXTENSIONS },
+                { name: t('filter.all'), extensions: ['*'] },
             ],
         });
         return paths ? this.expand(paths) : [];

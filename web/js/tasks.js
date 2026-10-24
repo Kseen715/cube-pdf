@@ -1,24 +1,8 @@
 // One input file in the list, and the list itself
 
 import { outputName } from './config.js';
+import { has, t } from './i18n.js';
 import { FileProgress } from './progress.js';
-
-// Engine error kind -> what we tell the user
-const ERROR_MESSAGES = {
-    encrypted: 'Файл защищён паролем. Снимите пароль и попробуйте ещё раз.',
-    has_text:
-        'В файле уже есть текст. Чтобы распознать его заново, отметьте ' +
-        '«Распознать заново» в разделе «Обработка».',
-    output_access:
-        'Не получилось сохранить результат. Наверное, файл «{output}» ' +
-        'открыт в другой программе. Закройте его и попробуйте ещё раз.',
-    bad_input: 'Файл повреждён, или это не PDF и не картинка.',
-    missing_dependency:
-        'Программа собрана неправильно: не найден её компонент.',
-    too_big: 'Файл слишком большой: не хватило памяти компьютера.',
-    other: 'Что-то пошло не так.',
-    crash: 'Распознавание неожиданно прервалось.',
-};
 
 // A long document shows this many cells; each then stands for several pages
 const MAX_CELLS = 16;
@@ -31,14 +15,14 @@ export const State = {
     CANCELLED: 'cancelled',
 };
 
-// State -> [the word in the state column, the row's action]; a finished
-// file's action is named by the engine
+// State -> [the key of the word in the state column, of the row's
+// action]; a finished file's action is named by the engine
 const STATE_VIEW = {
-    [State.WAITING]: ['Ждёт', ''],
+    [State.WAITING]: ['task.waiting', ''],
     [State.RUNNING]: ['', ''],
-    [State.DONE]: ['Готово', ''],
-    [State.FAILED]: ['Ошибка', 'Причина'],
-    [State.CANCELLED]: ['Остановлено', ''],
+    [State.DONE]: ['task.done', ''],
+    [State.FAILED]: ['task.failed', 'task.reason'],
+    [State.CANCELLED]: ['task.cancelled', ''],
 };
 
 export class Task {
@@ -53,28 +37,35 @@ export class Task {
 
     reset() {
         this.state = State.WAITING;
-        this.error = '';
+        this.errorKind = '';
         this.details = '';
         this.progress = new FileProgress();
     }
 
+    // kind: one of the engine's error kinds (core/src/ocr.hpp)
     setError(kind, details) {
-        const message = ERROR_MESSAGES[kind] ?? ERROR_MESSAGES.other;
-        this.error = message.replace('{output}', this.output);
+        this.errorKind = kind;
         this.details = details;
+    }
+
+    // What we tell the user, in the interface language
+    get error() {
+        if (!this.errorKind) return '';
+        const key = `error.${this.errorKind}`;
+        return t(has(key) ? key : 'error.other', { output: this.output });
     }
 
     // The second line under the file name
     note() {
         switch (this.state) {
             case State.RUNNING:
-                return `${this.progress.label || 'Запускаю'}…`;
+                return `${this.progress.label || t('stage.start')}…`;
             case State.DONE:
-                return `Сохранён как ${this.output}`;
+                return t('task.savedAs', { output: this.output });
             case State.FAILED:
                 return this.error;
             default:
-                return `Получится ${this.output}`;
+                return t('task.willBe', { output: this.output });
         }
     }
 }
@@ -99,13 +90,13 @@ function pagesCell({ pages, pagesDone }) {
         cells.append(element('i', read ? 'read' : ''));
     }
     const count = element('span', '', `${pagesDone} / ${pages}`);
-    count.append(element('span', 'unit', ' стр.'));
+    count.append(element('span', 'unit', t('task.pages')));
     cell.append(cells, count);
     return cell;
 }
 
 export class TaskList {
-    // doneLabel: the action of a finished file;
+    // doneLabel: the key of the action of a finished file;
     // onActivate(task): open a finished file or explain a failed one
     constructor(list, doneLabel, onActivate) {
         this.element = list;
@@ -151,7 +142,7 @@ export class TaskList {
 
     paint(task) {
         const [word, view] = STATE_VIEW[task.state];
-        const action = task.state === State.DONE ? this.doneLabel : view;
+        const action = t(task.state === State.DONE ? this.doneLabel : view);
         const name = element('div', 'task-name');
         name.append(element('span', 'file', task.source.name),
             element('span', 'sub', task.note()));
@@ -160,8 +151,8 @@ export class TaskList {
         if (task.state === State.RUNNING)
             state.textContent = `${Math.floor(task.progress.percent)} %`;
         else if (task.state === State.DONE || task.state === State.FAILED)
-            state.append(element('span', 'pill', word));
-        else state.textContent = word;
+            state.append(element('span', 'pill', t(word)));
+        else if (word) state.textContent = t(word);
 
         const actionCell = element('div', 'task-action');
         if (action) {

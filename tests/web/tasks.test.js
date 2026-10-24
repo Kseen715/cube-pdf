@@ -5,7 +5,10 @@ import assert from 'node:assert/strict';
 import { readdirSync, readFileSync } from 'node:fs';
 import { test } from 'node:test';
 
+import { setLocale } from '../../web/js/i18n.js';
 import { State, Task } from '../../web/js/tasks.js';
+
+setLocale('ru');
 
 const ROOT = new URL('../../', import.meta.url);
 // Where an error kind is named: the core's ocr::Error and kind_of(), its
