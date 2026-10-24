@@ -7,7 +7,6 @@ export default {
     'theme.auto': 'Wie das System',
     'locale.group': 'Sprache der Oberfläche',
 
-    'title': 'Ein durchsuchbares PDF erstellen',
     'intro.desktop': 'Das Programm liest den Text auf Scans und Fotos ' +
         'von Dokumenten. Die Originaldatei bleibt unverändert: Daneben ' +
         'entsteht eine neue, mit „{suffix}“ am Ende des Namens.',

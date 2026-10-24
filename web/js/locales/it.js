@@ -7,7 +7,6 @@ export default {
     'theme.auto': 'Come il sistema',
     'locale.group': 'Lingua dell’interfaccia',
 
-    'title': 'Creare un PDF in cui si può cercare il testo',
     'intro.desktop': 'Il programma legge il testo di scansioni e foto di ' +
         'documenti. Il file originale non cambia: accanto ne compare uno ' +
         'nuovo, con «{suffix}» alla fine del nome.',

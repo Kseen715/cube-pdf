@@ -7,7 +7,6 @@ export default {
     'theme.auto': 'System',
     'locale.group': 'Interface language',
 
-    'title': 'Make a PDF you can search',
     'intro.desktop': 'The program reads the text on scans and photos of ' +
         'documents. The original file stays as it is: a new one appears ' +
         'next to it, with “{suffix}” at the end of its name.',

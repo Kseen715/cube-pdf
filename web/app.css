@@ -71,7 +71,6 @@ stroke-width='2'/%3E%3C/svg%3E");
 
     --font-text: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
     --font-head: "IBM Plex Serif", Georgia, "Times New Roman", serif;
-    --fs-title: 32px;
     --fs-head: 19px;
     --fs-body: 15px;
     --fs-small: 13px;
@@ -129,7 +128,6 @@ body {
     font: var(--fs-body) / 1.55 var(--font-text);
 }
 
-h1,
 h2 {
     margin: 0;
     font-family: var(--font-head);
@@ -302,17 +300,14 @@ main {
     padding: 40px 0 32px;
 }
 
-h1 {
-    font-size: var(--fs-title);
-    line-height: 1.15;
-    letter-spacing: -0.01em;
-}
-
 .lede {
     max-width: 68ch;
-    margin-top: 12px;
     color: var(--muted);
     font-size: 16px;
+}
+
+.lede + .lede {
+    margin-top: 12px;
 }
 
 .lede a {
@@ -861,7 +856,6 @@ dialog pre {
     :root {
         --gutter: 16px;
         --pad: 16px;
-        --fs-title: 24px;
     }
 
     .theme .label {
