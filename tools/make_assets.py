@@ -3,10 +3,10 @@
 The build makes every other icon from it (Tauri's "icon" command, with the
 manifest assets/icon.json), and the web page uses it as is. The Android
 launcher icon is made from assets/icon-android.png, the same cube shrunk,
-on the background colour the manifest names. The cube in the page's top
-bar (web/index.html) is the same drawing; change both together. Run it
-after changing the drawing; the results are committed, so building does
-not need Pillow.
+on the transparent background the manifest names, so the launcher shows
+only the cube. The cube in the page's top bar (web/index.html) is the same
+drawing; change both together. Run it after changing the drawing; the
+results are committed, so building does not need Pillow.
 """
 
 from pathlib import Path
