@@ -1,9 +1,12 @@
 """Draw assets/icon.png: a cube whose side is a page of text.
 
-The build makes every other icon from it (Tauri's "icon" command), and the
-web page uses it as is. The cube in the page's top bar (web/index.html) is
-the same drawing; change both together. Run it after changing the drawing;
-the result is committed, so building does not need Pillow.
+The build makes every other icon from it (Tauri's "icon" command, with the
+manifest assets/icon.json), and the web page uses it as is. The Android
+launcher icon is made from assets/icon-android.png, the same cube shrunk,
+on the background colour the manifest names. The cube in the page's top
+bar (web/index.html) is the same drawing; change both together. Run it
+after changing the drawing; the results are committed, so building does
+not need Pillow.
 """
 
 from pathlib import Path
@@ -19,6 +22,11 @@ PAPER = '#f3f3f1'
 INK = '#141414'
 BLUE = '#1d5fbf'
 PALE_BLUE = '#b9cdea'
+
+# Android masks the foreground of an adaptive icon to a shape that keeps
+# only a circle of 66 of its 108 dp for sure. The cube's corners lie on a
+# circle of 420 px, so shrunk to 0.7 they stay inside it (294 of 313 px).
+ANDROID_SCALE = 0.7
 
 # An isometric cube: the corners of its outline and its centre
 TOP = (512, 92)
@@ -62,10 +70,23 @@ def draw_icon() -> Image.Image:
     return image
 
 
+def draw_android_foreground() -> Image.Image:
+    size = round(CANVAS * ANDROID_SCALE)
+    cube = draw_icon().resize((size, size), Image.Resampling.LANCZOS)
+    image = Image.new('RGBA', (CANVAS, CANVAS), (0, 0, 0, 0))
+    offset = (CANVAS - size) // 2
+    image.alpha_composite(cube, (offset, offset))
+    return image
+
+
 def main() -> None:
     ASSETS.mkdir(exist_ok=True)
-    draw_icon().save(ASSETS / 'icon.png')
-    print(f'Wrote {ASSETS / "icon.png"}')
+    for name, image in (
+        ('icon.png', draw_icon()),
+        ('icon-android.png', draw_android_foreground()),
+    ):
+        image.save(ASSETS / name)
+        print(f'Wrote {ASSETS / name}')
 
 
 if __name__ == '__main__':

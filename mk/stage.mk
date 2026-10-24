@@ -8,13 +8,14 @@ STAGE := $(T)/stage
 STAGE_SOURCES := $(shell find desktop web -path desktop/target -prune \
     -o -type f -print)
 STAGE_DEPS := $(NOTICES) $(STAMP)/fonts $(VERSION_JS) LICENSE \
-    assets/icon.png $(STAGE_SOURCES)
+    assets/icon.png assets/icon-android.png assets/icon.json $(STAGE_SOURCES)
 
 # Crates and the downloaded MSVC runtime are kept in the build directory
 TAURI_ENV_COMMON := CARGO_HOME=$(B)/cargo-home CARGO_TARGET_DIR=$(T)/cargo
 
 # $(call stage_app,ICON_FLAGS): stage the shell; ICON_FLAGS go to
-# "cargo tauri icon", which writes the icons of the app
+# "cargo tauri icon", which writes the icons of the app from the manifest
+# assets/icon.json
 define stage_app
 	rm -rf $(STAGE)
 	mkdir -p $(STAGE)
@@ -27,5 +28,5 @@ define stage_app
 	    cp LICENSE $(STAGE)/$$dir/LICENSE.txt; \
 	    cp $(NOTICES) $(STAGE)/$$dir/THIRD-PARTY-NOTICES.txt; done
 	cp assets/icon.png $(STAGE)/web/icon.png
-	cd $(STAGE)/desktop && cargo tauri icon $(CURDIR)/assets/icon.png $(1)
+	cd $(STAGE)/desktop && cargo tauri icon $(CURDIR)/assets/icon.json $(1)
 endef
