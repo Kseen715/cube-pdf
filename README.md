@@ -1,5 +1,7 @@
 # CUBE-PDF
 
+[![Coverage](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/Kseen715/cube-pdf/badges/coverage.json)](#tests)
+
 Turns scans and photos of documents into searchable PDF/A files. You pick files, press one
 button, and get `<name>_ocr.pdf`. The interface is in Russian.
 
@@ -129,10 +131,11 @@ To try the web version locally, serve `dist/wasm` with any static server, for ex
 
 `.github/workflows/check.yml` runs Ruff and the tests of `tools/` and `web/` on every push to
 `main` and every pull request; `core.yml` runs the core's tests when the core or what it is built
-from changes. `.github/workflows/build.yml` builds all four targets for tags that start with `v`,
-when started by hand from the Actions tab, and on `main` when what its caches come from changes
-(`deps/`, `docker/`, `mk/`, the `Makefile`, `desktop/Cargo.lock`, `desktop/gen/android/`), so the
-next tag starts from warm caches. A tag also publishes the web version on GitHub Pages; this needs
+from changes. On `main` both measure the tests' coverage and commit it to the `badges` branch,
+which the coverage badge above reads through shields.io. `.github/workflows/build.yml` builds all
+four targets for tags that start with `v`, when started by hand from the Actions tab, and on
+`main` when what its caches come from changes (`deps/`, `docker/`, `mk/`, the `Makefile`,
+`desktop/Cargo.lock`, `desktop/gen/android/`), so the next tag starts from warm caches. A tag also publishes the web version on GitHub Pages; this needs
 **Settings → Pages → Source: GitHub Actions** once, and the tag rule `v*` in **Settings →
 Environments → github-pages → Deployment branches and tags**. A tag also creates a GitHub release
 with:
@@ -182,6 +185,16 @@ core and run against the built `ocr-pdf-core`, Ghostscript and language models: 
 and scans of a page of text with MuPDF and check what comes out, including Tesseract's
 recognition and PDF/A. The window's DOM, the engines and the Rust shell are not tested; the
 builds cover them.
+
+The coverage badge counts the lines of `tools/`, of the files in `web/js` that the tests import
+and of `core/src` that the tests run, all suites together. To measure it locally:
+
+```sh
+python -m coverage run --source=tools -m unittest discover -s tests/tools
+python -m coverage report
+node --test --experimental-test-coverage --test-coverage-include='web/js/**' tests/web/*.test.js
+tools/docker-make.sh linux coverage          # writes out/linux/coverage/core.lcov
+```
 
 ## License
 

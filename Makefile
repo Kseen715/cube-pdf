@@ -10,7 +10,8 @@
 #   tools/docker-make.sh android   Android app (.apk)
 #
 # Other goals: core (just ocr-pdf-core and the libraries), test (the core's
-# tests, Linux only), notices, clean.
+# tests, Linux only), coverage (the same with their coverage, for CI),
+# notices, clean.
 # Finished packages land in dist/<target>/.
 
 TARGET ?= linux

@@ -9,7 +9,7 @@ ARG TAURI_CLI_VERSION=2.12.4
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends \
         build-essential cmake pkg-config curl ca-certificates xz-utils \
-        file patchelf python3 git \
+        file patchelf python3 git lcov \
         libwebkit2gtk-4.1-dev libgtk-3-dev librsvg2-dev libssl-dev \
         libayatana-appindicator3-dev libxdo-dev \
     && rm -rf /var/lib/apt/lists/*

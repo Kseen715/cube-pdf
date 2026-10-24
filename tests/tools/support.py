@@ -18,4 +18,5 @@ def load_tool(name: str):
 
 
 collect_licenses = load_tool('collect_licenses')
+coverage_badge = load_tool('coverage_badge')
 make_assets = load_tool('make_assets')

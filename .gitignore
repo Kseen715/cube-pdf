@@ -29,3 +29,6 @@ desktop.ini
 
 # Fonts the build unpacks into web/ to try the page without building
 web/fonts/
+
+# Coverage data of the tests of tools/ (README, "Tests")
+.coverage

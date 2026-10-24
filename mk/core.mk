@@ -2,13 +2,23 @@
 # WebAssembly modules for the web (their link step is in mk/web.mk)
 
 CORE_SRC := core/src
-CORE_OBJ := $(T)/obj/core
-BIN := $(T)/bin
+
+# The goal "coverage" (mk/test.mk) builds the core instrumented for gcov,
+# unoptimized so that lines map to code, apart from the normal build
+ifneq ($(filter coverage,$(MAKECMDGOALS)),)
+COV := -coverage
+COV_FLAGS := -O0 --coverage
+CORE_LDFLAGS += --coverage
+endif
+
+CORE_OBJ := $(T)/obj/core$(COV)
+BIN := $(T)/bin$(COV)
 
 CORE_COMMON := pdf.c ocr.cpp image.cpp pdfa.cpp
 CORE_NATIVE := cli.cpp process.cpp
 
-CORE_CFLAGS := $(OPT_FLAGS) -I$(PREFIX)/include -Wall -MMD -MP
+CORE_CFLAGS := $(OPT_FLAGS) $(COV_FLAGS) -I$(PREFIX)/include -Wall \
+    -MMD -MP
 CORE_CXXFLAGS := $(CORE_CFLAGS) -std=c++17
 # With MinGW the static libraries are named libtesseract55.a and
 # libleptonica-1.87.0.dll (sic); the patterns find them on every target

@@ -1,6 +1,7 @@
 # Checks every push to main and every pull request without building the
 # apps (build.yml does that): Ruff and the tests of tools/, and the tests of
-# the page in web/. The core has its own tests (core.yml).
+# the page in web/. The core has its own tests (core.yml). On main, the
+# tests' coverage goes into the README badge (.github/actions).
 name: Check
 
 on:
@@ -14,10 +15,12 @@ permissions:
 jobs:
   python:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v7
 
-      - name: Install Ruff and Pillow
+      - name: Install Ruff, coverage and Pillow
         run: |
           python3 -m venv .venv
           .venv/bin/python -m pip install -q -r requirements-dev.txt
@@ -29,12 +32,41 @@ jobs:
         run: .venv/bin/python -m ruff check .
 
       - name: Test
-        run: .venv/bin/python -m unittest discover -s tests/tools
+        run: |
+          .venv/bin/python -m coverage run --source=tools \
+            -m unittest discover -s tests/tools
+          .venv/bin/python -m coverage lcov -q -o "$RUNNER_TEMP/tools.lcov"
+
+      - if: github.event_name == 'push'
+        uses: ./.github/actions/coverage-badge
+        with:
+          suite: tools
+          lcov: ${{ runner.temp }}/tools.lcov
 
   web:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v7
 
+      # The test runner's coverage options need a recent Node
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+
+      # Coverage counts the files of web/js that the tests import
       - name: Test
-        run: node --test tests/web/*.test.js
+        run: >
+          node --test --experimental-test-coverage
+          --test-coverage-include='web/js/**'
+          --test-reporter=spec --test-reporter-destination=stdout
+          --test-reporter=lcov
+          --test-reporter-destination="$RUNNER_TEMP/web.lcov"
+          tests/web/*.test.js
+
+      - if: github.event_name == 'push'
+        uses: ./.github/actions/coverage-badge
+        with:
+          suite: web
+          lcov: ${{ runner.temp }}/web.lcov

@@ -1,6 +1,7 @@
 # The tests of the OCR core (tests/core) in the Linux toolchain, for pushes
 # to main and pull requests that change the core or what it is built from.
-# The libraries come from the caches build.yml uses (.github/actions).
+# The libraries come from the caches build.yml uses (.github/actions). On
+# main, the tests' coverage goes into the README badge.
 name: Core
 
 on:
@@ -24,6 +25,8 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v7
 
@@ -34,4 +37,10 @@ jobs:
       - name: Test
         env:
           OCR_IMAGE_BUILT: 1
-        run: tools/docker-make.sh linux test
+        run: tools/docker-make.sh linux coverage
+
+      - if: github.event_name == 'push'
+        uses: ./.github/actions/coverage-badge
+        with:
+          suite: core
+          lcov: out/linux/coverage/core.lcov
