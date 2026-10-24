@@ -18,7 +18,9 @@ TAURI_TARGET_x86_64 := x86_64
 # Gradle keeps what it downloads in the build directory, as Cargo does
 APK_ENV := $(TAURI_ENV_COMMON) GRADLE_USER_HOME=$(B)/gradle-home
 
-abis:
+# The ABI builds share $(DL): fetch it here first, so that they never
+# download the same file at the same time
+abis: $(SOURCE_FILES) $(TESSDATA_FILES)
 	+for abi in $(filter-out $(ABI),$(ANDROID_ABIS)); do \
 	    $(MAKE) ABI=$$abi core || exit 1; done
 
