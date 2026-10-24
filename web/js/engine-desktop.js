@@ -3,6 +3,7 @@
 
 import { INPUT_EXTENSIONS, OUTPUT_SUFFIX } from './config.js';
 import { coreMessage, runOptions } from './core.js';
+import { appUpdates } from './update.js';
 
 const tauri = window.__TAURI__;
 const CORE = 'binaries/ocr-pdf-core';
@@ -32,6 +33,12 @@ export class DesktopEngine {
             open: (task) => tauri.opener.openPath(task.result),
             reveal: (task) => tauri.opener.revealItemInDir(task.result),
             doneDialog: true,
+        };
+        // The portable zip and other copies not installed from a package
+        // send the user to the release's page instead
+        this.updates = {
+            ...appUpdates,
+            openPage: (url) => tauri.opener.openUrl(url),
         };
     }
 

@@ -1,7 +1,7 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
-  "description": "Pick files, open the results, run ocr-pdf-core",
+  "description": "Pick files, open the results, run ocr-pdf-core, update",
   "windows": ["main"],
   "platforms": ["linux", "windows", "macOS"],
   "permissions": [
@@ -15,6 +15,10 @@
       "allow": [{ "path": "**" }]
     },
     "opener:allow-reveal-item-in-dir",
+    {
+      "identifier": "opener:allow-open-url",
+      "allow": [{ "url": "https://github.com/Kseen715/cube-pdf/releases/tag/*" }]
+    },
     {
       "identifier": "shell:allow-spawn",
       "allow": [

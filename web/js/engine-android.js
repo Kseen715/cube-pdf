@@ -4,6 +4,7 @@
 
 import { parallelPages } from './config.js';
 import { coreMessage, runOptions } from './core.js';
+import { appUpdates } from './update.js';
 
 const { invoke, Channel } = window.__TAURI__.core;
 
@@ -25,6 +26,7 @@ export class AndroidEngine {
             open: (task) => invoke('open_result', { uri: task.result }),
             doneDialog: true,
         };
+        this.updates = appUpdates;
     }
 
     async init() {}

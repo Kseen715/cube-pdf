@@ -8,6 +8,7 @@ import {
 } from './config.js';
 import * as dialogs from './dialogs.js';
 import { State, TaskList } from './tasks.js';
+import { checkForUpdate } from './update.js';
 import { APP_VERSION } from './version.js';
 
 const START_TEXT = 'Начать распознавание';
@@ -49,6 +50,8 @@ class App {
         this.batch = [];
         this.cancelling = false;
         this.log = [];
+        this.update = null;
+        this.updating = false;
 
         document.title = APP_NAME;
         $('intro').textContent = engine.intro;
@@ -60,6 +63,7 @@ class App {
         this.applySettings();
         this.refresh();
         engine.startupSources().then((sources) => this.addSources(sources));
+        this.checkUpdate();
     }
 
     buildLanguages() {
@@ -81,6 +85,7 @@ class App {
         $('clear').addEventListener('click', () => this.clearList());
         $('start').addEventListener('click', () => this.startOrStop());
         $('about').addEventListener('click', () => dialogs.showAbout());
+        $('update').addEventListener('click', () => this.offerUpdate());
         document.addEventListener('keydown', (event) => {
             if (event.key === 'F1') {
                 event.preventDefault();
@@ -187,6 +192,53 @@ class App {
     taskActivated(task) {
         if (task.state === State.DONE) this.engine.actions.open(task);
         else if (task.state === State.FAILED) dialogs.showError(task);
+    }
+
+    // --- updates ---------------------------------------------------------
+
+    // The web version is always the latest, so its engine has no updates
+    async checkUpdate() {
+        const updates = this.engine.updates;
+        if (!updates) return;
+        try {
+            const update = await checkForUpdate(APP_VERSION,
+                await updates.kind());
+            if (update && (update.file || updates.openPage)) {
+                this.update = update;
+                $('update').hidden = false;
+            }
+        } catch {
+            // offline, or GitHub did not answer: the app works as it is
+        }
+    }
+
+    async offerUpdate() {
+        const update = this.update;
+        if (this.running) {
+            await dialogs.showMessage(
+                'Обновить программу можно, когда распознавание закончится.');
+            return;
+        }
+        if (!(await dialogs.confirmUpdate(update))) return;
+        if (!update.file) {
+            this.engine.updates.openPage(update.page);
+            return;
+        }
+
+        this.updating = true;
+        this.refresh();
+        $('status').textContent = 'Скачиваю обновление…';
+        try {
+            await this.engine.updates.install(update, (percent) => {
+                $('status').textContent = `Скачиваю обновление… ${percent} %`;
+            });
+            $('status').textContent = '';
+        } catch (error) {
+            $('status').textContent = '';
+            await dialogs.showUpdateFailed(`${error}`);
+        }
+        this.updating = false;
+        this.refresh();
     }
 
     // --- running ---------------------------------------------------------
@@ -335,6 +387,8 @@ class App {
         const start = $('start');
         start.textContent = this.running ? STOP_TEXT : START_TEXT;
         start.classList.toggle('running', this.running);
+        start.disabled = this.updating;
+        $('update').disabled = this.updating;
         for (const box of [...Object.values(this.languageBoxes),
             $('deskew'), $('force')])
             box.disabled = this.running;

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- What AndroidManifest.xml's FileProvider may share: the updates that
+     desktop/src/update.rs downloads into the cache -->
+<paths>
+    <cache-path name="updates" path="updates/" />
+</paths>

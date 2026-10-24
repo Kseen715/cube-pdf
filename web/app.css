@@ -631,6 +631,13 @@ input[type="checkbox"]:disabled {
     background: var(--negative-bg);
 }
 
+/* While an update downloads (app.js) */
+.start:disabled,
+.update:disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
 /* --- footer ---------------------------------------------------------- */
 
 .foot {
@@ -644,6 +651,40 @@ input[type="checkbox"]:disabled {
 .version {
     color: var(--muted);
     font-variant-numeric: tabular-nums;
+}
+
+.release {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Shown next to the version when a newer release is out (update.js) */
+.update {
+    display: grid;
+    place-items: center;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: none;
+    background: var(--primary);
+    color: var(--on-primary);
+}
+
+.update:hover {
+    background: var(--primary-hover);
+}
+
+.update[hidden] {
+    display: none;
+}
+
+.update svg {
+    width: 16px;
+    height: 16px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.6;
 }
 
 /* --- dialogs --------------------------------------------------------- */

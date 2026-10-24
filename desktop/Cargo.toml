@@ -6,6 +6,8 @@ name = "ocr-pdf"
 version = "0.0.0"
 edition = "2021"
 license = "AGPL-3.0-or-later"
+# The app updates itself from this repository's releases (src/update.rs)
+repository = "https://github.com/Kseen715/cube-pdf"
 publish = false
 
 # Android loads the app as a library; the desktop builds use main.rs
@@ -19,6 +21,9 @@ tauri-build = { version = "2.7", features = [] }
 [dependencies]
 tauri = { version = "2.12", features = [] }
 serde = { version = "1", features = ["derive"] }
+# Downloads updates; rustls with its bundled root certificates, so every
+# target has the same TLS without a system library
+ureq = { version = "3.5", default-features = false, features = ["rustls"] }
 
 [target.'cfg(not(target_os = "android"))'.dependencies]
 tauri-plugin-dialog = "2.8"

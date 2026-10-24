@@ -43,6 +43,7 @@ web/            the window: HTML/CSS/JS, the same page everywhere
   js/engine-desktop.js   runs ocr-pdf-core through Tauri (desktop)
   js/engine-android.js   runs ocr-pdf-core through the app's commands (Android)
   js/engine-web.js       runs the WebAssembly core in Web Workers (browser)
+  js/update.js           finds a newer release on GitHub, for both apps
   js/core.js             ocr-pdf-core's options and messages, for both apps
 core/src/       the OCR pipeline, C/C++, compiled natively and to WebAssembly
   pdf.c            MuPDF: images to PDF, page analysis, rendering, text layers
@@ -52,6 +53,7 @@ core/src/       the OCR pipeline, C/C++, compiled natively and to WebAssembly
   wasm.cpp         the same steps for the Web Workers
 desktop/        the Tauri shell, no OCR logic
   src/android.rs   starts ocr-pdf-core on Android, which has no shell plugin
+  src/update.rs    downloads and installs an update
   gen/android/     the Android project; AndroidPlugin.kt: file picker, Downloads
 deps/           pinned sources and our patches
 mk/, Makefile   the build, one fragment per step and per target
@@ -87,6 +89,23 @@ The Android app runs the same `ocr-pdf-core` and Ghostscript, built with the NDK
 folder, so the APK carries them as `libocr_pdf_core.so` and `libocr_pdf_gs.so`. The app copies
 the picked file into its cache, runs the core there and saves the result to Downloads. OCR
 runs while the app is open: Android pauses apps in the background.
+
+### Updates
+
+At start the apps ask GitHub for the latest release of this repository; that and the download
+of an update are all they do over the network, and files never leave the device. When it is
+newer than the app, an arrow appears next to the version at the bottom of the window. Pressing
+it shows both versions and asks whether to update. On yes the app downloads the release's file
+for the way it was installed and installs it:
+
+| Installed from | Downloads | Installs |
+| --- | --- | --- |
+| Windows installer | `-windows-x86_64.exe` | runs it in passive mode, which closes the app and starts the new version |
+| `.deb` / `.rpm` | the same kind of package | `pkexec dpkg -i` / `pkexec rpm -U` (asks for the password), then restarts the app |
+| Android APK | `-android-universal.apk` | the system's package installer, which asks first (and, the first time, for the right to install apps from CUBE-PDF) |
+
+The portable zip, and a copy not installed from a package, cannot replace itself: the arrow
+opens the release's page instead. The web version is always the latest and does not check.
 
 ## Building
 
@@ -224,3 +243,6 @@ projects.
 5. Готовый файл `имя_ocr.pdf` появится рядом с исходным (в веб-версии — скачивается кнопкой
    **Скачать** в строке файла, на Android — сохраняется в папку «Загрузки»). Исходный файл не
    меняется.
+
+Когда выходит новая версия, внизу окна рядом с номером версии появляется стрелка. Нажмите её,
+чтобы скачать и установить обновление.

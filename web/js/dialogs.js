@@ -106,6 +106,28 @@ export function showAllFailed() {
     });
 }
 
+// update: see findUpdate in update.js. Resolves with whether to go on.
+export async function confirmUpdate({ from, to, file }) {
+    const question = file
+        ? 'Скачать и установить её?'
+        : 'Открыть страницу, где её можно скачать?';
+    const clicked = await show({
+        title: 'Обновление',
+        text: `Вышла новая версия: ${from} → ${to}.\n\n${question}`,
+        buttons: ['Да', 'Нет'],
+    });
+    return clicked === 'Да';
+}
+
+export function showUpdateFailed(details) {
+    return show({
+        title: 'Обновление',
+        text: 'Не получилось установить обновление. Его можно скачать ' +
+            'вручную на странице релизов на GitHub.',
+        details,
+    });
+}
+
 export function showMessage(text, buttons) {
     return show({ text, buttons });
 }

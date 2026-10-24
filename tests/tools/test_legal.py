@@ -4,7 +4,7 @@ import json
 import re
 import unittest
 
-from support import ROOT
+from support import ROOT, collect_licenses
 
 COPYRIGHT = re.compile(r'Copyright © (\d{4}) ([^<"\n]+)')
 LICENSE_NAME = 'AGPL-3.0-or-later'
@@ -48,6 +48,19 @@ class Legal(unittest.TestCase):
         self.assertIn('без каких-либо гарантий', dialogs)
         self.assertIn('SOURCE_URL', dialogs)
         self.assertIn('THIRD-PARTY-NOTICES.txt', dialogs)
+
+    def test_the_apps_update_from_the_source_repository(self):
+        url = collect_licenses.source_url()
+        self.assertIn(f'repository = "{url}"', read('desktop/Cargo.toml'))
+        capability = json.loads(read('desktop/capabilities/default.json'))
+        scopes = [
+            scope['url']
+            for permission in capability['permissions']
+            if isinstance(permission, dict)
+            for scope in permission.get('allow', [])
+            if 'url' in scope
+        ]
+        self.assertEqual(scopes, [f'{url}/releases/tag/*'])
 
     def test_readme_says_it_is_not_affiliated(self):
         section = ' '.join(readme_section('License').split())

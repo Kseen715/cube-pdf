@@ -4,6 +4,17 @@
 export const APP_NAME = 'CUBE-PDF';
 export const SOURCE_URL = 'https://github.com/Kseen715/cube-pdf';
 export const RELEASES_URL = `${SOURCE_URL}/releases`;
+export const LATEST_RELEASE_API = SOURCE_URL.replace('https://github.com/',
+    'https://api.github.com/repos/') + '/releases/latest';
+// The file of a release each app updates from, by the kind of package it
+// was installed from (desktop/src/update.rs); the release job of
+// .github/workflows/build.yml names them
+export const UPDATE_FILES = {
+    windows: '-windows-x86_64.exe',
+    deb: '-linux-glibc-x86_64.deb',
+    rpm: '-linux-glibc-x86_64.rpm',
+    android: '-android-universal.apk',
+};
 export const OUTPUT_SUFFIX = '_ocr';
 
 // Tesseract code -> label shown in the UI, in display order

@@ -3,7 +3,7 @@
 // run programs from its native library folder, so the APK carries
 // ocr-pdf-core and Ghostscript as libocr_pdf_core.so and libocr_pdf_gs.so
 // (mk/apk.mk). What needs the Android APIs, such as that folder, the file
-// picker and Downloads, is in AndroidPlugin.kt.
+// picker, Downloads and the package installer, is in AndroidPlugin.kt.
 
 use std::fs;
 use std::io::{BufRead, BufReader, Read};
@@ -74,6 +74,11 @@ struct Open {
     uri: String,
 }
 
+#[derive(Serialize)]
+struct Install<'a> {
+    path: &'a str,
+}
+
 #[derive(Deserialize)]
 struct Nothing {}
 
@@ -132,6 +137,19 @@ async fn pick_files(app: AppHandle) -> Result<Vec<Picked>, Failure> {
         Ok(picked.files)
     })
     .await
+}
+
+/// The app's cache folder, where update.rs downloads updates
+pub(crate) fn cache_dir(app: &AppHandle) -> Result<PathBuf, String> {
+    let paths: Paths = call(app, "paths", ())?;
+    Ok(PathBuf::from(paths.cache))
+}
+
+/// Hands a downloaded APK in the cache's updates/ folder to the system's
+/// package installer, which asks the user
+pub(crate) fn install_apk(app: &AppHandle, apk: &Path) -> Result<(), String> {
+    call::<Nothing>(app, "installApk", Install { path: &utf8(apk) })?;
+    Ok(())
 }
 
 /// Shows a result from Downloads in the app the user picks
@@ -281,6 +299,8 @@ pub fn platform(builder: Builder<Wry>) -> Builder<Wry> {
             pick_files,
             open_result,
             run_core,
-            cancel_core
+            cancel_core,
+            crate::update::update_package,
+            crate::update::install_update
         ])
 }

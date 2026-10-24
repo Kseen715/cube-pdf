@@ -86,7 +86,9 @@ images and models.
 ### Keep these consistent
 
 - `SOURCE_URL` in `web/js/config.js` must point at this repository. If the repository moves or
-  is renamed, update it; `tools/collect_licenses.py` reads it.
+  is renamed, update it; `tools/collect_licenses.py` reads it. The apps update from the same
+  repository's releases: `repository` in `desktop/Cargo.toml` and the `opener:allow-open-url`
+  scope in `desktop/capabilities/default.json` must name it too.
 - The copyright holder and year in `ABOUT` (`web/js/dialogs.js`), in `desktop/tauri.conf.json`
   and the license named there, in `LICENSE`, in the notices header and in the README "License"
   section must agree.

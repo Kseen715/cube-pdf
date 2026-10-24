@@ -10,6 +10,7 @@ import android.net.Uri
 import android.provider.MediaStore
 import android.provider.OpenableColumns
 import androidx.activity.result.ActivityResult
+import androidx.core.content.FileProvider
 import app.tauri.annotation.ActivityCallback
 import app.tauri.annotation.Command
 import app.tauri.annotation.InvokeArg
@@ -27,6 +28,9 @@ private const val GS = "libocr_pdf_gs.so"
 // The language models mk/apk.mk puts into the APK's assets
 private const val TESSDATA = "tessdata"
 private const val PDF = "application/pdf"
+private const val APK = "application/vnd.android.package-archive"
+// The FileProvider of AndroidManifest.xml, which shares the updates
+private const val FILES = ".files"
 // What the picker offers, as web/js/config.js INPUT_EXTENSIONS
 private val INPUT_TYPES = arrayOf(PDF, "image/jpeg", "image/png", "image/tiff")
 
@@ -45,6 +49,11 @@ class SaveArgs {
 @InvokeArg
 class OpenArgs {
     lateinit var uri: String
+}
+
+@InvokeArg
+class InstallArgs {
+    lateinit var path: String
 }
 
 @TauriPlugin
@@ -187,6 +196,22 @@ class AndroidPlugin(private val activity: Activity) : Plugin(activity) {
             .setDataAndType(Uri.parse(args.uri), PDF)
             .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         activity.startActivity(Intent.createChooser(view, null))
+        null
+    }
+
+    // An update that desktop/src/update.rs downloaded. The installer asks
+    // the user, the first time also for the right to install apps from
+    // CUBE-PDF, and replaces the app when it has the same signature.
+    @Command
+    fun installApk(invoke: Invoke) = answer(invoke) {
+        val args = invoke.parseArgs(InstallArgs::class.java)
+        val authority = activity.packageName + FILES
+        val uri = FileProvider.getUriForFile(activity, authority,
+            File(args.path))
+        val install = Intent(Intent.ACTION_VIEW)
+            .setDataAndType(uri, APK)
+            .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        activity.startActivity(install)
         null
     }
 }
