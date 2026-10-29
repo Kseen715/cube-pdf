@@ -1,6 +1,11 @@
 """tools/make_assets.py draws the icons committed in assets/."""
 
+import io
+import tempfile
 import unittest
+from contextlib import redirect_stdout
+from pathlib import Path
+from unittest import mock
 
 from PIL import Image
 from support import ROOT, make_assets
@@ -30,6 +35,20 @@ class DrawIcon(unittest.TestCase):
         left, top, right, bottom = image.getbbox()
         self.assertLessEqual(centre - top, safe_radius)
         self.assertLessEqual(bottom - centre, safe_radius)
+
+
+class Main(unittest.TestCase):
+    def test_writes_both_icons(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            assets = Path(tmp) / 'assets'
+            with (
+                mock.patch.object(make_assets, 'ASSETS', assets),
+                redirect_stdout(io.StringIO()),
+            ):
+                make_assets.main()
+            for name in ('icon.png', 'icon-android.png'):
+                with Image.open(assets / name) as written:
+                    self.assertEqual(written.size, (make_assets.CANVAS,) * 2)
 
 
 if __name__ == '__main__':

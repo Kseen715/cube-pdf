@@ -1,10 +1,13 @@
 """tools/coverage_badge.py sums the lcov reports of the suites into one
 badge."""
 
+import io
 import json
 import tempfile
 import unittest
+from contextlib import redirect_stdout
 from pathlib import Path
+from unittest import mock
 
 from support import coverage_badge as cb
 
@@ -43,6 +46,28 @@ class Update(unittest.TestCase):
             written = json.loads((badges / 'coverage.json').read_text())
             self.assertEqual(written['message'], '50%')
             self.assertEqual(written['schemaVersion'], 1)
+
+
+class Main(unittest.TestCase):
+    def test_reads_the_report_of_a_suite(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            badges, report = Path(tmp) / 'badges', Path(tmp) / 'web.lcov'
+            report.write_text(lcov((3, 4)), encoding='utf-8')
+            argv = ['coverage_badge.py', str(badges), 'web', str(report)]
+            with (
+                mock.patch.object(cb.sys, 'argv', argv),
+                redirect_stdout(io.StringIO()) as printed,
+            ):
+                cb.main()
+
+            suite = json.loads((badges / 'suites' / 'web.json').read_text())
+            self.assertEqual(suite, {'hit': 3, 'found': 4})
+            self.assertEqual(printed.getvalue(), 'Coverage with web: 75%\n')
+
+    def test_needs_three_arguments(self):
+        with mock.patch.object(cb.sys, 'argv', ['coverage_badge.py', 'x']):
+            with self.assertRaises(SystemExit):
+                cb.main()
 
 
 if __name__ == '__main__':

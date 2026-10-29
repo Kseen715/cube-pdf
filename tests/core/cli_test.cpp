@@ -12,6 +12,8 @@ namespace {
 
 // The exit code of a usage error, as opposed to a failed run
 constexpr int USAGE_CODE = 2;
+// More than one, so that the pages are shared among threads
+constexpr int PAGES = 3;
 
 test::Output run(const std::string &input, const std::string &output,
                  std::vector<std::string> extra = {})
@@ -43,6 +45,34 @@ TEST(run_makes_a_searchable_pdfa)
     CHECK(!test::exists(out + ".part"));
     CHECK(test::has_words(test::page_text(ctx, out)));
     CHECK(test::has_output_intent(ctx, out));
+}
+
+TEST(run_shares_the_pages_among_threads)
+{
+    ocr::Context ctx;
+    TempDir dir;
+    std::string out = dir.file("out.pdf");
+    std::string jobs = std::to_string(PAGES);
+    test::Output output =
+        run(test::scan_tiff(ctx, dir, PAGES), out, {"--jobs", jobs});
+    CHECK_EQ(output.code, 0);
+    CHECK(says(output, R"("stage":"ocr","done":)" + jobs +
+                           R"(,"total":)" + jobs));
+    REQUIRE(ocr::prepare(ctx, out, dir.path()).pages == PAGES);
+    for (int page = 0; page < PAGES; page++)
+        CHECK(test::has_words(test::page_text(ctx, out, page)));
+}
+
+// The options of the apps (web/js/core.js), as a run without them fails
+TEST(run_takes_force_and_deskew)
+{
+    ocr::Context ctx;
+    TempDir dir;
+    std::string out = dir.file("out.pdf");
+    test::Output output =
+        run(test::text_pdf(ctx, dir), out, {"--force", "--deskew"});
+    CHECK_EQ(output.code, 0);
+    CHECK(test::has_words(test::page_text(ctx, out)));
 }
 
 TEST(run_without_ghostscript_still_delivers)
@@ -89,11 +119,25 @@ TEST(run_reports_an_unwritable_output)
     CHECK(says(output, R"("kind":"output_access")"));
 }
 
+TEST(run_reports_a_missing_language)
+{
+    ocr::Context ctx;
+    TempDir dir;
+    test::Output output =
+        test::run_core({"run", "--input", test::scan_png(ctx, dir), "--output",
+                        dir.file("out.pdf"), "--languages", "xyz"});
+    CHECK_EQ(output.code, 1);
+    CHECK(says(output, R"("kind":"missing_dependency")"));
+}
+
 TEST(bad_arguments)
 {
     test::Output output = test::run_core({"run", "--input", "a.pdf"});
     CHECK_EQ(output.code, 1);
     CHECK(says(output, R"("event":"error","kind":"other")"));
+    output = run("a.pdf", "b.pdf", {"--colour"});
+    CHECK_EQ(output.code, 1);
+    CHECK(says(output, "unknown argument --colour"));
     CHECK_EQ(test::run_core({}).code, USAGE_CODE);
     CHECK_EQ(test::run_core({"convert"}).code, USAGE_CODE);
 }

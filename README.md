@@ -204,10 +204,11 @@ tools/docker-make.sh linux test              # the OCR core, end to end
 ```
 
 The core's tests (`tests/core`) are a C/C++ program, `out/linux/test-core`, linked with the
-core and run against the built `ocr-pdf-core`, Ghostscript and language models: they make PDFs
-and scans of a page of text with MuPDF and check what comes out, including Tesseract's
-recognition and PDF/A. The window's DOM, the engines and the Rust shell are not tested; the
-builds cover them.
+core and run against the built `ocr-pdf-core`, Ghostscript and language models: they make PDFs,
+scans, camera photos and multi-page TIFFs of a page of text with MuPDF and check what comes out,
+including Tesseract's recognition and PDF/A. The page's modules run against a small stand-in for
+the DOM (`tests/web/dom.js`); the window itself (`app.js`, `dialogs.js`), the engines and the Rust
+shell are not tested, the builds cover them.
 
 The coverage badge counts the lines of `tools/`, of the files in `web/js` that the tests import
 and of `core/src` that the tests run, all suites together. To measure it locally:

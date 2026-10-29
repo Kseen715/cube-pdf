@@ -6,11 +6,12 @@ import { afterEach, describe, test } from 'node:test';
 
 import { LATEST_RELEASE_API, UPDATE_FILES } from '../../web/js/config.js';
 import {
-    checkForUpdate, findUpdate, isNewer, parseVersion,
+    appUpdates, checkForUpdate, findUpdate, isNewer, parseVersion,
 } from '../../web/js/update.js';
 
 const WORKFLOW = new URL('../../.github/workflows/build.yml',
     import.meta.url);
+const UPDATE_RS = new URL('../../desktop/src/update.rs', import.meta.url);
 const PAGE = 'https://github.com/Kseen715/cube-pdf/releases/tag/v2.3.0';
 
 function release(tag, names) {
@@ -128,6 +129,64 @@ describe('checkForUpdate', () => {
         const asked = fakeFetch({ ok: true, json: async () => LATEST });
         assert.equal(await checkForUpdate('', 'windows'), null);
         assert.deepEqual(asked, []);
+    });
+});
+
+// Tauri hands the page's camelCase arguments to the command's snake_case
+// parameters; AppHandle is Tauri's own
+function commandArguments(command) {
+    const source = readFileSync(UPDATE_RS, 'utf8');
+    const [, params] = new RegExp(`fn ${command}\\(([^)]*)\\)`).exec(source);
+    return [...params.matchAll(/(\w+):\s*([\w:<>]+)/g)]
+        .filter(([, , type]) => type !== 'AppHandle')
+        .map(([, name]) => name.replace(/_(\w)/g,
+            (_, letter) => letter.toUpperCase()));
+}
+
+describe('appUpdates', () => {
+    afterEach(() => {
+        delete globalThis.window;
+    });
+
+    function fakeTauri() {
+        const calls = [];
+        class Channel {}
+        globalThis.window = {
+            __TAURI__: {
+                core: {
+                    Channel,
+                    invoke: async (command, args) => {
+                        calls.push({ command, args });
+                        return 'deb';
+                    },
+                },
+            },
+        };
+        return { calls, Channel };
+    }
+
+    test('asks the app what it was installed from', async () => {
+        const { calls } = fakeTauri();
+        assert.equal(await appUpdates.kind(), 'deb');
+        assert.deepEqual(calls,
+            [{ command: 'update_package', args: undefined }]);
+        assert.deepEqual(commandArguments('update_package'), []);
+    });
+
+    test('installs the file of the update and reports how far', async () => {
+        const { calls, Channel } = fakeTauri();
+        const update = findUpdate(LATEST, 'v2.2.1', 'deb');
+        const onPercent = () => {};
+        await appUpdates.install(update, onPercent);
+
+        const [{ command, args }] = calls;
+        assert.equal(command, 'install_update');
+        assert.deepEqual(Object.keys(args).sort(),
+            commandArguments('install_update').sort());
+        assert.deepEqual([args.tag, args.name, args.size],
+            ['v2.3.0', 'CUBE-PDF-2.3.0-linux-glibc-x86_64.deb', 102]);
+        assert.ok(args.onPercent instanceof Channel);
+        assert.equal(args.onPercent.onmessage, onPercent);
     });
 });
 

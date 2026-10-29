@@ -22,7 +22,8 @@ const STORAGE_KEY = 'cube-pdf-locale';
 const listeners = [];
 let locale = initialLocale();
 
-function initialLocale() {
+// The saved choice, else the browser's first language the page has
+export function initialLocale() {
     try {
         const saved = localStorage.getItem(STORAGE_KEY);
         if (saved in LOCALES) return saved;

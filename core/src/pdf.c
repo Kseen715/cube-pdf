@@ -15,6 +15,8 @@
 
 static const char LAYER_NAME[] = "OCRLayer";
 static const char IMAGE_NAME[] = "OCRImage";
+/* Between a unit square with y going down and one with y going up */
+static const fz_matrix FLIP_Y = {1, 0, 0, -1, 0, 1};
 
 typedef struct analyze_device {
     fz_device super;
@@ -82,29 +84,43 @@ static pdf_obj *image_resources(fz_context *ctx, pdf_document *doc,
     return res;
 }
 
-/* One page as large as the image is at its resolution, turned upright */
-static void add_image_page(fz_context *ctx, pdf_document *doc,
-                           fz_image *image)
+/*
+ * The size of the image at its resolution, as it is to be shown, and the
+ * matrix that draws it so. MuPDF's orientation matrix has y going down, as
+ * in its devices; in a content stream y goes up, so it is flipped around.
+ */
+static fz_matrix image_placement(fz_context *ctx, fz_image *image, float *w,
+                                 float *h)
 {
     int xres, yres;
-    float w, h, swap;
-    fz_matrix place;
-    pdf_obj *ref = NULL, *res = NULL, *page = NULL;
-    fz_buffer *contents = NULL;
+    uint8_t orientation = fz_image_orientation(ctx, image);
+    fz_matrix turn = fz_image_orientation_matrix(ctx, image);
+    float swap;
 
     fz_image_resolution(image, &xres, &yres);
     if (xres < MIN_BELIEVABLE_DPI || yres < MIN_BELIEVABLE_DPI)
         xres = yres = FALLBACK_IMAGE_DPI;
-    w = image->w * 72.0f / xres;
-    h = image->h * 72.0f / yres;
-    /* EXIF orientations 5 to 8 turn the image by 90 degrees */
-    if (fz_image_orientation(ctx, image) >= 5) {
-        swap = w;
-        w = h;
-        h = swap;
+    *w = image->w * 72.0f / xres;
+    *h = image->h * 72.0f / yres;
+    /* MuPDF's even orientations (not EXIF's numbers) turn it a quarter */
+    if (orientation && orientation % 2 == 0) {
+        swap = *w;
+        *w = *h;
+        *h = swap;
     }
-    place = fz_concat(fz_image_orientation_matrix(ctx, image),
-                      fz_scale(w, h));
+
+    turn = fz_concat(fz_concat(FLIP_Y, turn), FLIP_Y);
+    return fz_concat(turn, fz_scale(*w, *h));
+}
+
+/* One page as large as the image is at its resolution, turned upright */
+static void add_image_page(fz_context *ctx, pdf_document *doc,
+                           fz_image *image)
+{
+    float w, h;
+    fz_matrix place = image_placement(ctx, image, &w, &h);
+    pdf_obj *ref = NULL, *res = NULL, *page = NULL;
+    fz_buffer *contents = NULL;
 
     fz_var(ref);
     fz_var(res);

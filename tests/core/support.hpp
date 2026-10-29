@@ -41,11 +41,17 @@ bool exists(const std::string &path);
 // the test
 std::string text_pdf(const ocr::Context &ctx, const TempDir &dir,
                      int rotate = 0);
+// skew: degrees the paper lay turned on the scanner
 std::string scan_png(const ocr::Context &ctx, const TempDir &dir,
-                     int rotate = 0);
+                     int rotate = 0, int skew = 0);
+// A camera's photo of the page turned by rotate, with an EXIF orientation
+std::string photo_jpeg(const ocr::Context &ctx, const TempDir &dir,
+                       int rotate, int orientation);
+std::string scan_tiff(const ocr::Context &ctx, const TempDir &dir, int pages);
 std::string encrypted_pdf(const ocr::Context &ctx, const TempDir &dir);
 
-std::string page_text(const ocr::Context &ctx, const std::string &pdf);
+std::string page_text(const ocr::Context &ctx, const std::string &pdf,
+                      int page = 0);
 int page_rotation(const ocr::Context &ctx, const std::string &pdf);
 bool has_output_intent(const ocr::Context &ctx, const std::string &pdf);
 bool has_words(const std::string &text);

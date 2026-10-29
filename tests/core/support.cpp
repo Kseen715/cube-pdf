@@ -94,13 +94,35 @@ std::string text_pdf(const ocr::Context &ctx, const TempDir &dir, int rotate)
     return pdf;
 }
 
-std::string scan_png(const ocr::Context &ctx, const TempDir &dir, int rotate)
+std::string scan_png(const ocr::Context &ctx, const TempDir &dir, int rotate,
+                     int skew)
 {
     std::string pdf = text_pdf(ctx, dir, rotate);
-    std::string png = dir.file("scan-" + std::to_string(rotate) + ".png");
-    REQUIRE(fixture_page_png(ctx.get(), pdf.c_str(), SCAN_DPI,
+    std::string png = dir.file("scan-" + std::to_string(rotate) + "-" +
+                               std::to_string(skew) + ".png");
+    REQUIRE(fixture_page_png(ctx.get(), pdf.c_str(), SCAN_DPI, skew,
                              png.c_str()) == 0);
     return png;
+}
+
+std::string photo_jpeg(const ocr::Context &ctx, const TempDir &dir,
+                       int rotate, int orientation)
+{
+    std::string pdf = text_pdf(ctx, dir, rotate);
+    std::string jpeg = dir.file("photo-" + std::to_string(rotate) + "-" +
+                                std::to_string(orientation) + ".jpg");
+    REQUIRE(fixture_photo_jpeg(ctx.get(), pdf.c_str(), SCAN_DPI, orientation,
+                               jpeg.c_str()) == 0);
+    return jpeg;
+}
+
+std::string scan_tiff(const ocr::Context &ctx, const TempDir &dir, int pages)
+{
+    std::string pdf = text_pdf(ctx, dir);
+    std::string tiff = dir.file("scan-" + std::to_string(pages) + ".tif");
+    REQUIRE(fixture_page_tiff(ctx.get(), pdf.c_str(), SCAN_DPI, pages,
+                              tiff.c_str()) == 0);
+    return tiff;
 }
 
 std::string encrypted_pdf(const ocr::Context &ctx, const TempDir &dir)
@@ -111,10 +133,11 @@ std::string encrypted_pdf(const ocr::Context &ctx, const TempDir &dir)
     return out;
 }
 
-std::string page_text(const ocr::Context &ctx, const std::string &pdf)
+std::string page_text(const ocr::Context &ctx, const std::string &pdf,
+                      int page)
 {
     std::vector<char> text(TEXT_SIZE);
-    REQUIRE(fixture_page_text(ctx.get(), pdf.c_str(), 0, text.data(),
+    REQUIRE(fixture_page_text(ctx.get(), pdf.c_str(), page, text.data(),
                               text.size()) == 0);
     return text.data();
 }

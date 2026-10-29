@@ -21,9 +21,24 @@ extern "C" {
 int fixture_text_pdf(fz_context *ctx, const char *path, const char *text,
                      int rotate);
 
-/* Page 0 of pdf as a gray PNG scanned at dpi, which the PNG records */
-int fixture_page_png(fz_context *ctx, const char *pdf, int dpi,
+/*
+ * Page 0 of pdf as a gray PNG scanned at dpi, which the PNG records, with
+ * the paper turned clockwise by skew degrees
+ */
+int fixture_page_png(fz_context *ctx, const char *pdf, int dpi, float skew,
                      const char *png);
+
+/*
+ * Page 0 of pdf as a camera's JPEG: taken at dpi but recording 72 dpi, as
+ * cameras do, and the EXIF orientation (1 to 8) it is to be shown with
+ */
+int fixture_photo_jpeg(fz_context *ctx, const char *pdf, int dpi,
+                       int orientation, const char *jpeg);
+
+/* Page 0 of pdf scanned at dpi as an uncompressed gray TIFF, once on each
+   of its pages */
+int fixture_page_tiff(fz_context *ctx, const char *pdf, int dpi, int pages,
+                      const char *tiff);
 
 /* A copy of pdf that needs no password to open but is encrypted */
 int fixture_encrypt(fz_context *ctx, const char *pdf, const char *out);
