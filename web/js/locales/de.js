@@ -2,9 +2,12 @@
 
 export default {
     'theme.group': 'Farbschema',
-    'theme.light': 'Hell',
-    'theme.dark': 'Dunkel',
-    'theme.auto': 'Wie das System',
+    'theme.sakura': 'Sakura',
+    'theme.sakura-dark': 'Sakura · Dunkel',
+    'theme.wine': 'Wein',
+    'theme.wine-dark': 'Wein · Dunkel',
+    'theme.rust': 'Rost',
+    'theme.rust-dark': 'Rost · Dunkel',
     'locale.group': 'Sprache der Oberfläche',
 
     'intro.desktop': 'Das Programm liest den Text auf Scans und Fotos ' +

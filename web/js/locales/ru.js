@@ -4,9 +4,12 @@
 
 export default {
     'theme.group': 'Тема оформления',
-    'theme.light': 'Светлая',
-    'theme.dark': 'Тёмная',
-    'theme.auto': 'Как в системе',
+    'theme.sakura': 'Сакура',
+    'theme.sakura-dark': 'Сакура · тёмная',
+    'theme.wine': 'Вино',
+    'theme.wine-dark': 'Вино · тёмная',
+    'theme.rust': 'Ржавчина',
+    'theme.rust-dark': 'Ржавчина · тёмная',
     'locale.group': 'Язык интерфейса',
 
     'intro.desktop': 'Программа читает текст на сканах и фотографиях ' +

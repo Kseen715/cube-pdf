@@ -1,120 +1,89 @@
 /* The typefaces come from the build (mk/fonts.mk puts them in fonts/).
    Without them the page falls back to the system's faces. */
 @font-face {
-    font-family: "IBM Plex Sans";
-    font-weight: 100 700;
+    font-family: "Oswald";
+    font-weight: 200 700;
     font-display: swap;
-    src: url("fonts/plex-sans-latin1.woff2") format("woff2");
-    unicode-range: U+0000, U+000D, U+0020-007E, U+00A0-00FF, U+0131,
-        U+0152-0153, U+02C6, U+02DA, U+02DC, U+2013-2014, U+2018-201A,
-        U+201C-201E, U+2020-2022, U+2026, U+2030, U+2039-203A, U+2044,
-        U+20AC, U+2122, U+2212, U+FB01-FB02;
+    src: url("fonts/oswald-latin.woff2") format("woff2");
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6,
+        U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122,
+        U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
 @font-face {
-    font-family: "IBM Plex Sans";
-    font-weight: 100 700;
+    font-family: "Oswald";
+    font-weight: 200 700;
     font-display: swap;
-    src: url("fonts/plex-sans-cyrillic.woff2") format("woff2");
-    unicode-range: U+0400-045F, U+0462-0463, U+046A-046B, U+0472-0475,
-        U+0490-04C2, U+04CF-04D9, U+04DC-04E9, U+04EE-04F9, U+0524-0525;
+    src: url("fonts/oswald-cyrillic.woff2") format("woff2");
+    unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
 }
 
 @font-face {
-    font-family: "IBM Plex Serif";
-    font-weight: 100 700;
+    font-family: "Manrope";
+    font-weight: 200 800;
     font-display: swap;
-    src: url("fonts/plex-serif-latin1.woff2") format("woff2");
-    unicode-range: U+0000, U+000D, U+0020-007E, U+00A0-00FF, U+0131,
-        U+0152-0153, U+02C6, U+02DA, U+02DC, U+2013-2014, U+2018-201A,
-        U+201C-201E, U+2020-2022, U+2026, U+2030, U+2039-203A, U+2044,
-        U+20AC, U+2122, U+2212, U+FB01-FB02;
+    src: url("fonts/manrope-latin.woff2") format("woff2");
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6,
+        U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122,
+        U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
 @font-face {
-    font-family: "IBM Plex Serif";
-    font-weight: 100 700;
+    font-family: "Manrope";
+    font-weight: 200 800;
     font-display: swap;
-    src: url("fonts/plex-serif-cyrillic.woff2") format("woff2");
-    unicode-range: U+0400-045F, U+0462-0463, U+046A-046B, U+0472-0475,
-        U+0490-04C2, U+04CF-04D9, U+04DC-04E9, U+04EE-04F9, U+0524-0525;
+    src: url("fonts/manrope-cyrillic.woff2") format("woff2");
+    unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
 }
 
-/* Ink on paper: no colour in the chrome. The one hue (--data) marks the
-   recognised pages; status colours appear only on finished files.
-   Every corner is square. */
+@font-face {
+    font-family: "JetBrains Mono";
+    font-weight: 100 800;
+    font-display: swap;
+    src: url("fonts/jetbrains-mono-latin.woff2") format("woff2");
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6,
+        U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122,
+        U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+    font-family: "JetBrains Mono";
+    font-weight: 100 800;
+    font-display: swap;
+    src: url("fonts/jetbrains-mono-cyrillic.woff2") format("woff2");
+    unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+
+/* The Kerasi look (kerasi.css holds its tokens): paper grounds, hairlines,
+   uppercase Oswald for headings and buttons, mono for labels and numbers,
+   one accent per theme. Corners are square; only filled elements get the
+   chamfer. */
 :root {
-    --ground: #f3f3f1;
-    --surface: #ffffff;
-    --raised: #ecece9;
-    --active: #e6e6e2;
-    --border: #e2e2de;
-    --rule: #eeeeeb;
-    --control: #b9b9b4;
-    --text: #121212;
-    --muted: #5d5d59;
-    --primary: #141414;
-    --primary-hover: #333333;
-    --on-primary: #ffffff;
-    --data: #1d5fbf;
-    --mark-top: #d3d3ce;
-    --mark-lines: #b9cdea;
-    --positive-bg: #dcfae5;
-    --positive-ink: #04250e;
-    --negative: #c4242a;
-    --negative-bg: #ffedea;
-    --negative-ink: #831c1e;
-    --check: url("data:image/svg+xml,%3Csvg \
-xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E\
-%3Cpath d='M3.5 8.5l3 3 6-7' fill='none' stroke='%23fff' \
-stroke-width='2'/%3E%3C/svg%3E");
+    /* Kerasi's status colours are too dark to read on its dark grounds */
+    --success: var(--status-success);
+    --danger: var(--status-danger);
 
-    --font-text: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
-    --font-head: "IBM Plex Serif", Georgia, "Times New Roman", serif;
-    --fs-head: 19px;
+    --fs-head: 20px;
     --fs-body: 15px;
     --fs-small: 13px;
+    --fs-label: 12px;
 
     /* The column: 1200 = (1fr) 816 + 24 gap + 360 settings */
     --column: 1200px;
-    --gutter: 32px;
+    --gutter: clamp(16px, 4vw, 32px);
     --gap: 24px;
     --pad: 24px;
     --settings: 360px;
     --row: 60px;
     --control-height: 36px;
     --cell: 8px;
-
-    color-scheme: light;
+    /* Kerasi's least touch target on phones */
+    --touch: 44px;
 }
 
-:root[data-theme="dark"] {
-    --ground: #0f0f0f;
-    --surface: #171717;
-    --raised: #222222;
-    --active: #2a2a2a;
-    --border: #2a2a2a;
-    --rule: #222222;
-    --control: #555555;
-    --text: #f2f2f2;
-    --muted: #b0b0b0;
-    --primary: #f2f2f2;
-    --primary-hover: #d0d0d0;
-    --on-primary: #111111;
-    --data: #6b9be6;
-    --mark-top: #4a4a4a;
-    --mark-lines: #b9cdea;
-    --positive-bg: #172a1d;
-    --positive-ink: #3fc07a;
-    --negative: #e5566f;
-    --negative-bg: #2c1a20;
-    --negative-ink: #e5566f;
-    --check: url("data:image/svg+xml,%3Csvg \
-xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E\
-%3Cpath d='M3.5 8.5l3 3 6-7' fill='none' stroke='%23111' \
-stroke-width='2'/%3E%3C/svg%3E");
-
-    color-scheme: dark;
+[data-theme$="-dark"] {
+    --success: color-mix(in srgb, var(--status-success) 55%, var(--fg-1));
+    --danger: color-mix(in srgb, var(--status-danger) 55%, var(--fg-1));
 }
 
 * {
@@ -123,25 +92,46 @@ stroke-width='2'/%3E%3C/svg%3E");
 
 body {
     margin: 0;
-    background: var(--ground);
-    color: var(--text);
-    font: var(--fs-body) / 1.55 var(--font-text);
+    background: var(--bg);
+    color: var(--fg-1);
+    font: var(--fs-body) / 1.6 var(--font-body);
+    -webkit-font-smoothing: antialiased;
 }
 
 h2 {
     margin: 0;
-    font-family: var(--font-head);
+    font-family: var(--font-display);
     font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
 }
 
 p {
     margin: 0;
 }
 
+a {
+    color: var(--accent-ink);
+    text-underline-offset: 3px;
+    text-decoration-thickness: 1px;
+}
+
+a:hover {
+    color: var(--fg-1);
+}
+
+::selection {
+    background: var(--accent-soft);
+    color: var(--fg-1);
+}
+
 button {
     font: inherit;
     color: inherit;
     cursor: pointer;
+    transition: background var(--dur-1) var(--ease-out),
+        color var(--dur-1) var(--ease-out),
+        border-color var(--dur-1) var(--ease-out);
 }
 
 button:disabled {
@@ -149,14 +139,14 @@ button:disabled {
 }
 
 :focus-visible {
-    outline: 2px solid var(--data);
+    outline: 2px solid var(--accent);
     outline-offset: 2px;
 }
 
 /* --- top bar --------------------------------------------------------- */
 
 .bar {
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--line);
 }
 
 .bar-inner,
@@ -171,38 +161,39 @@ main {
     align-items: center;
     justify-content: space-between;
     gap: 16px;
-    min-height: 56px;
+    min-height: 64px;
 }
 
 .brand {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
+    font-family: var(--font-display);
     font-weight: 600;
-    font-size: 16px;
-    letter-spacing: 0.02em;
+    font-size: 22px;
+    letter-spacing: 0.04em;
     white-space: nowrap;
 }
 
 .mark {
-    width: 22px;
-    height: 25px;
+    width: 24px;
+    height: 28px;
 }
 
 .mark-top {
-    fill: var(--mark-top);
+    fill: var(--line-strong);
 }
 
 .mark-left {
-    fill: var(--data);
+    fill: var(--accent);
 }
 
 .mark-right {
-    fill: var(--text);
+    fill: var(--fg-1);
 }
 
 .mark-lines {
-    fill: var(--mark-lines);
+    fill: var(--accent-soft);
 }
 
 .bar-controls {
@@ -210,88 +201,57 @@ main {
     gap: 12px;
 }
 
-.theme {
-    display: flex;
-}
-
-.theme button {
+.picker {
+    position: relative;
     display: flex;
     align-items: center;
     gap: 8px;
-    height: 32px;
+    height: var(--control-height);
     padding: 0 12px;
-    border: 1px solid var(--control);
-    background: transparent;
-    color: var(--muted);
-    font-size: var(--fs-small);
+    border: 1px solid var(--line-strong);
+    color: var(--fg-2);
+    font: 500 var(--fs-label) / 1 var(--font-mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    transition: border-color var(--dur-1) var(--ease-out),
+        color var(--dur-1) var(--ease-out);
 }
 
-.theme button + button {
-    margin-left: -1px;
+.picker:hover {
+    border-color: var(--fg-1);
+    color: var(--fg-1);
 }
 
-.theme button:hover {
-    color: var(--text);
-}
-
-.theme button[aria-pressed="true"] {
-    position: relative;
-    border-color: var(--text);
-    background: var(--text);
-    color: var(--surface);
-}
-
-.swatch {
-    width: 12px;
-    height: 12px;
-    border: 1.5px solid currentColor;
-}
-
-[data-theme-choice="dark"] .swatch {
-    background: currentColor;
-}
-
-[data-theme-choice="auto"] .swatch {
-    box-shadow: inset 5px 0 0 currentColor;
-}
-
-.locale {
-    position: relative;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    height: 32px;
-    padding: 0 12px;
-    border: 1px solid var(--control);
-    color: var(--muted);
-    font-size: var(--fs-small);
-    letter-spacing: 0.04em;
-}
-
-.locale:hover {
-    color: var(--text);
-}
-
-.locale:focus-within {
-    outline: 2px solid var(--data);
+.picker:focus-within {
+    outline: 2px solid var(--accent);
     outline-offset: 2px;
 }
 
-.locale svg {
+.picker svg {
     width: 14px;
     height: 14px;
     fill: none;
     stroke: currentColor;
-    stroke-width: 1.3;
+    stroke-width: 1.5;
 }
 
 /* invisible, but it is what is clicked and what reads the choice aloud */
-.locale select {
+.picker select {
     position: absolute;
     inset: 0;
     width: 100%;
     opacity: 0;
     cursor: pointer;
+}
+
+/* The accent of the theme on its ground */
+.swatch {
+    --chamfer: 4px;
+    width: 14px;
+    height: 14px;
+    background: var(--accent);
+    clip-path: var(--clip-chamfer);
 }
 
 /* --- title ----------------------------------------------------------- */
@@ -301,17 +261,13 @@ main {
 }
 
 .lede {
-    max-width: 68ch;
-    color: var(--muted);
-    font-size: 16px;
+    max-width: 62ch;
+    color: var(--fg-2);
+    font-size: 18px;
 }
 
 .lede + .lede {
     margin-top: 12px;
-}
-
-.lede a {
-    color: var(--text);
 }
 
 /* --- the two panels -------------------------------------------------- */
@@ -323,14 +279,14 @@ main {
 }
 
 .panel {
-    background: var(--surface);
-    border: 1px solid var(--border);
+    background: var(--bg-raised);
+    border: 1px solid var(--line);
     padding: var(--pad);
 }
 
 .panel h2 {
     font-size: var(--fs-head);
-    line-height: 1.3;
+    line-height: 1.2;
 }
 
 .text-button {
@@ -338,19 +294,19 @@ main {
     white-space: nowrap;
     border: none;
     background: none;
-    color: var(--text);
-    text-decoration: underline;
-    text-decoration-color: var(--control);
-    text-underline-offset: 3px;
+    color: var(--accent-ink);
+    font-family: var(--font-display);
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
 }
 
 .text-button:hover {
-    text-decoration-color: currentColor;
+    color: var(--fg-1);
 }
 
 .text-button:disabled {
-    color: var(--muted);
-    text-decoration: none;
+    color: var(--fg-3);
 }
 
 /* --- files ----------------------------------------------------------- */
@@ -369,10 +325,11 @@ main {
     padding-bottom: 16px;
 }
 
-.count {
-    color: var(--muted);
-    font-size: var(--fs-small);
-    font-variant-numeric: tabular-nums;
+.count,
+.version {
+    color: var(--fg-3);
+    font: var(--fs-label) var(--font-mono);
+    letter-spacing: 0.04em;
 }
 
 .panel-head .text-button {
@@ -399,12 +356,12 @@ main {
     min-height: var(--row);
     margin: 0 -8px;
     padding: 8px;
-    border-top: 1px solid var(--rule);
+    border-top: 1px solid var(--line);
     cursor: default;
 }
 
 .tasks li.selected {
-    background: var(--active);
+    background: var(--bg-sunken);
 }
 
 .task-name {
@@ -420,7 +377,7 @@ main {
 }
 
 .sub {
-    color: var(--muted);
+    color: var(--fg-3);
     font-size: var(--fs-small);
 }
 
@@ -429,8 +386,7 @@ main {
     align-items: center;
     gap: 12px;
     white-space: nowrap;
-    font-size: var(--fs-small);
-    font-variant-numeric: tabular-nums;
+    font: var(--fs-label) var(--font-mono);
 }
 
 .cells {
@@ -441,42 +397,46 @@ main {
 .cells i {
     width: var(--cell);
     height: var(--cell);
-    background: var(--raised);
-    outline: 1px solid var(--border);
+    background: var(--bg-sunken);
+    outline: 1px solid var(--line-strong);
     outline-offset: -1px;
 }
 
 .cells i.read {
-    background: var(--data);
+    background: var(--accent);
     outline: none;
 }
 
 .task-pages .none,
 .waiting .task-state,
 .cancelled .task-state {
-    color: var(--muted);
+    color: var(--fg-3);
 }
 
 .task-state {
-    font-size: var(--fs-small);
-    font-variant-numeric: tabular-nums;
+    font: var(--fs-label) var(--font-mono);
 }
 
+/* Kerasi's badge: mono capitals in a hairline box */
 .pill {
-    display: inline-block;
-    padding: 1px 8px;
+    display: inline-flex;
+    align-items: center;
+    height: 22px;
+    padding: 0 8px;
+    border: 1px solid currentColor;
+    font-size: 11px;
     font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
     white-space: nowrap;
 }
 
 .done .pill {
-    background: var(--positive-bg);
-    color: var(--positive-ink);
+    color: var(--success);
 }
 
 .failed .pill {
-    background: var(--negative-bg);
-    color: var(--negative-ink);
+    color: var(--danger);
 }
 
 .task-action {
@@ -489,27 +449,31 @@ main {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
     flex: 1;
     min-height: 320px;
     padding: 24px;
-    border: 1px dashed var(--control);
-    background: var(--ground);
+    border: 1px dashed var(--line-strong);
+    background: var(--bg-sunken);
     text-align: center;
 }
 
 .drop:hover {
-    border-color: var(--text);
+    border-color: var(--accent);
 }
 
 .drop-title {
-    font-family: var(--font-head);
-    font-size: 21px;
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 26px;
+    line-height: 1.1;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
 }
 
 .drop-more {
     max-width: 36ch;
-    color: var(--muted);
+    color: var(--fg-2);
 }
 
 /* Touch screens cannot drag files onto the page */
@@ -540,6 +504,10 @@ main {
 
 .has-files .drop-again {
     display: inline;
+    font-family: var(--font-display);
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
 }
 
 .panel-foot {
@@ -563,20 +531,20 @@ progress {
     width: 100%;
     height: 4px;
     border: none;
-    background: var(--raised);
-    color: var(--text);
+    background: var(--bg-sunken);
+    color: var(--accent);
 }
 
 progress::-webkit-progress-bar {
-    background: var(--raised);
+    background: var(--bg-sunken);
 }
 
 progress::-webkit-progress-value {
-    background: var(--text);
+    background: var(--accent);
 }
 
 progress::-moz-progress-bar {
-    background: var(--text);
+    background: var(--accent);
 }
 
 .files:not(.has-files) progress {
@@ -603,72 +571,91 @@ progress::-moz-progress-bar {
     align-items: flex-start;
     gap: 12px;
     padding: 10px 0;
-    border-top: 1px solid var(--rule);
+    border-top: 1px solid var(--line);
     cursor: pointer;
 }
 
 .choice:has(input:disabled) {
-    color: var(--muted);
+    color: var(--fg-3);
     cursor: default;
 }
 
 .note {
     padding-top: 10px;
-    border-top: 1px solid var(--rule);
-    color: var(--muted);
+    border-top: 1px solid var(--line);
+    color: var(--fg-3);
     font-size: var(--fs-small);
 }
 
 input[type="checkbox"] {
     appearance: none;
+    display: grid;
+    place-content: center;
     flex: none;
     width: 18px;
     height: 18px;
     margin: 3px 0 0;
-    border: 1.5px solid var(--control);
-    background: var(--surface);
+    border: 1px solid var(--line-strong);
+    background: var(--bg-raised);
     cursor: inherit;
+    transition: background var(--dur-1) var(--ease-out);
+}
+
+/* The tick, drawn in the theme's colour on the accent */
+input[type="checkbox"]::before {
+    content: "";
+    width: 12px;
+    height: 12px;
+    background: var(--accent-fg);
+    clip-path: polygon(10% 52%, 0 64%, 38% 98%, 100% 18%, 88% 6%,
+        37% 74%);
+    visibility: hidden;
 }
 
 input[type="checkbox"]:hover:enabled {
-    border-color: var(--text);
+    border-color: var(--fg-1);
 }
 
 input[type="checkbox"]:checked {
-    border-color: var(--text);
-    background: var(--text) var(--check) center / 14px no-repeat;
+    border-color: var(--accent);
+    background: var(--accent);
+}
+
+input[type="checkbox"]:checked::before {
+    visibility: visible;
 }
 
 input[type="checkbox"]:disabled {
-    opacity: 0.6;
+    opacity: 0.5;
 }
 
+/* Kerasi's primary button: an accent block with a cut corner */
 .start {
-    height: 52px;
-    border: 1px solid var(--primary);
-    background: var(--primary);
-    color: var(--on-primary);
-    font-weight: 600;
-    font-size: 16px;
+    height: 54px;
+    border: none;
+    background: var(--accent);
+    color: var(--accent-fg);
+    clip-path: var(--clip-chamfer);
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 18px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
 }
 
 .start:hover {
-    border-color: var(--primary-hover);
-    background: var(--primary-hover);
-}
-
-.start:active {
-    transform: translateY(1px);
+    background: var(--accent-hover);
 }
 
 .start.running {
-    border-color: var(--negative);
+    border: 1px solid var(--danger);
     background: transparent;
-    color: var(--negative);
+    color: var(--danger);
+    clip-path: none;
 }
 
 .start.running:hover {
-    background: var(--negative-bg);
+    background: color-mix(in srgb, var(--danger) 10%, transparent);
 }
 
 /* While an update downloads (app.js) */
@@ -688,11 +675,6 @@ input[type="checkbox"]:disabled {
     font-size: var(--fs-small);
 }
 
-.version {
-    color: var(--muted);
-    font-variant-numeric: tabular-nums;
-}
-
 .release {
     display: flex;
     align-items: center;
@@ -701,18 +683,20 @@ input[type="checkbox"]:disabled {
 
 /* Shown next to the version when a newer release is out (update.js) */
 .update {
+    --chamfer: 6px;
     display: grid;
     place-items: center;
-    width: 24px;
-    height: 24px;
+    width: 26px;
+    height: 26px;
     padding: 0;
     border: none;
-    background: var(--primary);
-    color: var(--on-primary);
+    background: var(--accent);
+    color: var(--accent-fg);
+    clip-path: var(--clip-chamfer);
 }
 
 .update:hover {
-    background: var(--primary-hover);
+    background: var(--accent-hover);
 }
 
 .update[hidden] {
@@ -724,22 +708,25 @@ input[type="checkbox"]:disabled {
     height: 16px;
     fill: none;
     stroke: currentColor;
-    stroke-width: 1.6;
+    stroke-width: 1.75;
+    stroke-linecap: square;
 }
 
 /* --- dialogs --------------------------------------------------------- */
 
 dialog {
+    --chamfer: var(--chamfer-lg);
     max-width: min(560px, calc(100vw - 32px));
-    padding: 24px;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    color: var(--text);
-    box-shadow: 0 16px 48px rgb(0 0 0 / 0.18);
+    padding: 28px;
+    border: none;
+    background: var(--bg-raised);
+    color: var(--fg-1);
+    clip-path: var(--clip-chamfer);
 }
 
 dialog::backdrop {
-    background: rgb(0 0 0 / 0.4);
+    background: color-mix(in srgb, var(--fg-1) 35%, transparent);
+    backdrop-filter: blur(6px);
 }
 
 dialog.wide {
@@ -748,14 +735,17 @@ dialog.wide {
 }
 
 dialog h3 {
-    margin: 0 0 12px;
-    font-family: var(--font-head);
-    font-size: var(--fs-head);
+    margin: 0 0 16px;
+    font-family: var(--font-display);
+    font-size: 28px;
     font-weight: 500;
+    line-height: 1.05;
+    text-transform: uppercase;
 }
 
 .dialog-body {
     white-space: pre-line;
+    color: var(--fg-2);
 }
 
 /* Plain messages keep their line breaks; the About text is HTML */
@@ -767,8 +757,8 @@ dialog h3 {
     margin: 0 0 10px;
 }
 
-.dialog-body a {
-    color: var(--text);
+.dialog-body b {
+    color: var(--fg-1);
 }
 
 dialog details {
@@ -777,14 +767,18 @@ dialog details {
 
 dialog summary {
     cursor: pointer;
+    font: var(--fs-label) var(--font-mono);
+    letter-spacing: var(--tracking-overline);
+    text-transform: uppercase;
+    color: var(--fg-3);
 }
 
 dialog pre {
     max-height: 60vh;
     overflow: auto;
-    background: var(--raised);
+    background: var(--bg-sunken);
     padding: 12px;
-    font: 13px/1.4 Consolas, "DejaVu Sans Mono", monospace;
+    font: 12px / 1.5 var(--font-mono);
     white-space: pre-wrap;
 }
 
@@ -792,19 +786,25 @@ dialog pre {
     display: flex;
     justify-content: flex-end;
     flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 20px;
+    gap: 10px;
+    margin-top: 24px;
 }
 
+/* Kerasi's secondary button: an ink outline that fills on hover */
 .dialog-buttons button {
-    height: var(--control-height);
-    padding: 0 16px;
-    border: 1px solid var(--control);
-    background: var(--surface);
+    height: 42px;
+    padding: 0 20px;
+    border: 1px solid var(--fg-1);
+    background: transparent;
+    font-family: var(--font-display);
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
 }
 
 .dialog-buttons button:hover {
-    border-color: var(--text);
+    background: var(--fg-1);
+    color: var(--bg);
 }
 
 /* --- narrow windows -------------------------------------------------- */
@@ -842,7 +842,8 @@ dialog pre {
     }
 }
 
-@media (max-width: 960px) {
+/* Kerasi's tablets and phones: the settings drop below the files */
+@media (max-width: 1023px) {
     .layout {
         grid-template-columns: minmax(0, 1fr);
     }
@@ -852,33 +853,22 @@ dialog pre {
     }
 }
 
-@media (max-width: 640px) {
+@media (max-width: 639px) {
     :root {
-        --gutter: 16px;
         --pad: 16px;
+        --control-height: var(--touch);
     }
 
-    .theme .label {
-        position: absolute;
-        width: 1px;
-        height: 1px;
-        overflow: hidden;
-        clip-path: inset(50%);
-    }
-
-    .theme button {
-        width: 44px;
-        height: 36px;
-        justify-content: center;
+    .theme-name {
+        display: none;
     }
 
     .bar-controls {
         gap: 8px;
     }
 
-    .locale {
-        height: 36px;
-        padding: 0 10px;
+    .picker {
+        padding: 0 11px;
     }
 
     .locale svg {
@@ -889,11 +879,34 @@ dialog pre {
         padding: 24px 0 20px;
     }
 
+    .lede {
+        font-size: 16px;
+    }
+
     .drop {
         min-height: 200px;
     }
 
+    .text-button {
+        min-height: var(--touch);
+    }
+
+    /* Kerasi's bottom sheet, its main button on top */
+    dialog,
+    dialog.wide {
+        width: 100%;
+        max-width: 100%;
+        max-height: 88vh;
+        margin: auto 0 0;
+        overflow-y: auto;
+        padding: 24px 16px calc(16px + env(safe-area-inset-bottom));
+    }
+
     .dialog-buttons {
-        flex-direction: column;
+        flex-direction: column-reverse;
+    }
+
+    .dialog-buttons button {
+        height: var(--touch);
     }
 }

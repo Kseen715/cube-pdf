@@ -62,26 +62,31 @@ TESSDATA_osd_SHA256 := \
 # Compiled into the programs; every release attaches these tarballs
 SOURCE_PACKAGES := TESSERACT LEPTONICA MUPDF GHOSTSCRIPT ZLIB
 
-# The typefaces of the window (SIL OFL 1.1). Each zip has the fonts split
-# into script subsets; *_WOFF2 is the path of one subset inside the zip,
-# without its "-<subset>.woff2" ending.
-PLEX_HOME := $(GH)/IBM/plex
-PLEX_RELEASES := $(PLEX_HOME)/releases/download
+# The typefaces of the window (SIL OFL 1.1), as Fontsource packs them for
+# npm: each tarball holds the variable font split into script subsets,
+# files/<name>-<subset>-wght-normal.woff2, and the font's LICENSE.
+# *_HOME is the font's own project.
+FONTSOURCE := https://registry.npmjs.org/@fontsource-variable
 
-PLEX_SANS_VERSION := 0.2.0
-PLEX_SANS_TAG := %40ibm%2Fplex-sans-variable%40$(PLEX_SANS_VERSION)
-PLEX_SANS_FILE := plex-sans-variable-$(PLEX_SANS_VERSION).zip
-PLEX_SANS_URL := $(PLEX_RELEASES)/$(PLEX_SANS_TAG)/plex-sans-variable.zip
-PLEX_SANS_SHA256 := \
-    f83825d527be6cd39c8971c932b9bf22688a3ad3e5ac6305b6143d02f52b87b6
-PLEX_SANS_WOFF2 := fonts/split/woff2/IBM Plex Sans Var-Roman
+OSWALD_VERSION := 5.3.0
+OSWALD_FILE := oswald-$(OSWALD_VERSION).tgz
+OSWALD_URL := $(FONTSOURCE)/oswald/-/$(OSWALD_FILE)
+OSWALD_SHA256 := \
+    962bdb468592daece384e9e32d90eb84344301135488ff7adabff88443da6700
+OSWALD_HOME := $(GH)/googlefonts/OswaldFont
 
-PLEX_SERIF_VERSION := 2.0.0
-PLEX_SERIF_TAG := %40ibm%2Fplex-serif-variable%40$(PLEX_SERIF_VERSION)
-PLEX_SERIF_FILE := plex-serif-variable-$(PLEX_SERIF_VERSION).zip
-PLEX_SERIF_URL := $(PLEX_RELEASES)/$(PLEX_SERIF_TAG)/plex-serif-variable.zip
-PLEX_SERIF_SHA256 := \
-    87282fe6f7aa3c26149d8b4b709e035d0be2a9124b859e68d8046d8e786d9d30
-PLEX_SERIF_WOFF2 := plex-serif-variable/split/woff2/IBM Plex Serif Var-Roman
+MANROPE_VERSION := 5.3.0
+MANROPE_FILE := manrope-$(MANROPE_VERSION).tgz
+MANROPE_URL := $(FONTSOURCE)/manrope/-/$(MANROPE_FILE)
+MANROPE_SHA256 := \
+    9629a2474e2bd73944d83392c856e268193d42c3954455bd6adb3d1ea74aa27a
+MANROPE_HOME := $(GH)/sharanda/manrope
 
-FONT_PACKAGES := PLEX_SANS PLEX_SERIF
+JETBRAINS_MONO_VERSION := 5.3.0
+JETBRAINS_MONO_FILE := jetbrains-mono-$(JETBRAINS_MONO_VERSION).tgz
+JETBRAINS_MONO_URL := $(FONTSOURCE)/jetbrains-mono/-/$(JETBRAINS_MONO_FILE)
+JETBRAINS_MONO_SHA256 := \
+    996fe6368a480c9ce15d4de22a2682b7c40b403718fee2b15e7272f244fd993f
+JETBRAINS_MONO_HOME := $(GH)/JetBrains/JetBrainsMono
+
+FONT_PACKAGES := OSWALD MANROPE JETBRAINS_MONO

@@ -31,7 +31,7 @@ first visit it also downloads about 70 MB of language models, which the browser 
 | [Ghostscript](https://ghostscript.com) | 10.08.0 | PDF/A-2b |
 | [zlib](https://zlib.net) | 1.3.2 | compression |
 | [Tauri](https://tauri.app) | 2.12 | the app window (WebView2 on Windows, WebKitGTK on Linux, Android System WebView) |
-| [IBM Plex](https://github.com/IBM/plex) Sans and Serif | 0.2.0, 2.0.0 | the typefaces of the window |
+| [Oswald](https://github.com/googlefonts/OswaldFont), [Manrope](https://github.com/sharanda/manrope), [JetBrains Mono](https://github.com/JetBrains/JetBrainsMono) | [Fontsource](https://fontsource.org) 5.3.0 | the typefaces of the window |
 
 `deps/versions.mk` pins every source tarball by SHA-256. The full list, with the libraries
 MuPDF and Ghostscript bundle, is in each build's `THIRD-PARTY-NOTICES.txt`.
@@ -41,7 +41,8 @@ MuPDF and Ghostscript bundle, is in each build's `THIRD-PARTY-NOTICES.txt`.
 ```text
 web/            the window: HTML/CSS/JS, the same page everywhere
   js/app.js        file list, options, progress, dialogs
-  js/theme.js      light, dark or the system's theme
+  kerasi.css       the six themes and tokens of the Kerasi design system
+  js/theme.js      the chosen theme; until then Sakura, light or dark
   js/i18n.js       the interface language; js/locales/ holds the texts
   js/engine-desktop.js   runs ocr-pdf-core through Tauri (desktop)
   js/engine-android.js   runs ocr-pdf-core through the app's commands (Android)

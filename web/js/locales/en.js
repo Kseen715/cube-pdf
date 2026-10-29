@@ -2,9 +2,12 @@
 
 export default {
     'theme.group': 'Colour theme',
-    'theme.light': 'Light',
-    'theme.dark': 'Dark',
-    'theme.auto': 'System',
+    'theme.sakura': 'Sakura',
+    'theme.sakura-dark': 'Sakura · Dark',
+    'theme.wine': 'Wine',
+    'theme.wine-dark': 'Wine · Dark',
+    'theme.rust': 'Rust',
+    'theme.rust-dark': 'Rust · Dark',
     'locale.group': 'Interface language',
 
     'intro.desktop': 'The program reads the text on scans and photos of ' +

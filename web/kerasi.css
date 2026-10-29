@@ -1,0 +1,132 @@
+/* The tokens of the Kerasi design system (tokens/themes.css, palette.css,
+   typography.css and spacing.css there), which app.css builds on. Six
+   themes, three families in light and dark; js/theme.js sets one as
+   <html data-theme>. Copy changes from Kerasi here, not into app.css. */
+
+:root,
+[data-theme="sakura"] {
+    --bg: #f9f0ec;
+    --bg-raised: #fffaf8;
+    --bg-sunken: #f3e4de;
+    --fg-1: #2a1712;
+    --fg-2: #5e4038;
+    --fg-3: #8c6e64;
+    --line: #e8d6cf;
+    --line-strong: #c9afa5;
+    --accent: #ac2937;
+    --accent-hover: #8a1f2b;
+    --accent-fg: #fff6f2;
+    --accent-soft: #f7d9de;
+    --accent-ink: #ac2937;
+}
+
+[data-theme="sakura-dark"] {
+    --bg: #171514;
+    --bg-raised: #201d1b;
+    --bg-sunken: #121110;
+    --fg-1: #f2ece8;
+    --fg-2: #c9bdb7;
+    --fg-3: #8f837d;
+    --line: #302b28;
+    --line-strong: #4a433f;
+    --accent: #f58aa0;
+    --accent-hover: #ffa3b6;
+    --accent-fg: #1e1a18;
+    --accent-soft: #3d2329;
+    --accent-ink: #ff9cb0;
+}
+
+[data-theme="wine"] {
+    --bg: #f4efe6;
+    --bg-raised: #fbf8f2;
+    --bg-sunken: #eae2d3;
+    --fg-1: #191716;
+    --fg-2: #4a4240;
+    --fg-3: #7a706b;
+    --line: #ddd3c2;
+    --line-strong: #bbaa8e;
+    --accent: #773344;
+    --accent-hover: #5a2433;
+    --accent-fg: #f4efe6;
+    --accent-soft: #ebd9dd;
+    --accent-ink: #773344;
+}
+
+[data-theme="wine-dark"] {
+    --bg: #191716;
+    --bg-raised: #221f1d;
+    --bg-sunken: #121110;
+    --fg-1: #f4efe6;
+    --fg-2: #cfc5b4;
+    --fg-3: #8e857c;
+    --line: #332e2b;
+    --line-strong: #4e4641;
+    --accent: #eec567;
+    --accent-hover: #f7d688;
+    --accent-fg: #191716;
+    --accent-soft: #2c2719;
+    --accent-ink: #f2cd76;
+}
+
+[data-theme="rust"] {
+    --bg: #eef0f1;
+    --bg-raised: #f8f9f9;
+    --bg-sunken: #e1e4e6;
+    --fg-1: #20252b;
+    --fg-2: #46505a;
+    --fg-3: #6f7882;
+    --line: #d3d7da;
+    --line-strong: #a9afb4;
+    --accent: #b7472a;
+    --accent-hover: #8f3620;
+    --accent-fg: #f8f9f9;
+    --accent-soft: #f5ded6;
+    --accent-ink: #a03d23;
+}
+
+[data-theme="rust-dark"] {
+    --bg: #20252b;
+    --bg-raised: #282e35;
+    --bg-sunken: #1a1e23;
+    --fg-1: #eef0f1;
+    --fg-2: #bfc4c7;
+    --fg-3: #858d95;
+    --line: #353c44;
+    --line-strong: #4e5761;
+    --accent: #b7472a;
+    --accent-hover: #c9532f;
+    --accent-fg: #f8f9f9;
+    --accent-soft: #3a2a26;
+    --accent-ink: #e0603f;
+}
+
+:root {
+    color-scheme: light;
+
+    --status-success: #4f7a4a;
+    --status-danger: #b3262f;
+
+    --font-display: "Oswald", "Arial Narrow", sans-serif;
+    --font-body: "Manrope", "Helvetica Neue", sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, monospace;
+    --tracking-overline: 0.14em;
+
+    --chamfer: 10px;
+    --chamfer-lg: 18px;
+    --shadow-pop: 0 18px 40px -18px rgb(25 23 22 / 0.35);
+    --ease-out: cubic-bezier(0.2, 0.7, 0.1, 1);
+    --dur-1: 120ms;
+    --dur-2: 220ms;
+}
+
+/* The signature 45° corner cut. Declared on every element, so that a
+   --chamfer set on one changes its cut. */
+* {
+    --clip-chamfer: polygon(var(--chamfer) 0, 100% 0,
+        100% calc(100% - var(--chamfer)), calc(100% - var(--chamfer)) 100%,
+        0 100%, 0 var(--chamfer));
+}
+
+[data-theme$="-dark"] {
+    color-scheme: dark;
+}

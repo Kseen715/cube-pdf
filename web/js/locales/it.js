@@ -2,9 +2,12 @@
 
 export default {
     'theme.group': 'Tema',
-    'theme.light': 'Chiaro',
-    'theme.dark': 'Scuro',
-    'theme.auto': 'Come il sistema',
+    'theme.sakura': 'Sakura',
+    'theme.sakura-dark': 'Sakura · Scuro',
+    'theme.wine': 'Vino',
+    'theme.wine-dark': 'Vino · Scuro',
+    'theme.rust': 'Ruggine',
+    'theme.rust-dark': 'Ruggine · Scuro',
     'locale.group': 'Lingua dell’interfaccia',
 
     'intro.desktop': 'Il programma legge il testo di scansioni e foto di ' +

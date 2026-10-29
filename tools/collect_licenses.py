@@ -141,9 +141,15 @@ def components(v: dict[str, str]) -> list[Component]:
     def attached(package: str) -> str:
         return f'{v[package + "_FILE"]}, attached to every release'
 
-    def font_license(package: str, folder: str) -> str:
-        subsets = v[package + '_WOFF2'].rsplit('/', 1)[0]
-        return f'src:{folder}/{subsets}/license.txt'
+    def font(name: str, package: str, use: str) -> Component:
+        folder = package.lower().replace('_', '-')
+        return Component(
+            f'{name}, the typeface of {use}',
+            f'{v[package + "_VERSION"]} (Fontsource)',
+            'OFL-1.1',
+            [f'src:{folder}/LICENSE'],
+            v[package + '_HOME'],
+        )
 
     both = 'compiled into MuPDF and Ghostscript'
     return [
@@ -245,20 +251,9 @@ def components(v: dict[str, str]) -> list[Component]:
             ['src:ghostscript/extract/COPYING'],
             'part of the Ghostscript sources',
         ),
-        Component(
-            'IBM Plex Sans, the typeface of the window',
-            v['PLEX_SANS_VERSION'],
-            'OFL-1.1',
-            [font_license('PLEX_SANS', 'plex-sans')],
-            v['PLEX_HOME'],
-        ),
-        Component(
-            'IBM Plex Serif, the typeface of the headings',
-            v['PLEX_SERIF_VERSION'],
-            'OFL-1.1',
-            [font_license('PLEX_SERIF', 'plex-serif')],
-            v['PLEX_HOME'],
-        ),
+        font('Oswald', 'OSWALD', 'the headings'),
+        font('Manrope', 'MANROPE', 'the window'),
+        font('JetBrains Mono', 'JETBRAINS_MONO', 'labels and logs'),
         Component(
             'GCC runtime libraries (libstdc++, libgcc), linked statically',
             compiler_version(os.environ.get('CXX', 'g++')),
@@ -496,7 +491,7 @@ later (see LICENSE). Its source code, the build scripts and this file are at
 {programs} contain the third-party components listed below,
 each under its own license. The full license texts follow the list. Every
 component is built from the source tarball named in deps/versions.mk, or,
-for the fonts, taken from the release archive named there. Their exact
+for the fonts, taken from the Fontsource package named there. Their exact
 source code, of the (A)GPL ones in particular, is attached to every GitHub
 release of CUBE-PDF. Small patches (deps/patches) only make the sources
 build for some targets, without changing what the programs do: Tesseract's

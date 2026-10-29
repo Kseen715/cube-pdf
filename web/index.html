@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>CUBE-PDF</title>
 <link rel="icon" href="icon.png">
+<link rel="stylesheet" href="kerasi.css">
 <link rel="stylesheet" href="app.css">
 <script src="js/theme.js"></script>
 <script type="module" src="js/app.js"></script>
@@ -24,19 +25,20 @@
       CUBE-PDF
     </span>
     <div class="bar-controls">
-      <div class="theme" role="group" data-i18n-label="theme.group">
-        <button type="button" data-theme-choice="light">
-          <span class="swatch" aria-hidden="true"></span>
-          <span class="label" data-i18n="theme.light"></span></button>
-        <button type="button" data-theme-choice="dark">
-          <span class="swatch" aria-hidden="true"></span>
-          <span class="label" data-i18n="theme.dark"></span></button>
-        <button type="button" data-theme-choice="auto">
-          <span class="swatch" aria-hidden="true"></span>
-          <span class="label" data-i18n="theme.auto"></span></button>
-      </div>
-      <!-- a native list over the button, so every platform picks well -->
-      <label class="locale">
+      <!-- native lists over small labels, so every platform picks well -->
+      <label class="picker">
+        <span class="swatch" aria-hidden="true"></span>
+        <span id="theme-name" class="theme-name" aria-hidden="true"></span>
+        <select id="theme" data-i18n-label="theme.group">
+          <option value="sakura" data-i18n="theme.sakura"></option>
+          <option value="sakura-dark" data-i18n="theme.sakura-dark"></option>
+          <option value="wine" data-i18n="theme.wine"></option>
+          <option value="wine-dark" data-i18n="theme.wine-dark"></option>
+          <option value="rust" data-i18n="theme.rust"></option>
+          <option value="rust-dark" data-i18n="theme.rust-dark"></option>
+        </select>
+      </label>
+      <label class="picker locale">
         <svg viewBox="0 0 16 16" aria-hidden="true">
           <circle cx="8" cy="8" r="6"/>
           <path d="M2 8h12M8 2c-2.2 2.4-2.2 9.6 0 12M8 2c2.2 2.4 2.2 9.6 0
